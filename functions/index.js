@@ -2,13 +2,8 @@ const { onRequest } = require('firebase-functions/v2/https');
 const logger = require('firebase-functions/logger');
 const admin = require('firebase-admin');
 
-// Use service account credentials to authenticate with Firebase Admin
-const serviceAccount = require('./service-account.json');
-
-// Initialize Firebase Admin
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// Initialize Firebase Admin with the runtime's default credentials
+admin.initializeApp();
 
 // Firebase HTTP Function for sending a notification
 exports.sendNotification = onRequest(async (request, response) => {
