@@ -1,0 +1,118 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons *ngIf="showButtons" slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Search Settings</ion-title>
+    <ion-buttons *ngIf="showButtons" slot="end">
+      <ion-button color="dark" (click)="save()"> Save </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="theme-card-wrapper bottom-space">
+    <div class="search-filter ion-padding">
+      <h3 class="header-title">
+        Age / {{ filters?.ageRange?.value.lower || this.minAge }} -
+        {{
+          (filters?.ageRange?.value.upper || this.maxAge) > 65
+            ? '65+'
+            : filters?.ageRange?.value.upper || this.maxAge
+        }}
+      </h3>
+
+      <ion-item lines="none" class="age-range">
+        <ion-range
+          dualKnobs="true"
+          min="18"
+          max="66"
+          snaps="true"
+          ticks="false"
+          [value]="filters?.ageRange?.value || { lower: 18, upper: 66 }"
+          (ionChange)="onAgeRangeChanged($event)"
+        >
+        </ion-range>
+      </ion-item>
+    </div>
+
+    <div class="search-filter ion-padding">
+      <h3 class="header-title">
+        Radius /
+        {{
+          (filters?.radius?.value || this.maxRadius) > 50
+            ? '50+'
+            : filters?.radius?.value || this.maxRadius
+        }}
+        Miles
+      </h3>
+
+      <ion-item lines="none" class="age-range">
+        <ion-range
+          min="0.1"
+          max="51"
+          snaps="true"
+          ticks="false"
+          [value]="filters?.radius?.value || maxRadius"
+          (ionChange)="onRadiusRangeChanged($event)"
+        ></ion-range>
+      </ion-item>
+    </div>
+    <div class="ion-padding">
+      <div class="outer-border text-input-wrapper p-relative mb-0">
+        <ion-item lines="none">
+          <ion-label position="floating">
+            <span>Update Current Location</span>
+          </ion-label>
+          <div class="update-location" (click)="updateLocation()">
+            <ion-icon color="light" name="locate"></ion-icon>
+          </div>
+        </ion-item>
+      </div>
+      <!-- <div class="outer-border text-input-wrapper p-relative last-child-space">
+                <ion-item lines="none">
+                    <ion-label position="floating">
+                        <span>Gender</span>
+                    </ion-label>
+                    <ion-select (ionChange)="onGenderSegmentChanged($event)" [value]="filters?.gender?.value" placeholder="Select Gender">
+                        <ion-select-option value="male">Male</ion-select-option>
+                        <ion-select-option value="female">Female</ion-select-option>
+                        <ion-select-option value="both">Both</ion-select-option>
+                    </ion-select>
+                </ion-item>
+            </div> -->
+    </div>
+    <div class="ion-padding">
+      <div class="search-filter d-flex ion-justify-content-between">
+        <h3 class="header-title c-width">Gender</h3>
+
+        <ion-button
+          class="theme-card-wrapper c-theme-card-wrapper"
+          [ngClass]="filters.gender == Gender.MALE ? 'selected' : ''"
+          fill="clear"
+          (click)="onGenderSegmentChanged(Gender.MALE)"
+        >
+          <ion-label> Male </ion-label>
+        </ion-button>
+        <ion-button
+          class="theme-card-wrapper c-theme-card-wrapper"
+          [ngClass]="filters.gender == Gender.FEMALE ? 'selected' : ''"
+          fill="clear"
+          (click)="onGenderSegmentChanged(Gender.FEMALE)"
+        >
+          <ion-label> Female </ion-label>
+        </ion-button>
+        <ion-button
+          class="theme-card-wrapper c-theme-card-wrapper"
+          [ngClass]="filters.gender == 'both' ? 'selected' : ''"
+          fill="clear"
+          (click)="onGenderSegmentChanged('both')"
+        >
+          <ion-label> Both </ion-label>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

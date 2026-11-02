@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Search Friends</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="search-container">
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionChange)="onSearchChange($event)"
+      placeholder="Enter Nickname"
+      debounce="300"
+    ></ion-searchbar>
+  </div>
+
+  <ng-container *ngIf="!searchQuery || searchQuery.trim().length === 0">
+    <div class="empty-state">
+      <ion-text color="medium">
+        <p>Enter Nickname to start searching</p>
+      </ion-text>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="searchQuery && searchQuery.trim().length > 0">
+    <div *ngIf="isSearching" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <ng-container *ngIf="!isSearching && searchResults.length === 0">
+      <div class="empty-state">
+        <ion-text color="medium">
+          <p>No users found</p>
+        </ion-text>
+      </div>
+    </ng-container>
+
+    <ion-list
+      [inset]="true"
+      class="ion-no-padding list"
+      *ngIf="!isSearching && searchResults.length > 0"
+    >
+      <ion-item *ngFor="let user of searchResults">
+        <ion-avatar slot="start">
+          <img
+            [src]="
+              user?.photos?.length > 0
+                ? user?.photos[user?.photos?.length - 1]
+                : './../../../assets/images/palm-tree.png'
+            "
+            onerror="this.src = './../../../assets/images/palm-tree.png'"
+            alt=""
+          />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ user.displayName }}</h2>
+          <p>@{{ user.username }}</p>
+        </ion-label>
+        <ion-button
+          class="from-contact-button"
+          fill="outline"
+          color="primary"
+          (click)="addAsFriend(user)"
+          *ngIf="!user.isInChats"
+        >
+          <ion-icon name="person-add-outline"></ion-icon>
+          Add Friend
+        </ion-button>
+        <ion-button
+          class="from-contact-button"
+          fill="outline"
+          color="medium"
+          disabled
+          *ngIf="user.isInChats"
+        >
+          <ion-icon name="checkmark-outline"></ion-icon>
+          Friends
+        </ion-button>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button expand="block" (click)="dismiss()">Close</ion-button>
+  </ion-toolbar>
+</ion-footer>

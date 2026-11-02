@@ -1,0 +1,129 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" *ngIf="activeSection === 'account'" class="back-btn-bg">
+      <ion-button (click)="activeSection = 'notifications'" color="dark" text="">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title mode="ios"
+      >{{ activeSection === 'account' ? 'Account Settings' : 'Settings' }}</ion-title
+    >
+  </ion-toolbar>
+</ion-header>
+
+<!-- TODO:: Need to use modals for accounts settings instead of section wise-->
+
+<div class="settings">
+  <ion-content>
+    <!-- MAIN SETTINGS: Notification toggles + Account Settings btn -->
+    <ng-container *ngIf="activeSection === 'notifications'">
+      <ion-list class="form-list theme-card-settings">
+        <ion-item class="card-box-heading" lines="none" style="padding-left: 0 !important">
+          <ion-label class="ion-text-center">
+            <h1>Notify me when...</h1>
+          </ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label class="c-label">Friend Requested</ion-label>
+          <ion-toggle
+            [ngModel]="pushNotificationSettings?.messagesRequested"
+            (ionChange)="updateUserSettingsForMessageRequested($event)"
+          ></ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label class="c-label">Message Received</ion-label>
+          <ion-toggle
+            [ngModel]="pushNotificationSettings?.messagesReceived"
+            (ionChange)="updateUserSettingsForMessageReceived($event)"
+          ></ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label class="c-label">Group Message Received</ion-label>
+          <ion-toggle
+            [ngModel]="pushNotificationSettings?.groupMessage"
+            (ionChange)="updateUserSettingsForGroupMessage($event)"
+          ></ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label class="c-label">A Top 5 is Ready Now</ion-label>
+          <ion-toggle
+            [ngModel]="pushNotificationSettings?.timerFromTop20Contacts"
+            (ionChange)="updateUserSettingsForTimerFromTop20Contacts($event)"
+          ></ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label class="c-label">Challenge Received</ion-label>
+          <ion-toggle
+            [ngModel]="pushNotificationSettings?.proGameRequest"
+            (ionChange)="updateUserSettingsForProGameRequest($event)"
+          ></ion-toggle>
+        </ion-item>
+      </ion-list>
+      <ion-button class="signout-btn footer-btn" expand="block" (click)="displayFromContacts()">
+        Add Friends From Contacts
+      </ion-button>
+      <ion-button class="delete-btn footer-btn" expand="block" (click)="activeSection = 'account'">
+        Account Settings
+      </ion-button>
+    </ng-container>
+
+    <!-- ACCOUNT SETTINGS: social + buttons at bottom -->
+    <ng-container *ngIf="activeSection === 'account'">
+      <ion-row>
+        <ion-col size="12">
+          <div class="profile-image">
+            <img src="../../assets/images/palm-tree.png" />
+          </div>
+        </ion-col>
+        <ion-col size="12">
+          <div class="ion-text-center text-big">
+            Enjoying the app? Email your thoughts! What do you want to see in the next version?
+          </div>
+          <ion-row>
+            <ion-col size="3" class="ion-text-end text-light">Email:</ion-col>
+            <ion-col size="9" class="ion-text-bold"
+              ><a href="mailto: info@wannahangtime.app">info@wannahangtime.app</a></ion-col
+            >
+          </ion-row>
+          <div class="ion-text-bold ion-text-center w-100 text-big bottom-space-extra">
+            Follow us!
+          </div>
+          <ion-row>
+            <ion-col size="5" class="ion-text-end text-light">Facebook:</ion-col>
+            <ion-col size="7" class="ion-text-bold"
+              ><a href="https://www.facebook.com/HangTime-109369428475912" target="_blank"
+                >@wannahangtime</a
+              ></ion-col
+            >
+          </ion-row>
+          <ion-row>
+            <ion-col size="5" class="ion-text-end text-light">Instagram:</ion-col>
+            <ion-col size="7" class="ion-text-bold"
+              ><a href="https://www.instagram.com/wannahangtime/" target="_blank"
+                >@wannahangtime</a
+              ></ion-col
+            >
+          </ion-row>
+          <ion-row>
+            <ion-col size="5" class="ion-text-end text-light">Twitter:</ion-col>
+            <ion-col size="7" class="ion-text-bold"
+              ><a href="https://twitter.com/wannahangtime" target="_blank"
+                >@wannahangtime</a
+              ></ion-col
+            >
+          </ion-row>
+        </ion-col>
+      </ion-row>
+      <ion-button class="signout-btn footer-btn" (click)="signOut()" expand="block">
+        Sign Out
+      </ion-button>
+      <ion-button
+        class="delete-btn footer-btn"
+        expand="block"
+        (click)="presentAlertMultipleButtons()"
+      >
+        Delete Account
+      </ion-button>
+    </ng-container>
+  </ion-content>
+</div>

@@ -1,0 +1,149 @@
+.card-heading {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.skills {
+  margin-top: 8px;
+}
+
+.search-filter {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.age-range {
+  flex: 3 auto;
+}
+
+.update-location {
+  position: absolute;
+  right: 15px;
+  top: 30px;
+  z-index: 9;
+  ion-icon {
+    background-color: var(--ion-color-primary);
+    border-radius: 25px;
+    padding: 5px;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 30px;
+  z-index: 9;
+  ion-icon {
+    background-color: var(--ion-color-primary);
+    border-radius: 25px;
+    padding: 5px;
+  }
+}
+
+.in-segment {
+  border: 1px solid #cccccc;
+  font-size: 10px;
+  text-transform: capitalize;
+  margin: 0 3px;
+  border-radius: 2px;
+  height: 30px;
+  min-height: auto;
+  flex: 0 0 23%;
+  min-width: auto;
+  --padding-start: 8px;
+  --padding-end: 8px;
+}
+
+.profile-details-icon {
+  width: 30px;
+}
+
+.c-btn-card {
+  margin-bottom: 15px;
+  margin-right: 10px;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgb(140 140 140 / 20%);
+  box-shadow: rgb(140 140 140 / 20%) 0px 6px;
+}
+
+.header {
+  background: #eef2f7;
+  padding: 10px 20px;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+}
+
+.bottom-space {
+  margin-bottom: 25px;
+}
+
+.header-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  min-width: 135px;
+}
+
+.search-filter {
+  border-bottom: 2px solid #f6f8fb;
+}
+
+.last-child-space {
+  margin-bottom: 0;
+}
+
+ion-header {
+  ion-toolbar {
+    --padding-top: 10px;
+    --padding-bottom: 3px;
+    --padding-start: 15px;
+    --padding-end: 15px;
+  }
+}
+
+.c-item-settings {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+  ion-label {
+    font-weight: 700;
+  }
+}
+
+.top-container {
+  height: 100%;
+  overflow: scroll;
+}
+
+.outer-border .item .label-floating {
+  display: unset !important;
+}
+
+.c-theme-card-wrapper {
+  overflow: hidden;
+  color: #000;
+  padding: 5px 10px;
+  box-shadow: #f6f8fb 0px 5px;
+  border-radius: 10px;
+  margin: 0px !important;
+  width: 250px;
+}
+
+.selected {
+  background: #fff;
+  border: 2px solid #5ac5f378;
+  box-shadow: #5ac5f378 0px 5px;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 5px 10px !important;
+}
+
+.c-width {
+  min-width: unset;
+  width: 100%;
+}

@@ -1,0 +1,134 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Add Friends</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="dark" (click)="refreshContacts()">
+        <ion-icon slot="icon-only" name="refresh-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="contacts.length === 0">
+    <div class="empty-state">
+      <h2>No contacts found</h2>
+      <p>Please ensure you have granted permission to access contacts.</p>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="contacts.length > 0 && processingContacts">
+    <div class="processing-list">
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Contacts Loaded: {{ contacts.length }}</h2>
+          <p>Processing contacts... {{ processedContacts }}/{{ totalContacts }}</p>
+        </ion-label>
+        <ion-spinner name="crescent" slot="end"></ion-spinner>
+      </ion-item>
+    </div>
+  </ng-container>
+
+  <ion-list [inset]="true" class="ion-no-padding list" *ngIf="contacts.length > 0">
+    <ion-list-header>
+      <ion-label>Add Friends From Contacts</ion-label>
+    </ion-list-header>
+
+    <ng-container *ngIf="!processingContacts && registeredContacts.length > 0">
+      <ion-item *ngFor="let contact of registeredContacts">
+        <ion-label>
+          <h2>{{ contact.name }}</h2>
+          <p>{{ contact.phoneNumber }}</p>
+        </ion-label>
+        <ion-button
+          class="from-contact-button"
+          fill="outline"
+          color="primary"
+          (click)="addContact(contact)"
+        >
+          <ion-icon name="person-add-outline"></ion-icon>
+          Add Friend
+        </ion-button>
+      </ion-item>
+    </ng-container>
+
+    <ng-container *ngIf="!processingContacts && registeredContacts.length === 0">
+      <div class="empty-state">
+        <h2>No registered contacts found</h2>
+        <p>Invite friends from your contacts.</p>
+      </div>
+    </ng-container>
+  </ion-list>
+  <ion-list [inset]="true" class="ion-no-padding list" *ngIf="contacts.length > 0">
+    <ion-list-header>
+      <ion-label>Invite From Contacts</ion-label>
+      <ion-button
+        *ngIf="!processingContacts && unregisteredContacts.length > 0"
+        fill="clear"
+        size="small"
+        (click)="toggleMultiSelectMode()"
+      >
+        {{ isMultiSelectMode ? 'Cancel' : 'Invite Multiple' }}
+      </ion-button>
+    </ion-list-header>
+
+    <ng-container *ngIf="!processingContacts && unregisteredContacts.length > 0">
+      <ion-item *ngFor="let contact of unregisteredContacts">
+        <!-- Checkbox for multi-select mode -->
+        <ion-checkbox
+          *ngIf="isMultiSelectMode"
+          slot="start"
+          [checked]="isContactSelected(contact)"
+          (ionChange)="toggleContactSelection(contact)"
+        ></ion-checkbox>
+
+        <ion-label>
+          <h2>{{ contact.name }}</h2>
+          <p>{{ contact.phoneNumber }}</p>
+        </ion-label>
+
+        <!-- Individual invite button (hidden in multi-select mode) -->
+        <ion-button
+          *ngIf="!isMultiSelectMode"
+          class="from-contact-button"
+          fill="outline"
+          color="primary"
+          (click)="inviteContact(contact)"
+        >
+          <ion-icon name="person-outline"></ion-icon>
+          Invite Friend
+        </ion-button>
+      </ion-item>
+
+      <!-- Send Multiple Invites Button -->
+      <ion-item *ngIf="isMultiSelectMode && selectedContacts.length > 0">
+        <ion-button
+          class="from-contact-button multiple-invite-btn"
+          fill="outline"
+          color="primary"
+          (click)="sendMultipleInvites()"
+        >
+          <ion-icon name="send-outline" slot="start"></ion-icon>
+          Send Invites ({{ selectedContacts.length }})
+        </ion-button>
+      </ion-item>
+    </ng-container>
+
+    <ng-container *ngIf="!processingContacts && unregisteredContacts.length === 0">
+      <div class="empty-state">
+        <h2>No unregistered contacts found</h2>
+        <p>All your contacts are registered.</p>
+      </div>
+    </ng-container>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <button class="footer-button" (click)="dismiss()">Close</button>
+  </ion-toolbar>
+</ion-footer>

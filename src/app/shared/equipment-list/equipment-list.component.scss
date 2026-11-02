@@ -1,0 +1,97 @@
+.profile-details {
+    display: flex;
+    align-items: center;
+    font-family: var(--ion-font-family-nanami-bold);
+    background: #eef2f7;
+    min-height: 56px;
+}
+
+.profile-details-skills {
+    font-size: 22px;
+    font-weight: 600;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.skill-icon-undefined {
+    display: none
+}
+
+.skill-icon-wrapper {
+    height: 26px;
+    width: 26px;
+    background-size: cover;
+    margin-left: 5px;
+}
+
+.skill-icon-beginner {
+    background-image: url("../../../assets/icon/icon-beginner.png");
+}
+
+.skill-icon-intermediate {
+    background-image: url("../../../assets/icon/icon-intermediate.png");
+}
+
+.skill-icon-advanced {
+    background-image: url("../../../assets/icon/icon-advanced.png");
+}
+
+.skill-icon-pro {
+    background-image: url("../../../assets/icon/icon-pro.png");
+}
+
+.profile-hobbies-wrapper {
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    .skill-level-bg {
+        background: #fff;
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hobbies-icon {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #fff;
+        margin-left: 5px;
+        img {
+            height: 18px;
+        }
+    }
+}
+
+.profile-details-icon {
+    height: 18px;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.skill-level-bg {
+    margin-left: 5px;
+    background: #fff;
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reverse-badge {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+}

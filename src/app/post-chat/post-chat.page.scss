@@ -1,0 +1,226 @@
+:host {
+  background: #eef2f7;
+}
+ion-header {
+  ion-toolbar {
+    --background: #eef2f7;
+    .post-date {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px 45px 0px;
+      justify-content: flex-start;
+    }
+    .time-and-date {
+      text-align: center;
+      min-width: 90px;
+      .date-wrapper-box {
+        background: #fff;
+        border: 2px solid #000;
+        margin-bottom: 5px;
+        // margin-right: 16px;
+        .month {
+          font-size: 20px;
+        }
+        .date {
+          font-size: 30px;
+        }
+      }
+      .time{
+        font-size: 10px;
+        text-align: center;
+      }
+    }
+    .back-btn-bg {
+      position: absolute;
+      top: 30px;
+      left: 16px;
+    }
+    .name-wrapper {
+      font-size: 14px;
+      color: #000;
+      font-weight: 600;
+      line-height: 18px;
+      text-transform: uppercase;
+      padding-left: 10px;
+      white-space: pre-line;
+    }
+    .post-wrap {
+      // white-space: pre;
+      font-size: 15px;
+      font-weight: 400;
+      color: #000;
+      line-height: 18px;
+      white-space: pre-line;
+    overflow-wrap: anywhere;
+    }
+    .post-data {
+      display: flex;
+      flex-direction: column;
+      margin-left: 14px;
+      .name-wrapper {
+        font-size: 16px;
+        line-height: 22px;
+      }
+    }
+    
+    .post-message {
+      font-size: 14px;
+      color: #000;
+      line-height: 18px;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+    .image-post {
+      display: flex;
+      align-items: center;
+    }
+    .admin {
+      display: flex;
+      align-items: center;
+      ion-text {
+        font-size: 14px;
+        color: #000;
+        line-height: 16px;
+        font-weight: 400;
+        margin: 0 10px;
+      }
+    }
+  }
+}
+.chat-input {
+  border-radius: 16px;
+}
+.chat {
+  margin-top: 0px;
+  height: 100%;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: rgb(136 165 191 / 48%) 0px 2px 16px 1px, rgb(255 255 255 / 80%) -6px -2px 16px 0px;
+  overflow: hidden;
+  padding: 16px;
+}
+.message {
+  border-radius: 16px;
+  margin-top: 12px;
+  align-self: flex-start;
+  flex: 0 1 65%;
+  // max-width: 65%;
+  max-width: max-content;
+  --min-height: 35px;
+  --inner-padding-end: 0;
+}
+.message-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-list {
+  .theme-chat-wrapper {
+    background: #fff;
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 4px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin: 0 10px 10px;
+  }
+}
+
+.message-text {
+  margin: 0;
+  font-size: 16px;
+  padding: 5px 9px;
+  white-space: normal;
+}
+
+.user-message {
+  --color: #fff !important;
+  align-self: flex-end;
+  box-shadow: #dbeafb 0px 4px !important;
+  border: 2px solid #dbeafb !important;
+  ion-label {
+    --color: #fff !important;
+  }
+}
+.ion-color-medium {
+  --ion-color-base: #eef2f7 !important;
+  --ion-color-base-rgb: var(--ion-color-medium-rgb, 146, 148, 156) !important;
+  --ion-color-contrast: #000 !important;
+  --ion-color-shade: #eef2f7 !important;
+  --ion-color-tint: #eef2f7 !important;
+}
+
+ion-footer {
+  box-shadow: rgb(136 165 191 / 48%) 0px 2px 16px 1px, rgb(255 255 255 / 80%) -6px -2px 16px 0px;
+  ion-toolbar {
+    --padding-top: 0px;
+    --padding-bottom: 0px;
+    --padding-start: 0px;
+    --padding-end: 0px;
+  }
+}
+.message-r {
+  display: flex;
+  align-items: center;
+  text-align: right;
+  margin-bottom: 10px;
+  span {
+    background: #3880ff;
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 4px;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #fff;
+    color: #fff !important;
+    align-self: flex-end;
+    box-shadow: #dbeafb 0px 4px !important;
+    border: 2px solid #dbeafb !important;
+    padding: 7px 12px;
+  }
+  img {
+    height: auto;
+    width: 35px;
+    object-fit: cover;
+    margin: 0 7px;
+  }
+}
+
+.cust-message {
+  display: flex;
+  align-items: flex-end;
+  // padding: 10px 0;
+  .item-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100px !important; //any size
+    max-height: 100px !important; //any size
+  }
+}
+.message-by-c-user {
+  flex-direction: row-reverse;
+}
+.cust-message {
+  ion-avatar {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+.admin-text {
+  text-align: right;
+  width: 100%;
+}
+.c-admin-text {
+  color: #999;
+  font-size: 14px;
+}
+
+.admin-text-visible {
+  visibility: hidden;
+}
+.edit-post-icon {
+  width: 20px;
+  height: 20px;
+}

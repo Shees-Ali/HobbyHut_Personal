@@ -1,0 +1,54 @@
+<ng-container *ngIf="{user: (vm$ | async)?.user, hobbies: (vm$ | async)?.hobbies} as vm">
+  <ion-header class="ion-no-padding ion-padding-top ion-padding-horizontal">
+    <ion-toolbar>
+      <div class="toolbar-space">
+        <h1>Hi {{ vm?.user?.displayName}},</h1>
+        <h2 class="what-like-to-play ion-padding-bottom">
+          Choose a room and<br />
+          see who's around?
+        </h2>
+      </div>
+      <ion-buttons slot="end">
+        <ion-button color="dark" (click)="openFilters()" style="height: auto">
+          <div class="cust-inner-button">
+            <img src="../../assets/icon/search_add.svg" style="height: 30px" />
+            <div class="cust-search-setting">
+              Search<br />
+              Settings
+            </div>
+          </div>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-row class="w-100">
+      <ion-col size="12">
+        <ion-item lines="none" class="ion-no-padding">
+          <ion-button fill="clear" slot="start" (click)="goBack()" class="back-btn ion-no-padding">
+            <ion-icon name="chevron-back"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <div class="list-section">
+      <ion-list lines="none" class="hobby-list">
+        <ion-row class="w-100" *ngFor="let hobby of vm?.hobbies | filterHome:filters">
+          <ion-col size="12" *ngIf="hobby.showGame">
+            <ion-item button detail="false" class="c-item">
+              <div class="c-item-inner" (click)="onHobbyClick(hobby)">
+                <ion-label
+                  class="hobby-list-single"
+                  stacked
+                  [ngClass]="{'hobby-chosen': hobby.isChosen, 'hobby-notavailable': !hobby.isAvailable}"
+                >
+                  <span class="label-text">{{hobby.name | titleCase}}</span>
+                </ion-label>
+              </div>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-list>
+    </div>
+  </ion-content>
+</ng-container>

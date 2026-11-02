@@ -1,0 +1,59 @@
+.unread-count {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: white;
+  background: red;
+  margin: 0px;
+  padding: 3px;
+  padding-top: 5px;
+  font-size: 10px;
+}
+
+.location-overlay {
+  width: 100%;
+  z-index: 1001;
+  top: 85px;
+  padding: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-radius: 6px;
+  background-color: #1fc8db;
+  background-image: linear-gradient(141deg, #9fb8ad 0%, #1fc8db 51%, #2cb5e8 75%);
+  color: white;
+  opacity: 0.8;
+  display: inline-flex;
+  position: absolute;
+  font-size: 12px;
+  span {
+    width: 100%;
+    text-align: center;
+    color: #ff0000;
+    font-weight: bold;
+  }
+  div {
+    margin: auto;
+    .arrow-right {
+      width: 0px;
+      height: 0px;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-left: 6px solid #ff0000;
+    }
+  }
+}
+
+ion-tab-bar {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  box-shadow: rgb(136 165 191 / 48%) 0px 2px 16px 1px, rgb(255 255 255 / 80%) -6px -2px 16px 0px;
+  .home-wrapper {
+    border-top-left-radius: 40px;
+  }
+  .settings-wrapper {
+    border-top-right-radius: 40px;
+  }
+}

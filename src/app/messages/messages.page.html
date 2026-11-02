@@ -1,0 +1,161 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons class="ion-padding-start" slot="start">
+      <div class="toolbar-button" (click)="displaySearchFriends()">
+        <img
+          class="no-bg-img"
+          src="../../assets/icon/add_friend.png"
+          style="width: 30px; padding-bottom: 4px"
+        />
+        <div class="request-text">Add</div>
+      </div>
+    </ion-buttons>
+    <ion-title mode="ios">Contacts</ion-title>
+    <ion-buttons class="ion-padding-end" slot="end">
+      <div class="toolbar-button" (click)="displayRequests()">
+        <img
+          class="no-bg-img"
+          src="../../assets/icon/request_icon.png"
+          style="width: 30px; padding-bottom: 4px"
+        />
+        <div class="request-text">Requests</div>
+        <ion-badge class="unread-count" *ngIf="unreadRequest.length > 0 " color="primary">
+          <span>{{unreadRequest.length}}</span>
+        </ion-badge>
+      </div>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<div class="contacts">
+  <div class="segment-wrapper">
+    <ion-segment #segment (ionChange)="onSegmentChanged($event)" value="messages">
+      <div class="message-segment" *ngIf="unreadMessage != 0">
+        <ion-badge class="unread-message">
+          <span>{{unreadMessage}}</span>
+        </ion-badge>
+      </div>
+      <div class="group-segment" *ngIf="unreadGroupMessage > 0">
+        <ion-badge class="unread-group">
+          <span>{{unreadGroupMessage}}</span>
+        </ion-badge>
+      </div>
+      <ion-segment-button value="messages" id="segment-1">
+        <ion-label>Messages</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="groups">
+        <ion-label> Groups </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+  <ion-content class="ion-padding">
+    <ion-list
+      class="message-list"
+      *ngIf="!isDisplayGroups"
+      [ngStyle]="{paddingLeft:messageLength<10?'5px':'30px'}"
+    >
+      <div class="main-wrapper">
+        <ng-container *ngIf="isLoading && messages.length == 0"> Loading Chat... </ng-container>
+        <ng-container *ngIf="isUpdatingTopFive"> Updating Top Five... </ng-container>
+        <ng-container *ngIf="!isLoading && !isUpdatingTopFive">
+          <div class="theme-card-wrapper">
+            <!-- Placeholder items -->
+            <ng-container *ngFor="let position of [0,1,2,3,4]; let i = index">
+              <app-chat-item
+                [message]="topFiveChats[position]"
+                [index]="i"
+                [currentUserId]="currentUserId"
+                [isTopFive]="true"
+                (avatarClick)="onAvatarClick($event)"
+                (messageClick)="onOpenMessage($event)"
+                (blockUser)="handleBlockUser($event)"
+                (reportUser)="handleReportUser($event)"
+                (removeTopFive)="handleRemoveFromTopFive($event)"
+              ></app-chat-item>
+            </ng-container>
+
+            <div class="footnote">
+                <p>Notify my Top 5 when Ready Now Timer Pressed</p>
+              <ion-toggle
+                [ngModel]="pushNotificationSettings?.timerToTop5Contacts"
+                (ionChange)="updateUserSettingsForTimerToTop5Contacts($event)"
+              ></ion-toggle>
+            </div>
+          </div>
+
+          <!-- Regular Messages -->
+          <ng-container *ngFor="let message of messages;let i = index">
+            <app-chat-item
+              [message]="message"
+              [index]="i"
+              [currentUserId]="currentUserId"
+              [isTopFive]="false"
+              (avatarClick)="onAvatarClick($event)"
+              (messageClick)="onOpenMessage($event)"
+              (blockUser)="handleBlockUser($event)"
+              (unmatch)="handleUnmatch($event)"
+              (reportUser)="handleReportUser($event)"
+              (addTopFive)="handleAddUser($event)"
+            ></app-chat-item>
+          </ng-container>
+        </ng-container>
+      </div>
+    </ion-list>
+
+    <!-- GROUP MESSAGES -->
+    <ion-list class="message-list" *ngIf="isDisplayGroups">
+      <div class="theme-card-wrapper">
+        <ng-container *ngIf="isLoadingPostMessage && postMessage.length == 0">
+          Loading Chat..
+        </ng-container>
+        <ng-container *ngFor="let message of postMessage">
+          <ion-item-group class="message-preview" button detail="false">
+            <ion-item-sliding>
+              <ion-item lines="none">
+                <ion-avatar
+                  (click)="onPostAvatarClick(message)"
+                  slot="start"
+                  [ngClass]="{'user-active': message?.participant?.isActive}"
+                >
+                  <img
+                    alt=""
+                    [src]="getAdminImage(message)"
+                    onerror="this.src='../../assets/images/palm-tree.png'"
+                  />
+                </ion-avatar>
+                <ion-label (click)="openPostMessage(message)">
+                  <h2
+                    class="participant-name post-subject"
+                    [ngClass]="{'unread': message?.chatUnreadMessage}"
+                  >
+                    {{message?.postSubject.length>20? message?.postSubject.slice(0,20)+' ...'
+                    :message?.postSubject}}
+                  </h2>
+                  <p [ngClass]="{'bold': message?.chatUnreadMessage}">
+                    {{message?.meta?.lastMessage === ''?'send message':message?.meta?.lastMessage }}
+                  </p>
+                </ion-label>
+                <ion-note slot="end" class="message-date">
+                  {{message?.meta?.timestamp | date:'dd MMM'}}
+                </ion-note>
+              </ion-item>
+
+              <ion-item-options side="end">
+                <ion-item-option>
+                  <div class="icon-shape red-color">
+                    <ion-icon
+                      name="close-circle-sharp"
+                      slot="icon-only"
+                    ></ion-icon>
+                  </div>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-item-group>
+        </ng-container>
+        <ng-container *ngIf="!isLoadingPostMessage && postMessage.length == 0">
+          No Groups chat are available.
+        </ng-container>
+      </div>
+    </ion-list>
+  </ion-content>
+</div>

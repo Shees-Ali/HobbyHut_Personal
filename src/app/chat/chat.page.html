@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start" class="back-btn-bg">
+      <ion-back-button color="dark" text="" defaultHref="tabs/messages"></ion-back-button>
+    </ion-buttons>
+    <ion-title mode="ios">
+      <ion-row class="ion-align-items-center ion-justify-content-center">
+        <ion-avatar (click)="onAvatarClick()">
+          <img [src]="photoUrl" onerror="this.src='../../../assets/images/palm-tree.png'" alt="" />
+        </ion-avatar>
+        <div class="name-wrapper">{{displayName}}</div>
+      </ion-row>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<div class="chat">
+  <ion-content #ionContent>
+    <ion-list class="message-list" lines="none">
+      <ng-container *ngFor="let message of messages$ | async">
+        <ion-item
+          class="message theme-chat-wrapper ion-no-padding"
+          [color]="message.senderID == user.uid ? 'primary' : 'medium'"
+          [ngClass]="{'user-message': message.senderID == user.uid}"
+        >
+          <ion-label class="message-text">{{message.text}}</ion-label>
+        </ion-item>
+      </ng-container>
+    </ion-list>
+  </ion-content>
+</div>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar color="light">
+    <form (submit)="sendMessage()" class="footer-form">
+      <div class="chat-option">
+        <ion-row class="ion-no-padding" style="height: 100%">
+          <ion-col size="4" class="ion-text-center ion-no-padding line"
+            ><a (click)="Addemoji(1)">Wanna hang? 🤙</a></ion-col
+          >
+          <ion-col size="4" class="ion-text-center ion-no-padding line"
+            ><a (click)="Addemoji(2)">Next time</a></ion-col
+          >
+          <ion-col size="4" class="remove-line ion-text-center ion-no-padding"
+            ><a (click)="Addemoji(3)">Let's do it!</a></ion-col
+          >
+        </ion-row>
+      </div>
+      <ion-item class="chat-input" lines="none">
+        <ion-textarea
+          [rows]="textareaRows$ | async"
+          [formControl]="chatInput"
+          placeholder="Write your message"
+          autocapitalize
+        >
+        </ion-textarea>
+        <ion-button type="submit" fill="clear">
+          <ion-icon name="send"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </form>
+  </ion-toolbar>
+</ion-footer>

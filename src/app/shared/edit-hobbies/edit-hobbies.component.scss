@@ -1,0 +1,109 @@
+.hint-copy {
+    color: var(--ion-color-medium);
+    padding: 0 50px;
+    margin-top: 16px;
+    font-size: 12px;
+}
+
+.hobby-list {
+    margin-top: 20px;
+    .hobby-list-single {
+        font-family: var(--ion-font-family-nanami-extralight);
+        &.hobby-chosen {
+            font-weight: bold;
+            font-family: var(--ion-font-family-nanami-regular);
+        }
+    }
+}
+
+// .hobby-chosen {
+//   font-weight: bold;
+//   // font-size: 1.2em;
+//   font-family: var(--ion-font-family);
+// }
+.c-flex {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    ion-label {
+        font-size: 22px;
+        font-weight: 600;
+        margin-right: 0px;
+    }
+}
+
+.botton-space {
+    margin-bottom: 20px;
+    padding: 0;
+    ion-item {
+        --padding-start: 0px;
+        --inner-padding-end: 0px;
+    }
+}
+
+// .hobby-list-single {
+//     padding: 10px 20px;
+//     background: #eef2f7;
+//     min-height: 56px;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+// }
+ion-header {
+    ion-toolbar {
+        --padding-top: 10px;
+        --padding-bottom: 3px;
+        --padding-start: 15px;
+        --padding-end: 15px;
+    }
+}
+
+.theme-btn{
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 6px;
+    border-radius: 10px;
+    --border-radius: 10px;
+    margin-bottom: 20px;
+    height: 1.8em;
+    width: 1.8em;
+    font-size: 20px;
+    font-weight: 600;
+    --background: #fff;
+    margin-right: 3px;
+    --padding-start: 0;
+    --padding-end: 0;
+}
+.selectedSkillLevel{
+    border: 2px solid #01c8f8;
+    box-shadow: #01c8f8 0px 6px;
+    border-radius: 10px;
+    --border-radius: 10px;
+    margin-bottom: 20px;
+    height: 1.8em;
+    width: 1.8em;
+    font-size: 20px;
+    font-weight: 600;
+    --background: #fff;
+    }
+
+    
+.skill-icon-wrapper {
+    height: 20px;
+    width: 20px;
+    background-size: cover;
+}
+.skill-icon-beginner {
+    background-image: url("../../../assets/icon/icon-beginner.png");
+}
+
+.skill-icon-intermediate {
+    background-image: url("../../../assets/icon/icon-intermediate.png");
+}
+
+.skill-icon-advanced {
+    background-image: url("../../../assets/icon/icon-advanced.png");
+}
+
+.skill-icon-pro {
+    background-image: url("../../../assets/icon/icon-pro.png");
+}

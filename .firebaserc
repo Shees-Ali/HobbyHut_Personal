@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "hobby-hut-dev": {
+      "hosting": {
+        "app": [
+          "hobby-hut-dev"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "hobby-hut-dev"
+  }
+}

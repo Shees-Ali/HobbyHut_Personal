@@ -1,0 +1,51 @@
+.recaptcha {
+    padding-top: 40px;
+     ::ng-deep {
+        >div>div {
+            margin: 0 auto;
+        }
+    }
+}
+
+.verify-wrapper {
+    margin-top: 25px;
+}
+
+ion-content {
+    --background: transparent;
+}
+
+.verify-card {
+    background: #fff;
+    border-radius: 16px;
+}
+
+.footer-btn {
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 6px;
+    border-radius: 15px;
+    --border-radius: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 2.7em;
+    font-size: 18px;
+    font-weight: 600;
+    --background: #fff;
+    color: #01c8f8;
+}
+
+.input-select-wrapper {
+    height: 100%;
+    width: 100%;
+    border: aliceblue;
+    border-bottom: 2px solid grey;
+    outline: none;
+}
+
+.c-input-wrapper {
+    height: 100%;
+    width: 100%;
+    border: aliceblue;
+    border-bottom: 2px solid grey;
+    outline: none;
+}

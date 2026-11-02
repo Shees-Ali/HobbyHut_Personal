@@ -1,0 +1,74 @@
+<div *ngIf="recaptchaStatus === 'not-started'" id="recaptcha" class="recaptcha"></div>
+<ng-container *ngTemplateOutlet="goBack"></ng-container>
+<ion-content class="ion-padding" scrollY="false">
+  <section class="verify-wrapper">
+    <ion-card class="ion-no-margin verify-card">
+      <ion-card-content>
+        <ng-container *ngIf="!isCode">
+          <form [formGroup]="sendCodeForm">
+            <ion-label position="stacked"> Phone number</ion-label>
+            <ion-row>
+              <ion-col size="5">
+                <select formControlName="country_code" class="input-select-wrapper" required>
+                  <option
+                    [attr.data-thumbnail]="obj.flag"
+                    [value]="obj.dial_code"
+                    *ngFor="let obj of country_code"
+                  >
+                    {{ obj.code }}({{ obj.dial_code }})
+                  </option>
+                </select>
+              </ion-col>
+              <ion-col size="7">
+                <ion-input
+                  placeholder="Enter phone number"
+                  class="c-input-wrapper"
+                  formControlName="phoneNumber"
+                  type="number"
+                  required
+                ></ion-input>
+              </ion-col>
+            </ion-row>
+          </form>
+          <ion-button class="footer-btn" expand="block" type="submit" (click)="sendCode()">
+            Send Code
+          </ion-button>
+        </ng-container>
+        <ng-container *ngIf="isCode">
+          <h4>
+            Code Is Sent To Number {{ phoneNumber }}.<label
+              class="labelEdit"
+              (click)="gotoPhoneNumber()"
+              >Change Phone Number</label
+            >
+          </h4>
+          <ion-item>
+            <ion-label position="stacked">Verification Code</ion-label>
+            <ion-input placeholder="Enter verification code" #confirmationCode></ion-input>
+          </ion-item>
+          <ion-button
+            class="footer-btn"
+            expand="block"
+            type="submit"
+            [disabled]="!confirmationCode.value || $any(confirmationCode.value).length !== 6"
+            (click)="verifyCode($any(confirmationCode.value))"
+          >
+            Verify Number
+          </ion-button>
+        </ng-container>
+      </ion-card-content>
+    </ion-card>
+  </section>
+</ion-content>
+<ng-template #goBack>
+  <ion-button
+    (click)="dimissModal()"
+    class="ion-margin-top"
+    color="light"
+    expand="block"
+    fill="clear"
+    size="small"
+  >
+    Go back
+  </ion-button>
+</ng-template>

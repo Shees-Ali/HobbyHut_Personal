@@ -1,0 +1,439 @@
+@import '../../global.scss';
+
+:host {
+  background: #eef2f7;
+}
+
+// header-set
+ion-header {
+  --background: transparent;
+  position: relative;
+  ion-toolbar {
+    --background: transparent;
+    --min-height: 80px;
+    ion-title {
+      font-size: 18px !important;
+      .hobby-name {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .hobby-icon-wrapper {
+          height: 36px;
+          width: 36px;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgb(0, 0, 0);
+          margin-left: 5px;
+          img {
+            height: 22px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.back-btn-bg {
+  background: #ffffff4d;
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  position: absolute;
+  top: 18px;
+  left: 20px;
+}
+
+.hobby-room {
+  height: 100%;
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow:
+    rgb(136 165 191 / 48%) 0px 2px 16px 1px,
+    rgb(255 255 255 / 80%) -6px -2px 16px 0px;
+  margin-top: 10px;
+  overflow: hidden;
+  padding: 16px;
+  .segment-wrapper {
+    padding: 12px 20px;
+    @include c-ion-segment;
+  }
+}
+
+.members-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 70px;
+}
+
+.members-card {
+  opacity: 1;
+  margin-bottom: 5px;
+  border-radius: 15px;
+  box-shadow:
+    rgba(0, 0, 0, 0.07) 0px 1px 1px,
+    rgba(0, 0, 0, 0.07) 0px 2px 2px,
+    rgba(0, 0, 0, 0.07) 0px 4px 4px,
+    rgba(0, 0, 0, 0.07) 0px 8px 8px,
+    rgba(0, 0, 0, 0.07) 0px 16px 16px;
+}
+
+.invite-friends {
+  text-align: center;
+  height: 140px;
+  ion-button {
+    font-size: 14px;
+    color: white;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+}
+
+.action-buttons-row {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 180px;
+  ion-button {
+    color: #fff;
+    width: 140px;
+    font-size: 14px;
+    font-weight: bold;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    margin-bottom: 8px !important;
+    height: 40px;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  ion-button::part(native) {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+}
+
+.loading-hooby-members {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.c-col-wrapper:nth-child(odd) ion-card {
+  top: -60px;
+}
+
+.c-col-wrapper:nth-child(odd) {
+  padding-inline-end: 10px;
+}
+
+.c-col-wrapper:nth-child(even) {
+  padding-inline-start: 10px;
+}
+
+.advertisement-margin:nth-child(odd) {
+  top: -60px;
+}
+.profile-img {
+  line-height: 0;
+}
+.advertisement {
+  // background: aqua;
+  // color: black;
+  min-height: unset;
+  margin-bottom: 5px;
+
+  .card_content {
+    min-height: unset;
+    text-align: center;
+
+    .profile-img img {
+      height: 100%;
+      object-fit: fill;
+    }
+  }
+  // ion-card-content {
+  //     height: 228px!important;
+  //     h3 {
+  //         margin-top: 60%;
+  //     }
+  // }
+}
+
+.members-card-active {
+  border: 3px solid #ffc001;
+  padding: 3px;
+  opacity: 1;
+  border-radius: 20px !important;
+}
+
+.members-card-active .card_content {
+  border: 3px solid #009ae0;
+  padding: 3px;
+  border-radius: 15px;
+}
+
+.members-card-title {
+  font-weight: 600;
+}
+.img-overlay-medal {
+  background: #fff;
+  // height: 26px;
+  // width: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.members-card-details {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 10px;
+  top: 30px;
+}
+
+.post-card {
+  border-radius: 15px 0 15px 15px;
+  .card_content {
+    // background: #cafdff;
+    padding: 5px 8px;
+    position: relative;
+    .post-blog {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      .card-date {
+        background: #ebebeb;
+        padding: 5px 12px;
+        margin-left: 5px;
+        position: relative;
+        top: -5px;
+        right: -10px;
+        border-bottom-left-radius: 15px;
+        h4 {
+          font-size: 24px;
+          color: #000;
+          font-weight: 700;
+          line-height: 26px;
+          margin: 0;
+          text-align: center;
+        }
+        h5 {
+          font-size: 14px;
+          color: #000;
+          font-weight: 600;
+          line-height: 18px;
+          margin: 0;
+          text-transform: uppercase;
+          text-align: center;
+        }
+        p {
+          font-size: 12px;
+          color: #000;
+          font-weight: 600;
+          line-height: 16px;
+          margin: 0;
+          text-transform: uppercase;
+          text-align: center;
+        }
+      }
+      .profile-img {
+        img {
+          height: 64px;
+          width: 64px;
+          border-radius: 50%;
+        }
+      }
+    }
+    .post-blog-1 {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 8px;
+      .title {
+        p {
+          font-size: 18px;
+          color: #000;
+          font-weight: 700;
+          text-transform: uppercase;
+          line-height: 22px;
+          margin: 0 0 0 5px;
+          display: flex;
+          flex-wrap: wrap;
+          white-space: pre-line;
+        }
+      }
+    }
+    .card-text {
+      ion-text {
+        font-size: 14px;
+        line-height: 18px;
+        color: #000;
+        font-weight: 400;
+      }
+      .comment-number {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        text-align: center;
+        position: relative;
+        height: 30px;
+        .count-message {
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 26px;
+          width: 36px;
+          z-index: 9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 700;
+        }
+        img {
+          height: 30px;
+          width: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #000;
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
+      }
+    }
+  }
+}
+.cc-color {
+  &:nth-child(n + 1) {
+    .card_content {
+      background: #cafdff;
+    }
+  }
+  &:nth-child(2n + 1) {
+    .card_content {
+      background: #efeda3;
+    }
+  }
+  &:nth-child(3n + 1) {
+    .card_content {
+      background: #c7f2c5;
+    }
+  }
+  &:nth-child(4n + 1) {
+    .card_content {
+      background: #f3d9dc;
+    }
+  }
+}
+.cc-color {
+  .title {
+    .heading-text {
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      overflow: hidden !important;
+      font-size: 15px;
+      color: #000;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 22px;
+      margin: 0 0 0 5px;
+      display: flex;
+      flex-wrap: wrap;
+      white-space: pre-line;
+    }
+  }
+  .subheading-text {
+    // white-space: pre;
+    margin: 0 0 0 5px;
+    font-size: 12px;
+    line-height: 18px;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3 !important;
+    overflow: hidden !important;
+  }
+}
+
+.profile-img {
+  padding: 0px;
+  position: relative;
+  img {
+    border-radius: 10px;
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+  }
+  .medal-icon {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+  }
+  .skill-img {
+    position: absolute;
+    right: -2px;
+    bottom: -5px;
+  }
+}
+
+.skill-icon {
+  font-size: 18px;
+}
+
+.skill-icon-beginner {
+  color: var(--ion-color-white);
+  box-shadow: inset 0px 0px 0px 1px var(--ion-color-silver);
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+.skill-icon-intermediate {
+  color: var(--ion-color-bronze);
+}
+
+.skill-icon-advanced {
+  color: var(--ion-color-silver);
+}
+
+.skill-icon-pro {
+  color: var(--ion-color-gold);
+}
+
+.content-main {
+  padding: 10px 10px;
+  .members-card-title {
+    font-size: 18px;
+    color: #009ae0;
+    font-weight: 600;
+    margin: 0;
+  }
+  .sub-content-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+}
+
+.cust-inner-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cust-search-setting {
+  font-size: 11px;
+  font-weight: bold;
+  padding-top: 6px;
+}

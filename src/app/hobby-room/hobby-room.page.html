@@ -1,0 +1,183 @@
+<ng-container>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start" class="back-btn-bg">
+        <ion-button (click)="pop()" color="dark" text="">
+          <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-title class="title-font">
+        {{((hobbiesList[hobbyIndex]?.name || hobbyName || 'Hobby') | titleCase) + " Room"}}
+      </ion-title>
+      <ion-buttons slot="end">
+        <ion-button
+          color="dark"
+          (click)="openFilters()"
+          style="height: auto"
+          [disabled]="!loadhobbyUsers"
+        >
+          <div class="cust-inner-button">
+            <ion-icon slot="icon-only" name="options-sharp"></ion-icon>
+            <div class="cust-search-setting">
+              Skill<br />
+              Settings
+            </div>
+          </div>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <div class="hobby-room">
+    <!-- <div class="hobby-room-header"> -->
+    <div class="segment-wrapper">
+      <ion-segment #segment (ionChange)="onSegmentChanged($event)" value="friends">
+        <ion-segment-button value="friends">
+          <ion-label> Friends </ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="noticeboard">
+          <ion-label> Noticeboard </ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+    <!-- </div> -->
+    <ion-content *ngIf="isFriendsVisible">
+      <div *ngIf="!loadhobbyUsers" class="loading-hooby-members">Loading...</div>
+      <div class="members-list" *ngIf="loadhobbyUsers">
+        <ion-row class="w-100">
+          <ion-col class="action-buttons-row" size="6">
+            <ion-button shape="round" (click)="searchFriends()">Add Friends</ion-button>
+            <ion-button shape="round" (click)="inviteFriends()">Invite Friends</ion-button>
+          </ion-col>
+          <ng-container *ngFor="let member of membersList | filterMembers:filters; let i = index">
+            <ion-col size="6" class="c-col-wrapper">
+              <ion-card
+                class="members-card ion-no-margin"
+                (click)="go(member.uid)"
+                [ngClass]="{'members-card-active': member.isActive }"
+              >
+                <div class="card_content">
+                  <div class="profile-img">
+                    <img
+                      [src]="member?.photos?.length > 0 ? member?.photos[member?.photos?.length-1] : './../../assets/images/palm-tree.png'"
+                      alt=""
+                      onerror="this.src = './../../assets/images/palm-tree.png'"
+                    />
+                    <section class="members-card-details">
+                      <equipment-list [hobbies]="{meta: member.meta}" [activeHobbies]="hobbyName">
+                      </equipment-list>
+                    </section>
+                    <div class="medal-icon img-overlay-medal">
+                      <ion-icon
+                        name="ellipse"
+                        class="skill-icon"
+                        [ngClass]="['skill-icon-'+member.skillLevel]"
+                      ></ion-icon>
+                    </div>
+                  </div>
+                  <ion-card-content class="ion-no-padding">
+                    <div class="content-main">
+                      <h3 class="members-card-title">{{member?.displayName}}</h3>
+                      <!-- <div class="sub-content-inner">
+                                                <div class="total-number">{{member?.dob | calculateAge }}</div>
+                                                
+                                            </div> -->
+                    </div>
+                  </ion-card-content>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size="6" *ngIf="(i+1) % 2 == 0" class="advertisement-margin">
+              <ion-card class="members-card advertisement ion-no-margin" (click)="openAd(getAdForIndex(i))">
+                <div class="card_content">
+                  <div class="profile-img">
+                    <img
+                      class="advertisment-image"
+                      [src]="getAdForIndex(i)?.image || './../../assets/images/palm-tree.png'"
+                      alt=""
+                      onerror="this.src = './../../assets/images/palm-tree.png'"
+                    />
+                  </div>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ng-container>
+        </ion-row>
+      </div>
+    </ion-content>
+    <ion-content *ngIf="!isFriendsVisible">
+      <div *ngIf="!loadPost" class="loading-hooby-members">Loading...</div>
+      <div class="members-list" *ngIf="loadPost">
+        <ion-row class="w-100">
+          <ion-col size="6">
+            <div class="invite-friends">
+              <ion-button shape="round" (click)="createPost()"> Create Post </ion-button>
+            </div>
+          </ion-col>
+          <ng-container *ngFor="let post of posts">
+            <ion-col
+              size="6"
+              class="c-col-wrapper ion-no-padding ion-margin-bottom cc-color"
+              (click)="onClickPost(post)"
+            >
+              <ion-card class="post-card ion-no-margin">
+                <div class="card_content">
+                  <div class="post-blog">
+                    <div class="profile-img">
+                      <img
+                        [src]="post.data.userProfile"
+                        onerror="this.src = '../../../assets/images/palm-tree.png'"
+                        alt=""
+                      />
+                      <div class="skill-img">
+                        <img
+                          style="width: 25px; height: auto; min-width: 25px"
+                          [src]="getSkillPhoto(post.data.userSkill)"
+                        />
+                      </div>
+                    </div>
+                    <div class="card-date">
+                      <ion-text>
+                        <h4>{{post.data.formatedStartDate}}</h4>
+                        <h5>{{post.data.formatedStartMonth}}</h5>
+                        <p style="width: max-content">{{post.data.formatedStartTime}}</p>
+                      </ion-text>
+                    </div>
+                  </div>
+                  <div class="post-blog-1">
+                    <!-- <div>
+                                            <img style="width: 25px; height: auto;min-width: 25px;" [src]="getSkillPhoto(post.data.userSkill)" />
+                                        </div> -->
+                    <div class="title">
+                      <div
+                        class="heading-text"
+                        style="
+                          -webkit-box-orient: vertical;
+                          overflow-wrap: anywhere;
+                          white-space: inherit;
+                        "
+                      >
+                        {{post.data.subject}}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-text">
+                    <div
+                      class="subheading-text"
+                      style="overflow-wrap: anywhere; -webkit-box-orient: vertical"
+                    >
+                      {{post.data.description}}
+                    </div>
+                    <div class="comment-number">
+                      <div class="count-message">{{post.data.messageCount}}</div>
+                      <img src="../../assets/icon/speach-mark.png" />
+                    </div>
+                  </div>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ng-container>
+        </ion-row>
+      </div>
+    </ion-content>
+  </div>
+</ng-container>

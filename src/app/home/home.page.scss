@@ -1,0 +1,160 @@
+.what-like-to-play {
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 0;
+  opacity: 0.8;
+}
+
+.no-shadow {
+  &::after {
+    content: none;
+  }
+  .in-toolbar {
+    --border-width: 0;
+  }
+}
+
+ion-toolbar {
+  --padding-bottom: 0px;
+  border-bottom: 2px solid #5ac5f3;
+}
+
+.toolbar-space {
+  padding: 10px 20px;
+}
+
+ion-content {
+  .hobby-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    padding-bottom: 16px;
+    overflow-y: scroll;
+    height: 100%;
+    .c-item {
+      // --padding-start: 0;
+      // --inner-padding-end: 0;
+      --min-height: 36px;
+      .c-item-inner {
+        width: 100%;
+        .hobby-list-single {
+          // position: absolute;
+          // bottom: 32px;
+          // left: 20px;
+          // max-height: 40px;
+          // height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 400;
+          color: #999;
+          font-size: 28px;
+        }
+        .hobby-chosen {
+          color: #000;
+          font-weight: 700;
+          font-size: 30px;
+        }
+        ion-label {
+          white-space: normal;
+          width: 100%;
+          text-align: center;
+          font-family: 'Roboto', sans-serif;
+        }
+      }
+    }
+  }
+}
+
+.hobby-list ion-col:nth-child(odd) {
+  padding-right: 10px;
+}
+
+.hobby-list ion-col:nth-child(even) {
+  padding-left: 10px;
+}
+
+.dynamic-hobbies-icon {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  @media screen and (max-width: 359px) {
+    top: 12px;
+  }
+  img {
+    height: 30px;
+    @media screen and (max-width: 359px) {
+      height: 25px;
+    }
+    @media screen and (min-width: 376px) {
+      height: 40px;
+    }
+  }
+}
+
+.cust-inner-button {
+  display: flex;
+  flex-direction: column;
+}
+.cust-search-setting {
+  font-size: 11px;
+  font-weight: bold;
+  padding-top: 6px;
+}
+.list-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90%;
+}
+
+.main-rooms {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.disabled-card {
+  pointer-events: none;
+  opacity: 0.8;
+
+  .card-title {
+    color: #fff !important;
+  }
+}
+
+.card {
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+  }
+}
+
+.hobby-notavailable {
+  color: #999;
+}
+
+.back-btn {
+  font-size: 24px;
+  background: #f7f7f7;
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  margin-left: 8px;
+  align-items: center;
+  color: #000;
+}

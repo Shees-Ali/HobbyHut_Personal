@@ -1,0 +1,121 @@
+:host {
+    background: #eef2f7;
+}
+
+// header-set 
+ion-header {
+    --background: transparent;
+    ion-toolbar {
+        --background: transparent;
+        --min-height: 80px;
+    }
+}
+
+// header-set end
+.settings {
+    height: 100%;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    background-color: #fff;
+    overflow: hidden;
+    box-shadow: rgb(136 165 191 / 48%) 0px 2px 16px 1px, rgb(255 255 255 / 80%) -6px -2px 16px 0px;
+    margin-top: 6px;
+    padding: 16px;
+}
+
+ion-content {
+    --background: transparent;
+}
+
+.signout-btn {
+    margin-top: auto;
+}
+
+.delete-btn {
+    margin-bottom: 60px;
+    margin-top: 8px;
+}
+
+.theme-card-settings {
+    margin-bottom: 20px;
+    ion-item {
+        --padding-start: 0px;
+        --inner-padding-start: 20px;
+        --inner-padding-end: 20px;
+        --border-color: #f6f8fb;
+    }
+}
+
+.card-box-heading {
+    background: #eef2f7;
+    padding: 10px 20px;
+    --background: transparent !important;
+    --inner-padding-start: 0px;
+    --inner-padding-end: 0px;
+    ion-label {
+        text-align: left !important;
+        margin: 0;
+        h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+    }
+}
+
+.c-label {
+    margin: 16px 8px 16px 0px !important;
+}
+
+.footer-btn {
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 10px;
+    border-radius: 20px;
+    --border-radius: 20px;
+    margin-bottom: 20px;
+    height: 3em;
+    font-size: 16px;
+    font-weight: 600;
+    @media screen and(max-height: 667px) {
+        height: 2.6em;
+        border-radius: 15px;
+        --border-radius: 15px;
+        box-shadow: #f6f8fb 0px 6px;
+        font-size: 18px;
+    }
+}
+
+.signout-btn {
+    --background: #fff;
+    color: #01c8f8;
+}
+
+.delete-btn {
+    --background: #eef2f7;
+    color: #000;
+}
+
+.profile-image {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.ion-text-bold {
+    font-weight: 500;
+}
+
+.text-light {
+    color: #bbb;
+}
+
+.text-big {
+    font-size: 20px;
+    color: #bbb;
+    margin-top: 10px;
+}
+
+.bottom-space-extra {
+    margin-bottom: 10px;
+}

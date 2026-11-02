@@ -1,0 +1,55 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button color="dark" (click)="dismiss()">
+                <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Add / Remove</ion-title>
+        <ion-buttons slot="end">
+            <ion-button color="dark" (click)="save()">
+                Save
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <p class="ion-text-center hint-copy">Tap on hobbies or skill levels to add or remove hobbies</p>
+
+    <section>
+        <ion-list lines="none" class="hobby-list">
+            <ion-item button detail="false" *ngFor="let hobby of vm$ | async" >
+                <ion-label class="hobby-list-single" [ngClass]="{ 'hobby-chosen': hobby.skillLevel }" (click)="removeHobby(hobby)">{{ hobby.name }}</ion-label>
+
+                <div class="btn-group">
+                    <ion-button fill="clear" class="theme-btn" [ngClass]="{'selectedSkillLevel':hobby?.skillLevel?.skillLevel==SkillLevel.BEGINNER }" 
+                    (click)="onSkillLevelChanged(SkillLevel.BEGINNER, hobby)">
+                        <div class="theme-card-wrapper c-theme-card-wrapper ">
+                            <div class="skill-icon-wrapper skill-icon-beginner"></div>
+                        </div>
+                    </ion-button>
+                    <ion-button fill="clear" class="theme-btn"  [ngClass]="{'selectedSkillLevel':hobby?.skillLevel?.skillLevel==SkillLevel.INTERMEDIATE }" 
+                    (click)="onSkillLevelChanged(SkillLevel.INTERMEDIATE, hobby)">
+                        <div class="theme-card-wrapper c-theme-card-wrapper ">
+                            <div class="skill-icon-wrapper skill-icon-intermediate"></div>
+                        </div>
+                    </ion-button>
+                    <ion-button fill="clear" class="theme-btn" [ngClass]="{'selectedSkillLevel':hobby?.skillLevel?.skillLevel==SkillLevel.ADVANCED }"  
+                    (click)="onSkillLevelChanged(SkillLevel.ADVANCED, hobby)">
+                        <div class="theme-card-wrapper c-theme-card-wrapper ">
+                            <div class="skill-icon-wrapper skill-icon-advanced"></div>
+                        </div>
+                    </ion-button>
+                    <ion-button fill="clear" class="theme-btn"  [ngClass]="{'selectedSkillLevel':hobby?.skillLevel?.skillLevel==SkillLevel.PRO }"  
+                    (click)="onSkillLevelChanged(SkillLevel.PRO, hobby)">
+                        <div class="theme-card-wrapper c-theme-card-wrapper ">
+                            <div class="skill-icon-wrapper skill-icon-pro"></div>
+                        </div>
+                    </ion-button>
+                </div>
+                <!-- <ui-skill-level [skillLevel]="hobby?.skillLevel?.skillLevel" (skillLevelChanged)="onSkillLevelChanged($event, hobby)"></ui-skill-level> -->
+            </ion-item>
+        </ion-list>
+    </section>
+</ion-content>

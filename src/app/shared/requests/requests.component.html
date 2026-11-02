@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Requests</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ng-container *ngFor="let message of messages | messagesFilter: 'requests' ">
+    <ion-item-group class="message-preview" button detail="false" *ngIf="filterRequestMessage(message)">
+      <ion-item lines="none">
+        <ion-avatar (click)="onAvatarClick(message)" slot="start"
+          [ngClass]="{'user-active': message?.participant?.isActive}">
+          <img alt="" [src]="message?.participant?.photoUrl" onerror="this.src='../../assets/images/palm-tree.png'" />
+        </ion-avatar>
+        <ion-label (click)="onOpenMessage(message)">
+          <h2 class="participant-name" [ngClass]="{'unread': message?.participant?.isLast}">
+            {{message?.participant?.displayName}}</h2>
+          <p [ngClass]="{'bold': message?.participant?.isLast}">
+            {{message?.meta?.lastMessage}}
+          </p>
+        </ion-label>
+        <div class="d-flex request-icon">
+          <div class="icon-shape success-color">
+            <ion-icon name="checkmark-circle-sharp" slot="icon-only" (click)="handleAcceptRequest(message)"></ion-icon>
+          </div>
+          <div class="icon-shape red-color">
+            <ion-icon name="close-circle-sharp" slot="icon-only" (click)="handleDeclineRequest(message)"></ion-icon>
+          </div>
+        </div>
+      </ion-item>
+    </ion-item-group>
+  </ng-container>
+  <div *ngIf="messagesFilterArrLength==0" class="empty-request">
+    <img
+      class="empty-state-img"
+      src="../../assets/images/no_requests_placeholder.png"
+      alt="No friend requests"
+    />
+    <p>There are no current friend requests</p>
+  </div>
+</ion-content>

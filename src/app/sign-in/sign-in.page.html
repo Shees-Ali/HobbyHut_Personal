@@ -1,0 +1,103 @@
+<ion-header *ngIf="!status && showSlides==false">
+  <ion-toolbar>
+    <ion-segment (ionChange)="segmentChanged($event)" [value]="checkedSegment">
+      <ion-segment-button value="login">
+        <ion-label>Sign In</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="signup">
+        <ion-label>Sign Up</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" *ngIf="!status">
+  <section class="signup-wrapper">
+    <ion-card class="ion-no-margin login-card">
+      <ion-card-header>
+        <ion-card-title class="card-title"> Welcome </ion-card-title>
+        <ng-container [ngSwitch]="checkedSegment">
+          <ion-card-subtitle *ngSwitchCase="'login'"> Sign In to your account </ion-card-subtitle>
+
+          <ion-card-subtitle *ngSwitchDefault> Sign Up for your account </ion-card-subtitle>
+        </ng-container>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="authForm" (ngSubmit)="loginWithEmail()">
+          <ion-item>
+            <ion-label position="floating">Email</ion-label>
+            <ion-input formControlName="email"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input formControlName="password" type="password"></ion-input>
+          </ion-item>
+          <div [ngSwitch]="checkedSegment" class="ion-text-center">
+            <ion-button *ngSwitchCase="'login'" type="submit" shape="round" class="ion-margin-top">
+              Sign In
+            </ion-button>
+            <ion-button
+              *ngSwitchDefault
+              class="ion-margin-top"
+              shape="round"
+              type="button"
+              (click)="signupWithEmail()"
+            >
+              Sign Up
+            </ion-button>
+          </div>
+        </form>
+        <p class="card-copy-separator ion-text-center">or</p>
+        <!-- <ion-button
+          class="sign-in-btn"
+          (click)="changeLoginPage()"
+          expand="block"
+          fill="clear"
+          shape="round"
+        >
+          Sign in with Social
+        </ion-button> -->
+      </ion-card-content>
+    </ion-card>
+  </section>
+</ion-content>
+<ion-app class="startSlider" *ngIf="status && showSlides==false">
+  <ion-content scroll-y="false">
+    <div class="slide-3-wrapper">
+      <img src="../../assets/images/slide_3_bg.png" class="slide-bg" />
+      <div class="login-card-wrapper">
+        <div class="app-logo-wrapper">
+          <img src="../../assets/icon/logo_main.png" />
+        </div>
+        <div class="card-content">
+          <ion-card class="ion-no-margin ion-padding">
+            <h3 class="card-heading">Sign In</h3>
+            <p class="card-sub-heading">
+              Your private information is secure and will not be published.
+            </p>
+            <!-- <ion-item class="signInButtons apple" lines="none">
+                            <ion-icon class="socialIcon" ios="logo-apple" md="logo-ios"></ion-icon>
+                            <ion-label color="dark" (click)="loginWithIos()">Sign in with apple</ion-label>
+                        </ion-item> -->
+            <ion-item class="signInButtons phone" lines="none">
+              <ion-icon class="socialIcon" name="call"></ion-icon>
+              <ion-label color="light" (click)="presentPhoneInput()" expand="block"
+                >Sign in with phone number
+              </ion-label>
+            </ion-item>
+            <ion-item class="signInButtons email" lines="none">
+              <ion-icon class="socialIcon" name="mail"></ion-icon>
+              <ion-label color="light" (click)="changeLoginPage()" expand="block"
+                >Sign in with Email</ion-label
+              >
+            </ion-item>
+            <!-- <ion-item class="signInButtons facebook" lines="none">
+                            <ion-icon class="socialIcon" ios="logo-facebook" md="logo-facebook"></ion-icon>
+                            <ion-label color="light" (click)="loginWithFacebook()">Sign in with facebook</ion-label>
+                        </ion-item> -->
+          </ion-card>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-app>

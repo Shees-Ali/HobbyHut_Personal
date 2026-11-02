@@ -1,0 +1,31 @@
+h1,
+h2,
+h3 {
+  font-family: var(--ion-font-family-nanami-bold);
+}
+
+h1 {
+  font-weight: 900;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+h2,
+h3 {
+  font-weight: 400;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+p {
+  margin: 0;
+}
+
+hr {
+  background: var(--ion-color-light);
+  height: 2px;
+}

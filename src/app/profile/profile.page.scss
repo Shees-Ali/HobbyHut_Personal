@@ -1,0 +1,541 @@
+.profile-img {
+  max-height: 360px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.img-wrapper {
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
+.upload-icon {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  font-size: 36px;
+  z-index: 12;
+}
+
+.profile-title {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  font-size: 32px;
+}
+
+.hobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: #eef2f7;
+  padding: 10px 20px;
+  min-height: 66px;
+}
+
+.back-btn-bg {
+  background: rgb(255 255 255 / 60%);
+  //   background: #ffffff4d;
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #000;
+  position: absolute;
+  top: 30px;
+  left: 20px;
+}
+
+.hobby {
+  display: inline-block;
+  border: 2px solid #8c8c8c;
+  padding: 5px 12px;
+  margin-right: 7px;
+  margin-bottom: 7px;
+  font-weight: bold;
+  border-radius: 30px;
+}
+
+.activeHobby {
+  border: 2px solid #009ae0;
+  padding: 2px;
+}
+
+.activeHobby .hobbyname {
+  border: 2px solid #ffc001 !important;
+  padding: 3px 10px !important;
+  border-radius: 30px;
+}
+
+.selectedHobby {
+  border: 2px solid #5ac5f3;
+  background: #5ac5f3;
+  color: #fff;
+}
+
+.profile-form {
+  padding-block-end: 10px;
+}
+
+.profile-form-label {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  background: #eef2f7;
+  padding: 10px 20px;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+}
+
+// .btn-add-remove-hobby, .btn-turn-off-times {
+//   color: var(--ion-color-primary);
+// }
+.profile-form-input {
+  font-size: smaller;
+}
+
+.sc-ion-textarea-ios-h {
+  --placeholder-color: lightgray !important;
+  --placeholder-opacity: 1;
+  font-size: 14px !important;
+  padding-top: 5px !important;
+}
+
+.sc-ion-input-ios-h {
+  --placeholder-color: lightgray !important;
+  --placeholder-opacity: 1;
+  font-size: 14px !important;
+  padding-top: 5px !important;
+}
+
+.platform-ios {
+  textarea {
+    margin-left: -3px;
+
+    &::placeholder {
+      padding-left: 3px;
+      font-size: 10px !important;
+    }
+  }
+}
+
+.placeholderDiv {
+  position: relative;
+  width: 100%;
+
+  .placeholder {
+    position: absolute;
+    top: 7px;
+    left: 2px;
+    color: lightgray;
+    font-size: 14px;
+  }
+
+  .placeholder.active {
+    display: none;
+  }
+}
+
+.skill-icon {
+  font-size: 16px;
+}
+
+.skill-icon-beginner {
+  color: var(--ion-color-white);
+  box-shadow: inset 0px 0px 0px 1px var(--ion-color-silver);
+  border-radius: 50%;
+}
+
+.skill-icon-intermediate {
+  color: var(--ion-color-bronze);
+}
+
+.skill-icon-advanced {
+  color: var(--ion-color-silver);
+}
+
+.skill-icon-pro {
+  color: var(--ion-color-gold);
+}
+
+ion-avatar {
+  height: 44px;
+  width: 44px;
+}
+
+.f-13 {
+  font-size: 13px;
+}
+
+.lh-22 {
+  line-height: 22px;
+}
+
+.upload-icon {
+  height: 40px;
+  width: 40px;
+  background: rgba(255, 255, 255, 0.63);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 27px;
+  box-shadow: rgb(2 8 20 / 10%) 0px 0.175em 0.5em, rgb(2 8 20 / 8%) 0px 0.085em 0.175em;
+}
+
+.background-profile {
+  position: absolute;
+  top: 0;
+  z-index: -2;
+
+  img {
+    min-height: 340px;
+    max-height: 340px;
+    width: 100vw;
+    object-fit: cover;
+
+    @media screen and(max-height: 667px) {
+      min-height: 300px;
+      max-height: 300px;
+    }
+
+    @media screen and(max-height: 736px) {
+      min-height: 320px;
+      max-height: 320px;
+    }
+  }
+}
+
+// header-set
+ion-header {
+  --background: transparent;
+  position: relative;
+
+  ion-toolbar {
+    --background: transparent;
+    --min-height: 250px;
+  }
+}
+
+.user-profile-name {
+  position: absolute;
+  bottom: 4px;
+  left: 20px;
+  font-size: 30px;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: #fff;
+
+  .username {
+    text-transform: none !important;
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  .last-seen {
+    font-size: 12px;
+    font-weight: 400;
+  }
+}
+
+.profile-img-shadow {
+  background: linear-gradient(0deg, black 0%, #000000ba 0%, rgba(0, 0, 0, 0) 85%);
+  position: absolute;
+  top: 173px;
+  left: 0;
+  height: 164px;
+  z-index: -1;
+  width: 100%;
+
+  @media screen and(max-height: 667px) {
+    top: 133px;
+  }
+
+  @media screen and(max-height: 736px) {
+    top: 153px;
+  }
+}
+
+.profile {
+  border-top-left-radius: 40px;
+  border-top-right-radius: 40px;
+  background-color: #fff;
+  overflow: hidden;
+  box-shadow: rgb(115 115 115 / 20%) 0px 2px 5px 1px, rgb(96 96 96 / 40%) -6px -2px 8px 0px;
+  margin-top: 6px;
+  height: 100%;
+  overflow: hidden;
+  padding: 15px;
+}
+
+// header-set end
+ion-content {
+  --background: transparent;
+
+  .add-remove-hobby-and-timer {
+    padding-bottom: 20px;
+
+    ion-button {
+      --background: #fff;
+      --color: #000;
+      --border-radius: 12px !important;
+      height: 4em;
+      font-size: 12px;
+      --border-color: #f6f8fb;
+      --box-shadow: #f6f8fb 0px 6px;
+      width: 100%;
+      --border-width: 2px;
+      --border-style: solid;
+    }
+  }
+
+  .btn-add-remove-hobby,
+  .btn-turn-off-times {
+    font-size: 14px;
+    text-wrap: auto;
+  }
+}
+
+.bottom-space {
+  margin-bottom: 25px;
+}
+
+.bottom-line {
+  border-bottom: 1px solid #f6f8fb;
+}
+
+.record-book-content-winner {
+  .game-name-wrapper {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+
+    .user-profile-game {
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .user-name-winner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .win {
+    color: #000;
+  }
+}
+
+.winner-number {
+  text-align: right;
+
+  @media screen and (min-width: 376px) {
+    padding-right: 3px !important;
+  }
+}
+
+.name-wrapper {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-book-content-looser {
+  .user-name-looser {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .looser-number {
+    color: #000;
+    text-align: right;
+
+    @media screen and (min-width: 376px) {
+      padding-right: 3px !important;
+    }
+  }
+
+  .looser {
+    color: #000;
+  }
+}
+
+.hobby-list {
+  text-align: center;
+}
+
+.skill-icon-wrapper {
+  height: 16px;
+  width: 16px;
+  min-width: 16px;
+  background-size: cover;
+}
+
+.skill-icon-beginner {
+  background-image: url('../../assets/icon/icon-beginner.png');
+}
+
+.skill-icon-intermediate {
+  background-image: url('../../assets/icon/icon-intermediate.png');
+}
+
+.skill-icon-advanced {
+  background-image: url('../../assets/icon/icon-advanced.png');
+}
+
+.skill-icon-pro {
+  background-image: url('../../assets/icon/icon-pro.png');
+}
+
+.profile-detail {
+  height: auto !important;
+
+  ion-item {
+    position: relative !important;
+    --padding-start: 10px;
+    --inner-padding-end: 10px;
+  }
+}
+
+.like-to-go-item {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-top: 0;
+  --inner-padding-bottom: 0;
+  --inner-padding-start: 0;
+  --inner-padding-end: 0;
+  align-items: flex-start;
+
+  ion-label {
+    margin: 2px 0 2px 0;
+  }
+}
+
+.c-border-row {
+  border: 2px solid #8c8c8c3b;
+  border-radius: 30px;
+  padding-left: 5px;
+}
+
+.border-bottom-none {
+  // border-bottom: none;
+  margin-bottom: 2px;
+}
+
+.c-inner-border {
+  border: 2px solid #8c8c8c3b;
+  border-radius: 30px;
+  padding: 1px 5px;
+}
+
+.border-top-bottom-none {
+  border-bottom: none;
+  border-top: none;
+  border-right: none;
+}
+
+.medium-text-area-wrapper {
+  ion-textarea {
+    --padding-top: 0px !important;
+    --padding-bottom: 0 !important;
+    --padding-start: 0px !important;
+    padding-bottom: 0 !important;
+  }
+}
+.c-disable {
+  color: #cfcdcd;
+}
+
+.custom-textarea-wrapper {
+  width: 100%;
+
+  .textarea-placeholder {
+    position: relative;
+    > div {
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background-color: #fff;
+      color: #d3d3d3;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 16px;
+      padding: 32px 10px 0 6px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+  }
+  ion-textarea {
+    &.data-edits {
+      background-color: #fff;
+    }
+  }
+}
+.about-me-wrapper {
+  min-height: 92px;
+  .about-input {
+    min-height: 100px;
+  }
+}
+.like-to-go-wrapper {
+  min-height: 88px;
+  .like-to-go-input {
+    min-height: 96px;
+  }
+}
+.last-meal-wrapper {
+  min-height: 62px;
+  .like-to-go-input {
+    min-height: 70px;
+  }
+}
+.hide-placeholder1 {
+  background-color: #fff;
+  min-height: 0 !important;
+}
+.hide-placeholder2 {
+  background-color: #fff;
+  min-height: 0 !important;
+}
+ion-label {
+  span {
+    color: #3dc2ff !important;
+  }
+}

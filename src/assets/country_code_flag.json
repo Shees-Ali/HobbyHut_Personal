@@ -1,0 +1,1487 @@
+[
+    {
+        "name": "Mexico",
+        "code": "MX",
+        "dial_code": "+52",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Mexico.svg"
+    },
+    {
+        "name": "United States",
+        "code": "US",
+        "dial_code": "+1",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg"
+    },
+    {
+        "name": "Israel",
+        "code": "IL",
+        "dial_code": "+972",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg"
+    },
+    {
+        "name": "Afghanistan",
+        "code": "AF",
+        "dial_code": "+93",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Afghanistan.svg"
+    },
+    {
+        "name": "Albania",
+        "code": "AL",
+        "dial_code": "+355",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/36/Flag_of_Albania.svg"
+    },
+    {
+        "name": "Algeria",
+        "code": "DZ",
+        "dial_code": "+213",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Algeria.svg"
+    },
+    {
+        "name": "Andorra",
+        "code": "AD",
+        "dial_code": "+376",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Andorra.svg"
+    },
+    {
+        "name": "Angola",
+        "code": "AO",
+        "dial_code": "+244",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Flag_of_Angola.svg"
+    },
+    {
+        "name": "Anguilla",
+        "code": "AI",
+        "dial_code": "+1 264",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Anguilla.svg"
+    },
+    {
+        "name": "Antigua and Barbuda",
+        "code": "AG",
+        "dial_code": "+1268",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/89/Flag_of_Antigua_and_Barbuda.svg"
+    },
+    {
+        "name": "Argentina",
+        "code": "AR",
+        "dial_code": "+54",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg"
+    },
+    {
+        "name": "Armenia",
+        "code": "AM",
+        "dial_code": "+374",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Flag_of_Armenia.svg"
+    },
+    {
+        "name": "Aruba",
+        "code": "AW",
+        "dial_code": "+297",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Flag_of_Aruba.svg"
+    },
+    {
+        "name": "Australia",
+        "code": "AU",
+        "dial_code": "+61",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg"
+    },
+    {
+        "name": "Austria",
+        "code": "AT",
+        "dial_code": "+43",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Austria.svg"
+    },
+    {
+        "name": "Azerbaijan",
+        "code": "AZ",
+        "dial_code": "+994",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Azerbaijan.svg"
+    },
+    {
+        "name": "Bahamas",
+        "code": "BS",
+        "dial_code": "+1 242",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/93/Flag_of_the_Bahamas.svg"
+    },
+    {
+        "name": "Bahrain",
+        "code": "BH",
+        "dial_code": "+973",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Bahrain.svg"
+    },
+    {
+        "name": "Bangladesh",
+        "code": "BD",
+        "dial_code": "+880",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f9/Flag_of_Bangladesh.svg"
+    },
+    {
+        "name": "Barbados",
+        "code": "BB",
+        "dial_code": "+1 246",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Barbados.svg"
+    },
+    {
+        "name": "Belarus",
+        "code": "BY",
+        "dial_code": "+375",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/85/Flag_of_Belarus.svg"
+    },
+    {
+        "name": "Belgium",
+        "code": "BE",
+        "dial_code": "+32",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Belgium.svg"
+    },
+    {
+        "name": "Belize",
+        "code": "BZ",
+        "dial_code": "+501",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Flag_of_Belize.svg"
+    },
+    {
+        "name": "Benin",
+        "code": "BJ",
+        "dial_code": "+229",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Benin.svg"
+    },
+    {
+        "name": "Bermuda",
+        "code": "BM",
+        "dial_code": "+1 441",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Flag_of_Bermuda.svg"
+    },
+    {
+        "name": "Bhutan",
+        "code": "BT",
+        "dial_code": "+975",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/91/Flag_of_Bhutan.svg"
+    },
+    {
+        "name": "Bosnia and Herzegovina",
+        "code": "BA",
+        "dial_code": "+387",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Flag_of_Bosnia_and_Herzegovina.svg"
+    },
+    {
+        "name": "Botswana",
+        "code": "BW",
+        "dial_code": "+267",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Botswana.svg"
+    },
+    {
+        "name": "Brazil",
+        "code": "BR",
+        "dial_code": "+55",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/0/05/Flag_of_Brazil.svg"
+    },
+    {
+        "name": "British Indian Ocean Territory",
+        "code": "IO",
+        "dial_code": "+246",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Flag_of_the_British_Indian_Ocean_Territory.svg"
+    },
+    {
+        "name": "Bulgaria",
+        "code": "BG",
+        "dial_code": "+359",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Bulgaria.svg"
+    },
+    {
+        "name": "Burkina Faso",
+        "code": "BF",
+        "dial_code": "+226",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Burkina_Faso.svg"
+    },
+    {
+        "name": "Burundi",
+        "code": "BI",
+        "dial_code": "+257",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/50/Flag_of_Burundi.svg"
+    },
+    {
+        "name": "Cambodia",
+        "code": "KH",
+        "dial_code": "+855",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_Cambodia.svg"
+    },
+    {
+        "name": "Cameroon",
+        "code": "CM",
+        "dial_code": "+237",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Cameroon.svg"
+    },
+    {
+        "name": "Canada",
+        "code": "CA",
+        "dial_code": "+1",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/cf/Flag_of_Canada.svg"
+    },
+    {
+        "name": "Cape Verde",
+        "code": "CV",
+        "dial_code": "+238",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Cape_Verde.svg"
+    },
+    {
+        "name": "Cayman Islands",
+        "code": "KY",
+        "dial_code": "+ 345",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_the_Cayman_Islands.svg"
+    },
+    {
+        "name": "Central African Republic",
+        "code": "CF",
+        "dial_code": "+236",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Central_African_Republic.svg"
+    },
+    {
+        "name": "Chad",
+        "code": "TD",
+        "dial_code": "+235",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Flag_of_Chad.svg"
+    },
+    {
+        "name": "Chile",
+        "code": "CL",
+        "dial_code": "+56",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Chile.svg"
+    },
+    {
+        "name": "China",
+        "code": "CN",
+        "dial_code": "+86",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_the_People%27s_Republic_of_China.svg"
+    },
+    {
+        "name": "Christmas Island",
+        "code": "CX",
+        "dial_code": "+61",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/67/Flag_of_Christmas_Island.svg"
+    },
+    {
+        "name": "Colombia",
+        "code": "CO",
+        "dial_code": "+57",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg"
+    },
+    {
+        "name": "Comoros",
+        "code": "KM",
+        "dial_code": "+269",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/94/Flag_of_the_Comoros.svg"
+    },
+    {
+        "name": "Congo",
+        "code": "CG",
+        "dial_code": "+242",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_the_Republic_of_the_Congo.svg"
+    },
+    {
+        "name": "Cook Islands",
+        "code": "CK",
+        "dial_code": "+682",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_the_Cook_Islands.svg"
+    },
+    {
+        "name": "Costa Rica",
+        "code": "CR",
+        "dial_code": "+506",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Costa_Rica_%28state%29.svg"
+    },
+    {
+        "name": "Croatia",
+        "code": "HR",
+        "dial_code": "+385",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg"
+    },
+    {
+        "name": "Cuba",
+        "code": "CU",
+        "dial_code": "+53",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg"
+    },
+    {
+        "name": "Cyprus",
+        "code": "CY",
+        "dial_code": "+537",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Cyprus.svg"
+    },
+    {
+        "name": "Czech Republic",
+        "code": "CZ",
+        "dial_code": "+420",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_Czech_Republic.svg"
+    },
+    {
+        "name": "Denmark",
+        "code": "DK",
+        "dial_code": "+45",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Denmark.svg"
+    },
+    {
+        "name": "Djibouti",
+        "code": "DJ",
+        "dial_code": "+253",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_Djibouti.svg"
+    },
+    {
+        "name": "Dominica",
+        "code": "DM",
+        "dial_code": "+1 767",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Flag_of_Dominica.svg"
+    },
+    {
+        "name": "Dominican Republic",
+        "code": "DO",
+        "dial_code": "+1 849",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_the_Dominican_Republic.svg"
+    },
+    {
+        "name": "Ecuador",
+        "code": "EC",
+        "dial_code": "+593",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Flag_of_Ecuador.svg"
+    },
+    {
+        "name": "Egypt",
+        "code": "EG",
+        "dial_code": "+20",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Egypt.svg"
+    },
+    {
+        "name": "El Salvador",
+        "code": "SV",
+        "dial_code": "+503",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg"
+    },
+    {
+        "name": "Equatorial Guinea",
+        "code": "GQ",
+        "dial_code": "+240",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Equatorial_Guinea.svg"
+    },
+    {
+        "name": "Eritrea",
+        "code": "ER",
+        "dial_code": "+291",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/29/Flag_of_Eritrea.svg"
+    },
+    {
+        "name": "Estonia",
+        "code": "EE",
+        "dial_code": "+372",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Flag_of_Estonia.svg"
+    },
+    {
+        "name": "Ethiopia",
+        "code": "ET",
+        "dial_code": "+251",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/71/Flag_of_Ethiopia.svg"
+    },
+    {
+        "name": "Faroe Islands",
+        "code": "FO",
+        "dial_code": "+298",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Flag_of_the_Faroe_Islands.svg"
+    },
+    {
+        "name": "Fiji",
+        "code": "FJ",
+        "dial_code": "+679",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Fiji.svg"
+    },
+    {
+        "name": "Finland",
+        "code": "FI",
+        "dial_code": "+358",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Finland.svg"
+    },
+    {
+        "name": "France",
+        "code": "FR",
+        "dial_code": "+33",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg"
+    },
+    {
+        "name": "French Guiana",
+        "code": "GF",
+        "dial_code": "+594",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/29/Flag_of_French_Guiana.svg"
+    },
+    {
+        "name": "French Polynesia",
+        "code": "PF",
+        "dial_code": "+689",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/db/Flag_of_French_Polynesia.svg"
+    },
+    {
+        "name": "Gabon",
+        "code": "GA",
+        "dial_code": "+241",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/04/Flag_of_Gabon.svg"
+    },
+    {
+        "name": "Gambia",
+        "code": "GM",
+        "dial_code": "+220",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_The_Gambia.svg"
+    },
+    {
+        "name": "Georgia",
+        "code": "GE",
+        "dial_code": "+995",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Georgia.svg"
+    },
+    {
+        "name": "Germany",
+        "code": "DE",
+        "dial_code": "+49",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/b/ba/Flag_of_Germany.svg"
+    },
+    {
+        "name": "Ghana",
+        "code": "GH",
+        "dial_code": "+233",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Ghana.svg"
+    },
+    {
+        "name": "Gibraltar",
+        "code": "GI",
+        "dial_code": "+350",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/02/Flag_of_Gibraltar.svg"
+    },
+    {
+        "name": "Greece",
+        "code": "GR",
+        "dial_code": "+30",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Greece.svg"
+    },
+    {
+        "name": "Greenland",
+        "code": "GL",
+        "dial_code": "+299",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_Greenland.svg"
+    },
+    {
+        "name": "Grenada",
+        "code": "GD",
+        "dial_code": "+1 473",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Grenada.svg"
+    },
+    {
+        "name": "Guadeloupe",
+        "code": "GP",
+        "dial_code": "+590",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/04/Flag_of_Guadeloupe_%28local%29.svg"
+    },
+    {
+        "name": "Guam",
+        "code": "GU",
+        "dial_code": "+1 671",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/07/Flag_of_Guam.svg"
+    },
+    {
+        "name": "Guatemala",
+        "code": "GT",
+        "dial_code": "+502",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Flag_of_Guatemala.svg"
+    },
+    {
+        "name": "Guinea",
+        "code": "GN",
+        "dial_code": "+224",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Flag_of_Guinea.svg"
+    },
+    {
+        "name": "Guinea-Bissau",
+        "code": "GW",
+        "dial_code": "+245",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_Guinea-Bissau.svg"
+    },
+    {
+        "name": "Guyana",
+        "code": "GY",
+        "dial_code": "+595",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/99/Flag_of_Guyana.svg"
+    },
+    {
+        "name": "Haiti",
+        "code": "HT",
+        "dial_code": "+509",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/56/Flag_of_Haiti.svg"
+    },
+    {
+        "name": "Honduras",
+        "code": "HN",
+        "dial_code": "+504",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/82/Flag_of_Honduras.svg"
+    },
+    {
+        "name": "Hungary",
+        "code": "HU",
+        "dial_code": "+36",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg"
+    },
+    {
+        "name": "Iceland",
+        "code": "IS",
+        "dial_code": "+354",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Iceland.svg"
+    },
+    {
+        "name": "India",
+        "code": "IN",
+        "dial_code": "+91",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg"
+    },
+    {
+        "name": "Indonesia",
+        "code": "ID",
+        "dial_code": "+62",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg"
+    },
+    {
+        "name": "Iraq",
+        "code": "IQ",
+        "dial_code": "+964",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Flag_of_Iraq.svg"
+    },
+    {
+        "name": "Ireland",
+        "code": "IE",
+        "dial_code": "+353",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Ireland.svg"
+    },
+    {
+        "name": "Israel",
+        "code": "IL",
+        "dial_code": "+972",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg"
+    },
+    {
+        "name": "Italy",
+        "code": "IT",
+        "dial_code": "+39",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/0/03/Flag_of_Italy.svg"
+    },
+    {
+        "name": "Jamaica",
+        "code": "JM",
+        "dial_code": "+1 876",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Jamaica.svg"
+    },
+    {
+        "name": "Japan",
+        "code": "JP",
+        "dial_code": "+81",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/9/9e/Flag_of_Japan.svg"
+    },
+    {
+        "name": "Jordan",
+        "code": "JO",
+        "dial_code": "+962",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Flag_of_Jordan.svg"
+    },
+    {
+        "name": "Kazakhstan",
+        "code": "KZ",
+        "dial_code": "+7 7",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Kazakhstan.svg"
+    },
+    {
+        "name": "Kenya",
+        "code": "KE",
+        "dial_code": "+254",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Kenya.svg"
+    },
+    {
+        "name": "Kiribati",
+        "code": "KI",
+        "dial_code": "+686",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Kiribati.svg"
+    },
+    {
+        "name": "Kuwait",
+        "code": "KW",
+        "dial_code": "+965",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Flag_of_Kuwait.svg"
+    },
+    {
+        "name": "Kyrgyzstan",
+        "code": "KG",
+        "dial_code": "+996",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Flag_of_Kyrgyzstan.svg"
+    },
+    {
+        "name": "Latvia",
+        "code": "LV",
+        "dial_code": "+371",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Latvia.svg"
+    },
+    {
+        "name": "Lebanon",
+        "code": "LB",
+        "dial_code": "+961",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/59/Flag_of_Lebanon.svg"
+    },
+    {
+        "name": "Lesotho",
+        "code": "LS",
+        "dial_code": "+266",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Flag_of_Lesotho.svg"
+    },
+    {
+        "name": "Liberia",
+        "code": "LR",
+        "dial_code": "+231",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Flag_of_Liberia.svg"
+    },
+    {
+        "name": "Liechtenstein",
+        "code": "LI",
+        "dial_code": "+423",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/47/Flag_of_Liechtenstein.svg"
+    },
+    {
+        "name": "Lithuania",
+        "code": "LT",
+        "dial_code": "+370",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Lithuania.svg"
+    },
+    {
+        "name": "Luxembourg",
+        "code": "LU",
+        "dial_code": "+352",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/da/Flag_of_Luxembourg.svg"
+    },
+    {
+        "name": "Madagascar",
+        "code": "MG",
+        "dial_code": "+261",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Madagascar.svg"
+    },
+    {
+        "name": "Malawi",
+        "code": "MW",
+        "dial_code": "+265",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Flag_of_Malawi.svg"
+    },
+    {
+        "name": "Malaysia",
+        "code": "MY",
+        "dial_code": "+60",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/66/Flag_of_Malaysia.svg"
+    },
+    {
+        "name": "Maldives",
+        "code": "MV",
+        "dial_code": "+960",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_Maldives.svg"
+    },
+    {
+        "name": "Mali",
+        "code": "ML",
+        "dial_code": "+223",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/92/Flag_of_Mali.svg"
+    },
+    {
+        "name": "Malta",
+        "code": "MT",
+        "dial_code": "+356",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Malta.svg"
+    },
+    {
+        "name": "Marshall Islands",
+        "code": "MH",
+        "dial_code": "+692",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Flag_of_the_Marshall_Islands.svg"
+    },
+    {
+        "name": "Martinique",
+        "code": "MQ",
+        "dial_code": "+596",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/52/Flag_of_Martinique.svg"
+    },
+    {
+        "name": "Mauritania",
+        "code": "MR",
+        "dial_code": "+222",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/43/Flag_of_Mauritania.svg"
+    },
+    {
+        "name": "Mauritius",
+        "code": "MU",
+        "dial_code": "+230",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/77/Flag_of_Mauritius.svg"
+    },
+    {
+        "name": "Mayotte",
+        "code": "YT",
+        "dial_code": "+262",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg"
+    },
+    
+    {
+        "name": "Monaco",
+        "code": "MC",
+        "dial_code": "+377",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Flag_of_Monaco.svg"
+    },
+    {
+        "name": "Mongolia",
+        "code": "MN",
+        "dial_code": "+976",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Flag_of_Mongolia.svg"
+    },
+    {
+        "name": "Montenegro",
+        "code": "ME",
+        "dial_code": "+382",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/64/Flag_of_Montenegro.svg"
+    },
+    {
+        "name": "Montserrat",
+        "code": "MS",
+        "dial_code": "+1664",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Montserrat.svg"
+    },
+    {
+        "name": "Morocco",
+        "code": "MA",
+        "dial_code": "+212",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg"
+    },
+    {
+        "name": "Myanmar",
+        "code": "MM",
+        "dial_code": "+95",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Flag_of_Myanmar.svg"
+    },
+    {
+        "name": "Namibia",
+        "code": "NA",
+        "dial_code": "+264",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Namibia.svg"
+    },
+    {
+        "name": "Nauru",
+        "code": "NR",
+        "dial_code": "+674",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/30/Flag_of_Nauru.svg"
+    },
+    {
+        "name": "Nepal",
+        "code": "NP",
+        "dial_code": "+977",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg"
+    },
+    {
+        "name": "Netherlands",
+        "code": "NL",
+        "dial_code": "+31",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg"
+    },
+    {
+        "name": "New Caledonia",
+        "code": "NC",
+        "dial_code": "+687",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/23/Flag_of_New_Caledonia.svg"
+    },
+    {
+        "name": "New Zealand",
+        "code": "NZ",
+        "dial_code": "+64",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Flag_of_New_Zealand.svg"
+    },
+    {
+        "name": "Nicaragua",
+        "code": "NI",
+        "dial_code": "+505",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Nicaragua.svg"
+    },
+    {
+        "name": "Niger",
+        "code": "NE",
+        "dial_code": "+227",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Flag_of_Niger.svg"
+    },
+    {
+        "name": "Nigeria",
+        "code": "NG",
+        "dial_code": "+234",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/79/Flag_of_Nigeria.svg"
+    },
+    {
+        "name": "Niue",
+        "code": "NU",
+        "dial_code": "+683",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_Niue.svg"
+    },
+    {
+        "name": "Norfolk Island",
+        "code": "NF",
+        "dial_code": "+672",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Norfolk_Island.svg"
+    },
+    {
+        "name": "Northern Mariana Islands",
+        "code": "MP",
+        "dial_code": "+1 670",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Flag_of_the_Northern_Mariana_Islands.svg"
+    },
+    {
+        "name": "Norway",
+        "code": "NO",
+        "dial_code": "+47",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg"
+    },
+    {
+        "name": "Oman",
+        "code": "OM",
+        "dial_code": "+968",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Flag_of_Oman.svg"
+    },
+    {
+        "name": "Pakistan",
+        "code": "PK",
+        "dial_code": "+92",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Pakistan.svg"
+    },
+    {
+        "name": "Palau",
+        "code": "PW",
+        "dial_code": "+680",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Palau.svg"
+    },
+    {
+        "name": "Panama",
+        "code": "PA",
+        "dial_code": "+507",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Flag_of_Panama.svg"
+    },
+    {
+        "name": "Papua New Guinea",
+        "code": "PG",
+        "dial_code": "+675",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Flag_of_Papua_New_Guinea.svg"
+    },
+    {
+        "name": "Paraguay",
+        "code": "PY",
+        "dial_code": "+595",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Paraguay.svg"
+    },
+    {
+        "name": "Peru",
+        "code": "PE",
+        "dial_code": "+51",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg"
+    },
+    {
+        "name": "Philippines",
+        "code": "PH",
+        "dial_code": "+63",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/99/Flag_of_the_Philippines.svg"
+    },
+    {
+        "name": "Poland",
+        "code": "PL",
+        "dial_code": "+48",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/1/12/Flag_of_Poland.svg"
+    },
+    {
+        "name": "Portugal",
+        "code": "PT",
+        "dial_code": "+351",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg"
+    },
+    {
+        "name": "Puerto Rico",
+        "code": "PR",
+        "dial_code": "+1 939",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/28/Flag_of_Puerto_Rico.svg"
+    },
+    {
+        "name": "Qatar",
+        "code": "QA",
+        "dial_code": "+974",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/65/Flag_of_Qatar.svg"
+    },
+    {
+        "name": "Romania",
+        "code": "RO",
+        "dial_code": "+40",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg"
+    },
+    {
+        "name": "Rwanda",
+        "code": "RW",
+        "dial_code": "+250",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/17/Flag_of_Rwanda.svg"
+    },
+    {
+        "name": "Samoa",
+        "code": "WS",
+        "dial_code": "+685",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/31/Flag_of_Samoa.svg"
+    },
+    {
+        "name": "San Marino",
+        "code": "SM",
+        "dial_code": "+378",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_San_Marino.svg"
+    },
+    {
+        "name": "Saudi Arabia",
+        "code": "SA",
+        "dial_code": "+966",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg"
+    },
+    {
+        "name": "Senegal",
+        "code": "SN",
+        "dial_code": "+221",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Flag_of_Senegal.svg"
+    },
+    {
+        "name": "Serbia",
+        "code": "RS",
+        "dial_code": "+381",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg"
+    },
+    {
+        "name": "Seychelles",
+        "code": "SC",
+        "dial_code": "+248",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Seychelles.svg"
+    },
+    {
+        "name": "Sierra Leone",
+        "code": "SL",
+        "dial_code": "+232",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/17/Flag_of_Sierra_Leone.svg"
+    },
+    {
+        "name": "Singapore",
+        "code": "SG",
+        "dial_code": "+65",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Singapore.svg"
+    },
+    {
+        "name": "Slovakia",
+        "code": "SK",
+        "dial_code": "+421",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Flag_of_Slovakia.svg"
+    },
+    {
+        "name": "Slovenia",
+        "code": "SI",
+        "dial_code": "+386",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Flag_of_Slovenia.svg"
+    },
+    {
+        "name": "Solomon Islands",
+        "code": "SB",
+        "dial_code": "+677",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/74/Flag_of_the_Solomon_Islands.svg"
+    },
+    {
+        "name": "South Africa",
+        "code": "ZA",
+        "dial_code": "+27",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/af/Flag_of_South_Africa.svg"
+    },
+    {
+        "name": "South Georgia and the South Sandwich Islands",
+        "code": "GS",
+        "dial_code": "+500",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Flag_of_South_Georgia_and_the_South_Sandwich_Islands.svg"
+    },
+    {
+        "name": "Spain",
+        "code": "ES",
+        "dial_code": "+34",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg"
+    },
+    {
+        "name": "Sri Lanka",
+        "code": "LK",
+        "dial_code": "+94",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Sri_Lanka.svg"
+    },
+    {
+        "name": "Sudan",
+        "code": "SD",
+        "dial_code": "+249",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/01/Flag_of_Sudan.svg"
+    },
+    {
+        "name": "Suriname",
+        "code": "SR",
+        "dial_code": "+597",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/60/Flag_of_Suriname.svg"
+    },
+    {
+        "name": "Swaziland",
+        "code": "SZ",
+        "dial_code": "+268",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Flag_of_Swaziland.svg"
+    },
+    {
+        "name": "Sweden",
+        "code": "SE",
+        "dial_code": "+46",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/4/4c/Flag_of_Sweden.svg"
+    },
+    {
+        "name": "Switzerland",
+        "code": "CH",
+        "dial_code": "+41",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/08/Flag_of_Switzerland_%28Pantone%29.svg"
+    },
+    {
+        "name": "Tajikistan",
+        "code": "TJ",
+        "dial_code": "+992",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Tajikistan.svg"
+    },
+    {
+        "name": "Thailand",
+        "code": "TH",
+        "dial_code": "+66",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Flag_of_Thailand.svg"
+    },
+    {
+        "name": "Togo",
+        "code": "TG",
+        "dial_code": "+228",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/68/Flag_of_Togo.svg"
+    },
+    {
+        "name": "Tokelau",
+        "code": "TK",
+        "dial_code": "+690",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Flag_of_Tokelau.svg"
+    },
+    {
+        "name": "Tonga",
+        "code": "TO",
+        "dial_code": "+676",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Tonga.svg"
+    },
+    {
+        "name": "Trinidad and Tobago",
+        "code": "TT",
+        "dial_code": "+1 868",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/64/Flag_of_Trinidad_and_Tobago.svg"
+    },
+    {
+        "name": "Tunisia",
+        "code": "TN",
+        "dial_code": "+216",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Flag_of_Tunisia.svg"
+    },
+    {
+        "name": "Turkey",
+        "code": "TR",
+        "dial_code": "+90",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg"
+    },
+    {
+        "name": "Turkmenistan",
+        "code": "TM",
+        "dial_code": "+993",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Turkmenistan.svg"
+    },
+    {
+        "name": "Turks and Caicos Islands",
+        "code": "TC",
+        "dial_code": "+1 649",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Flag_of_the_Turks_and_Caicos_Islands.svg"
+    },
+    {
+        "name": "Tuvalu",
+        "code": "TV",
+        "dial_code": "+688",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/3/38/Flag_of_Tuvalu.svg"
+    },
+    {
+        "name": "Uganda",
+        "code": "UG",
+        "dial_code": "+256",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Flag_of_Uganda.svg"
+    },
+    {
+        "name": "Ukraine",
+        "code": "UA",
+        "dial_code": "+380",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg"
+    },
+    {
+        "name": "United Arab Emirates",
+        "code": "AE",
+        "dial_code": "+971",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Flag_of_the_United_Arab_Emirates.svg"
+    },
+    {
+        "name": "United Kingdom",
+        "code": "GB",
+        "dial_code": "+44",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg"
+    },
+    
+    {
+        "name": "Uruguay",
+        "code": "UY",
+        "dial_code": "+598",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Uruguay.svg"
+    },
+    {
+        "name": "Uzbekistan",
+        "code": "UZ",
+        "dial_code": "+998",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Uzbekistan.svg"
+    },
+    {
+        "name": "Vanuatu",
+        "code": "VU",
+        "dial_code": "+678",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_Vanuatu.svg"
+    },
+    {
+        "name": "Wallis and Futuna",
+        "code": "WF",
+        "dial_code": "+681",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Flag_of_Wallis_and_Futuna.svg"
+    },
+    {
+        "name": "Yemen",
+        "code": "YE",
+        "dial_code": "+967",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/89/Flag_of_Yemen.svg"
+    },
+    {
+        "name": "Zambia",
+        "code": "ZM",
+        "dial_code": "+260",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Zambia.svg"
+    },
+    {
+        "name": "Zimbabwe",
+        "code": "ZW",
+        "dial_code": "+263",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Flag_of_Zimbabwe.svg"
+    },
+    {
+        "name": "Brunei Darussalam",
+        "code": "BN",
+        "dial_code": "+673",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Flag_of_Brunei.svg"
+    },
+    {
+        "name": "Cocos (Keeling) Islands",
+        "code": "CC",
+        "dial_code": "+61",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/74/Flag_of_the_Cocos_%28Keeling%29_Islands.svg"
+    },
+    {
+        "name": "Falkland Islands (Malvinas)",
+        "code": "FK",
+        "dial_code": "+500",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/83/Flag_of_the_Falkland_Islands.svg"
+    },
+    {
+        "name": "Guernsey",
+        "code": "GG",
+        "dial_code": "+44",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Guernsey.svg"
+    },
+    {
+        "name": "Holy See (Vatican City State)",
+        "code": "VA",
+        "dial_code": "+379",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_the_Vatican_City.svg"
+    },
+    {
+        "name": "Hong Kong",
+        "code": "HK",
+        "dial_code": "+852",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Flag_of_Hong_Kong.svg"
+    },
+    {
+        "name": "Isle of Man",
+        "code": "IM",
+        "dial_code": "+44",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Flag_of_the_Isle_of_Man.svg"
+    },
+    {
+        "name": "Jersey",
+        "code": "JE",
+        "dial_code": "+44",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Flag_of_Jersey.svg"
+    },
+    {
+        "name": "Lao People's Democratic Republic",
+        "code": "LA",
+        "dial_code": "+856",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/56/Flag_of_Laos.svg"
+    },
+    {
+        "name": "Macao",
+        "code": "MO",
+        "dial_code": "+853",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/63/Flag_of_Macau.svg"
+    },
+    {
+        "name": "Mozambique",
+        "code": "MZ",
+        "dial_code": "+258",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Mozambique.svg"
+    },
+    {
+        "name": "Pitcairn",
+        "code": "PN",
+        "dial_code": "+872",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_the_Pitcairn_Islands.svg"
+    },
+    {
+        "name": "Réunion",
+        "code": "RE",
+        "dial_code": "+262",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg"
+    },
+    {
+        "name": "Saint Barthélemy",
+        "code": "BL",
+        "dial_code": "+590",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg"
+    },
+    {
+        "name": "Saint Kitts and Nevis",
+        "code": "KN",
+        "dial_code": "+1 869",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Saint_Kitts_and_Nevis.svg"
+    },
+    {
+        "name": "Saint Lucia",
+        "code": "LC",
+        "dial_code": "+1 758",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Saint_Lucia.svg"
+    },
+    {
+        "name": "Saint Pierre and Miquelon",
+        "code": "PM",
+        "dial_code": "+508",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/74/Flag_of_Saint-Pierre_and_Miquelon.svg"
+    },
+    {
+        "name": "Saint Vincent and the Grenadines",
+        "code": "VC",
+        "dial_code": "+1 784",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Flag_of_Saint_Vincent_and_the_Grenadines.svg"
+    },
+    {
+        "name": "Sao Tome and Principe",
+        "code": "ST",
+        "dial_code": "+239",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Sao_Tome_and_Principe.svg"
+    },
+    {
+        "name": "Somalia",
+        "code": "SO",
+        "dial_code": "+252",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Flag_of_Somalia.svg"
+    },
+    {
+        "name": "Syrian Arab Republic",
+        "code": "SY",
+        "dial_code": "+963",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/53/Flag_of_Syria.svg"
+    },
+    {
+        "name": "Timor-Leste",
+        "code": "TL",
+        "dial_code": "+670",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flag_of_East_Timor.svg"
+    },
+    {
+        "name": "Viet Nam",
+        "code": "VN",
+        "dial_code": "+84",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Vietnam.svg"
+    },
+    {
+        "name": "Åland Islands",
+        "code": "AX",
+        "dial_code": "+358",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/"
+    },
+    {
+        "name": "American Samoa",
+        "code": "AS",
+        "dial_code": "+1",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/"
+    },
+    {
+        "name": "Bolivia - Plurinational",
+        "code": "BO",
+        "dial_code": "+591",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/"
+    },
+    {
+        "name": "Bonaire - Sint Eustatius and Saba",
+        "code": "BQ",
+        "dial_code": "+599",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/"
+    },
+    {
+        "name": "Bouvet Island",
+        "code": "BQ",
+        "dial_code": "+599",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/"
+    },
+    {
+        "name": "Bouvet Island",
+        "code": "BV",
+        "dial_code": "+55",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg"
+    },
+    {
+        "name": "Congo",
+        "code": "CG",
+        "dial_code": "+242",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Flag_of_the_Democratic_Republic_of_the_Congo.svg"
+    },
+    {
+        "name": "Côte d'Ivoire",
+        "code": "CI",
+        "dial_code": "+225",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg"
+    },
+    {
+        "name": "Curaçao",
+        "code": "CW",
+        "dial_code": "+599",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_Cura%C3%A7ao.svg"
+    },
+    {
+        "name": "French Southern Territories",
+        "code": "TF",
+        "dial_code": "+262",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Flag_of_the_French_Southern_and_Antarctic_Lands.svg"
+    },
+    {
+        "name": "Heard Island and McDonald Islands",
+        "code": "HM",
+        "dial_code": "+672",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Flag_of_Antarctica.svg"
+    },
+    {
+        "name": "Iran",
+        "code": "IR",
+        "dial_code": "+98",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Flag_of_Iran.svg"
+    },
+    {
+        "name": "North Korea",
+        "code": "KP",
+        "dial_code": "+850",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_North_Korea.svg"
+    },
+    {
+        "name": "South Korea",
+        "code": "KR",
+        "dial_code": "+82",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/09/Flag_of_South_Korea.svg"
+    },
+    {
+        "name": "Libya",
+        "code": "LY",
+        "dial_code": "+218",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Libya.svg"
+    },
+    {
+        "name": "Macedonia",
+        "code": "MK",
+        "dial_code": "+389",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_Macedonia.svg"
+    },
+    {
+        "name": "Micronesia",
+        "code": "FM",
+        "dial_code": "+691",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Flag_of_the_Federated_States_of_Micronesia.svg"
+    },
+    {
+        "name": "Moldova",
+        "code": "MD",
+        "dial_code": "+373",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Moldova.svg"
+    },
+    {
+        "name": "Palestine",
+        "code": "PS",
+        "dial_code": "+970",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/00/Flag_of_Palestine.svg"
+    },
+    {
+        "name": "Russian Federation",
+        "code": "RU",
+        "dial_code": "+7",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg"
+    },
+    {
+        "name": "Saint Helena - Ascension and Tristan da Cunha",
+        "code": "SH",
+        "dial_code": "+290",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg"
+    },
+    {
+        "name": "Saint Martin (French part)",
+        "code": "GP",
+        "dial_code": "+590",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/c/c3/Flag_of_France.svg"
+    },
+    {
+        "name": "Sint Maarten (Dutch part)",
+        "code": "MF",
+        "dial_code": "+721",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Sint_Maarten.svg"
+    },
+    {
+        "name": "South Sudan",
+        "code": "SD",
+        "dial_code": "+249",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Flag_of_South_Sudan.svg"
+    },
+    {
+        "name": "Taiwan",
+        "code": "TW",
+        "dial_code": "+886",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/7/72/Flag_of_the_Republic_of_China.svg"
+    },
+    {
+        "name": "United States Minor Outlying Islands",
+        "code": "UM",
+        "dial_code": "+246",
+        "flag": "https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg"
+    },
+    {
+        "name": "Venezuela",
+        "code": "VE",
+        "dial_code": "+58",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg"
+    },
+    {
+        "name": "Virgin Islands - British",
+        "code": "VG",
+        "dial_code": "+1",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/4/42/Flag_of_the_British_Virgin_Islands.svg"
+    },
+    {
+        "name": "Virgin Islands - U.S",
+        "code": "VI",
+        "dial_code": "+1",
+        "flag": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Flag_of_the_United_States_Virgin_Islands.svg"
+    }
+    
+]

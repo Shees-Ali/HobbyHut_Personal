@@ -1,0 +1,79 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Anyone Ready Now ?</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="anyone-ready-content">
+  <div class="ion-text-center ion-padding" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+    <p>Loading Anyone, Any activity, Ready Now</p>
+  </div>
+
+  <div *ngIf="!isLoading && onlineUsers.length === 0" class="empty-state">
+    <img
+      class="empty-state-img"
+      src="./../../assets/images/anyonereadynow_empty.png"
+      alt="No one ready"
+    />
+    <p>No one within your Search Settings is Ready Now</p>
+  </div>
+
+  <div class="members-list" *ngIf="!isLoading && onlineUsers.length > 0">
+    <ion-row class="w-100">
+      <ng-container *ngFor="let user of onlineUsers; let i = index">
+        <ion-col size="6" class="c-col-wrapper">
+          <ion-card
+            class="members-card ion-no-margin"
+            (click)="openProfile(user.uid)"
+            [ngClass]="{'members-card-active': user.isActive}"
+          >
+            <div class="card_content">
+              <div class="profile-img">
+                <img
+                  [src]="user?.photos?.length > 0 ? user?.photos[user?.photos?.length-1] : './../../assets/images/palm-tree.png'"
+                  alt=""
+                  onerror="this.src = './../../assets/images/palm-tree.png'"
+                />
+                <section class="members-card-details">
+                  <equipment-list [hobbies]="{meta: user.meta}" [activeHobbies]="user.hobbyName"></equipment-list>
+                </section>
+                <div class="medal-icon img-overlay-medal">
+                  <ion-icon
+                    name="ellipse"
+                    class="skill-icon"
+                    [ngClass]="['skill-icon-'+user.skillLevel]"
+                  ></ion-icon>
+                </div>
+              </div>
+              <ion-card-content class="ion-no-padding">
+                <div class="content-main">
+                  <h3 class="members-card-title">{{user?.displayName}}</h3>
+                </div>
+              </ion-card-content>
+            </div>
+          </ion-card>
+        </ion-col>
+        <ion-col size="6" *ngIf="(i+1) % 1 == 0" class="advertisement-margin">
+          <ion-card class="members-card advertisement ion-no-margin" (click)="openAd(getAdForIndex(i))">
+            <div class="card_content">
+              <div class="profile-img">
+                <img
+                  class="advertisment-image"
+                  [src]="getAdForIndex(i)?.image || './../../assets/images/palm-tree.png'"
+                  alt=""
+                  onerror="this.src = './../../assets/images/palm-tree.png'"
+                />
+              </div>
+            </div>
+          </ion-card>
+        </ion-col>
+      </ng-container>
+    </ion-row>
+  </div>
+</ion-content>

@@ -1,0 +1,172 @@
+:host {
+  background: #eef2f7;
+}
+
+.anyone-ready-content {
+  --background: #eef2f7;
+}
+
+.members-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 70px;
+  margin-bottom: 70px;
+}
+
+.members-card {
+  opacity: 1;
+  margin-bottom: 5px;
+  border-radius: 15px;
+  box-shadow:
+    rgba(0, 0, 0, 0.07) 0px 1px 1px,
+    rgba(0, 0, 0, 0.07) 0px 2px 2px,
+    rgba(0, 0, 0, 0.07) 0px 4px 4px,
+    rgba(0, 0, 0, 0.07) 0px 8px 8px,
+    rgba(0, 0, 0, 0.07) 0px 16px 16px;
+}
+
+.members-card-active {
+  border: 3px solid #ffc001;
+  padding: 3px;
+  opacity: 1;
+  border-radius: 20px !important;
+}
+
+.members-card-active .card_content {
+  border: 3px solid #009ae0;
+  padding: 3px;
+  border-radius: 15px;
+}
+
+.c-col-wrapper {
+  padding: 8px;
+}
+
+.c-col-wrapper:nth-child(odd) ion-card {
+  top: -60px;
+}
+
+.c-col-wrapper:nth-child(odd) {
+  padding-inline-end: 10px;
+}
+
+.c-col-wrapper:nth-child(even) {
+  padding-inline-start: 10px;
+}
+
+.card_content {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.profile-img {
+  padding: 0px;
+  position: relative;
+  line-height: 0;
+
+  img {
+    border-radius: 10px;
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+  }
+}
+
+.members-card-details {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 10px;
+  top: 30px;
+}
+
+.img-overlay-medal {
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medal-icon {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+}
+
+.skill-icon {
+  font-size: 18px;
+}
+
+.skill-icon-beginner {
+  color: var(--ion-color-white);
+  box-shadow: inset 0px 0px 0px 1px var(--ion-color-silver);
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+.skill-icon-intermediate {
+  color: var(--ion-color-bronze);
+}
+
+.skill-icon-advanced {
+  color: var(--ion-color-silver);
+}
+
+.skill-icon-pro {
+  color: var(--ion-color-gold);
+}
+
+.content-main {
+  padding: 10px 10px;
+
+  .members-card-title {
+    font-size: 18px;
+    color: #009ae0;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .hobby-name {
+    font-size: 14px;
+    color: #009ae0;
+    margin: 4px 0 0;
+    font-weight: 500;
+  }
+}
+
+.advertisement {
+  min-height: unset;
+  margin-bottom: 5px;
+
+  .card_content {
+    min-height: unset;
+    text-align: center;
+
+    .profile-img img {
+      height: 100%;
+      object-fit: fill;
+    }
+  }
+}
+
+.advertisement-margin:nth-child(odd) {
+  top: -60px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  text-align: center;
+  padding: 32px 16px;
+
+  .empty-state-img {
+    max-width: 240px;
+    width: 80%;
+    margin-bottom: 16px;
+  }
+}

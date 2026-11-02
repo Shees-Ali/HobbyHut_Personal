@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar>
+    <div mode="ios">
+      <ion-buttons slot="start" class="back-btn-bg">
+        <ion-back-button color="dark" text="" defaultHref="tabs/messages"></ion-back-button>
+      </ion-buttons>
+      <div class="post-date">
+        <div class="time-and-date">
+          <div class="date-wrapper-box">
+            <div class="month">{{post.data.formatedStartMonth}}</div>
+            <div class="date">{{post.data.formatedStartDate}}</div>
+          </div>
+          <div class="time">
+            {{post.data.formatedStartTime}}-{{post.data.formatedEndTime}}
+          </div>
+        </div>
+        <ion-row class="ion-align-items-start post-data">
+          <div class="name-wrapper" style="padding-left: 0;"> {{post.data.subject }}</div>
+          <div class="post-wrap">
+            {{post.data.description}}
+            <!-- <div>
+              {{post.data.formatedStartMonth}}
+              {{post.data.formatedStartDate}}, 
+              {{post.data.formatedStartTime}}
+            </div>
+            <div>
+              {{post.data.formatedEndMonth}}
+              {{post.data.formatedEndDate}},  
+              {{post.data.formatedEndTime}}
+            </div> -->
+          </div>
+        </ion-row>
+      </div>
+      <ion-row>
+        <div class="ion-padding-start post-message">
+          
+        </div>
+      </ion-row>
+      <div>
+        <ion-row class="ion-align-items-center ion-justify-content-between ion-padding" style="padding-bottom: 10px;">
+          <div class="image-post">
+            <ion-avatar>
+              <img [src]="post.data.userProfile" onerror="this.src='../../../assets/images/palm-tree.png'" alt="" />
+            </ion-avatar>
+            <div class="name-wrapper">{{post.data.userDisplayName}}</div>
+          </div>
+          <div class="image-post">
+            <div class="admin">
+              <div>
+                <img style="width: 25px; height: auto;" [src]="getSkillPhoto(post.data.userSkill)" />
+              </div>
+              <ion-text>Admin</ion-text>
+            </div>
+            <div>
+              <ion-button color="light" *ngIf="isAdmin()" (click)="editPost()">
+                <ion-icon name="create-outline" slot="icon-only" class="edit-post-icon"></ion-icon>
+              </ion-button>
+              <ion-button color="light" *ngIf="isAdmin()" (click)="deletePost()">
+                <ion-icon name="trash" slot="icon-only" class="edit-post-icon"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </ion-row>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<div class="chat">
+  <ion-content #ionContent>
+    <ion-list class="message-list" lines="none">
+      <ng-container *ngFor="let message of messages">
+        <div class="cust-message" [ngClass]="{'message-by-c-user': message.senderID == currentUser.uid}">
+          <div>
+            <ion-avatar slot="start" (click)="goToProfile(message.senderID)">
+              <img [src]="getPhoto(message.senderID)" alt=""
+                onerror="this.src='../../../assets/images/palm-tree.png'" />
+            </ion-avatar>
+            <div class="c-admin-text"
+              [ngClass]="{'admin-text': message.senderID == currentUser.uid,'admin-text-visible':message.senderID !== post['data'].createdBy}">
+              Admin</div>
+          </div>
+          <ion-item class="message theme-chat-wrapper ion-no-padding"
+            [color]="message.senderID == currentUser.uid ? 'primary' : 'medium'"
+            [ngClass]="{'user-message': message.senderID == currentUser.uid}">
+            <ion-label class="message-text">{{message.text}}</ion-label>
+          </ion-item>
+        </div>
+      </ng-container>
+    </ion-list>
+  </ion-content>
+</div>
+<ion-footer class="ion-no-border">
+  <ion-toolbar color="light">
+    <form (submit)="sendMessage()" class="footer-form">
+      <!-- <div class="chat-option">
+              <ion-row class="ion-no-padding" style="height: 100%;">
+                  <ion-col size="3.5" class="ion-text-center ion-no-padding line"><a (click)="Addemoji(1)">Wanna hang?</a></ion-col>
+                  <ion-col size="3.5" class="ion-text-center ion-no-padding line"><a (click)="Addemoji(2)">sorry, bad time</a></ion-col>
+                  <ion-col size="5" class="remove-line ion-text-center ion-no-padding"><a (click)="Addemoji(3)">sorry, found someone</a></ion-col>
+              </ion-row>
+          </div> -->
+      <ion-item class="chat-input" lines="none">
+        <ion-textarea [rows]="textareaRows$ | async" [formControl]="chatInput" placeholder="Write your message">
+        </ion-textarea>
+        <ion-button type="submit" fill="clear">
+          <ion-icon name="send"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </form>
+  </ion-toolbar>
+</ion-footer>

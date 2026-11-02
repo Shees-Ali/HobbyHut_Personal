@@ -1,0 +1,261 @@
+ion-app {
+    ion-header {
+        ion-toolbar {
+            --background: transparent;
+        }
+    }
+    ion-content {
+        --ion-color-base: transparent;
+        swiper-container {
+            swiper-slide {
+                height: 100vh !important;
+                .swiper-container-horizontal>.swiper-pagination-bullets,
+                .swiper-pagination-custom,
+                .swiper-pagination-fraction {
+                    bottom: auto !important;
+                    left: 0px !important;
+                    width: 0 !important;
+                }
+            }
+        }
+    }
+}
+
+.slide-height {
+    height: 100vh;
+}
+
+// new code
+@mixin footerButton {
+    .footer-btn-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        .bottom-btn {
+            width: 100%;
+            text-align: end;
+            ion-button {
+                font-weight: 700;
+                .slide-next-arrow {
+                    margin-left: 10px;
+                    height: 15px;
+                }
+            }
+        }
+    }
+}
+
+@mixin sliderContent {
+    .slide-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        .c-space-top {
+            display: flex;
+            align-items: flex-end;
+        }
+        .heading-content {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            h2 {
+                font-size: 33px;
+                font-weight: 700;
+                color: #fff;
+            }
+        }
+        .center-img {
+            padding: 20px;
+        }
+        .sub-content {
+            font-size: 24px;
+            font-weight: 500;
+            color: #fff;
+            padding: 0 50px;
+        }
+        @include footerButton;
+    }
+}
+
+.startSlider {
+    ion-content {
+        ion-card {
+            background: #ffffff4d;
+            backdrop-filter: blur(4px);
+            border-radius: 15px;
+            .card-heading {
+                font-size: 20px;
+                color: #000;
+                font-weight: 700;
+            }
+            .card-sub-heading {
+                font-size: 14px;
+                color: #000;
+            }
+            .signInButtons.apple {
+                --background: #fff;
+                border-radius: 50px;
+                margin-top: 20px;
+                ion-label {
+                    margin-left: 5px;
+                }
+            }
+            .signInButtons.phone {
+                --background: #000;
+                border-radius: 50px;
+                margin-top: 15px;
+                --color: #fff;
+                ion-icon {
+                    font-size: 1.3em;
+                }
+                ion-label {
+                    margin-left: 5px;
+                }
+            }
+            .signInButtons.facebook {
+                --background: #4267b2;
+                border-radius: 50px;
+                margin-top: 15px;
+                ion-label {
+                    margin-left: 5px;
+                }
+                ion-icon {
+                    color: #fff;
+                }
+            }
+
+            .signInButtons.email {
+                --background: #fff;
+                border-radius: 50px;
+                margin-top: 15px;
+                --color: #000;
+                ion-icon {
+                    font-size: 1.3em;
+                }
+                ion-label {
+                    margin-left: 5px;
+                    color: #000;
+                }
+            }
+        }
+        .slide-bg {
+            width: 100vw;
+            object-fit: cover;
+        }
+        .slide-1-wrapper {
+            @include sliderContent;
+        }
+        .slide-2-wrapper {
+            @include sliderContent;
+            .heading-content {
+                h2 {
+                    color: #000 !important;
+                }
+            }
+        }
+        .slide-3-wrapper {
+            @include sliderContent;
+            .heading-content {
+                width: 90%;
+            }
+            .slide-content .center-img {
+                padding: 0px !important;
+            }
+        }
+        .slide-4-wrapper {
+            @include sliderContent;
+            .heading-content {
+                h2 {
+                    color: #000 !important;
+                    margin-bottom: 20px;
+                }
+            }
+            .slide-content .center-img {
+                padding: 0 5px !important;
+            }
+        }
+    }
+}
+
+.slide-3-wrapper {
+    .heading-content {
+        width: 90% !important;
+    }
+}
+
+.slide-4-wrapper {
+    .heading-content {
+        width: 90% !important;
+        padding-top: 50px;
+    }
+    h2 {
+        font-size: 31px !important;
+    }
+}
+
+.theme-btn-blue {
+    --background: #5ac5f3;
+    --color: #fff;
+    --box-shadow: #5ac5f35e 0px 6px;
+    --border-radius: 15px;
+    height: 3em;
+    font-size: 18px;
+}
+
+.login-card-wrapper {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    .app-logo-wrapper {
+        height: 50vh;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        padding-bottom: 20px;
+        img {
+            height: 65%
+        }
+    }
+    .card-content {
+        height: 50vh;
+        padding: 20px;
+        display: flex;
+        align-items: flex-end;
+        ion-card {}
+    }
+}
+
+@media screen and(max-height:667px) {
+    .startSlider h2 {
+        font-size: 30px !important;
+    }
+    .slide-1-wrapper .heading-content {
+        width: 91% !important;
+        padding-top: 30px !important;
+    }
+    .slide-3-wrapper .heading-content {
+        width: 80% !important;
+        padding-top: 30px !important;
+    }
+    .slide-3-wrapper .center-img {
+        height: 55vh !important;
+    }
+    .slide-4-wrapper {
+        .heading-content {
+            padding-top: 30px !important;
+        }
+        h2 {
+            font-size: 24px !important;
+        }
+    }
+}
+
+// new code end

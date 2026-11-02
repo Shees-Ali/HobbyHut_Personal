@@ -1,0 +1,412 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+
+// @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200;400;600;800&display=swap');
+@import '~@ionic/angular/css/core.css';
+
+/* Basic CSS for apps built with Ionic */
+
+@import '~@ionic/angular/css/normalize.css';
+@import '~@ionic/angular/css/structure.css';
+@import '~@ionic/angular/css/typography.css';
+@import '~@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+
+@import '~@ionic/angular/css/padding.css';
+@import '~@ionic/angular/css/float-elements.css';
+@import '~@ionic/angular/css/text-alignment.css';
+@import '~@ionic/angular/css/text-transformation.css';
+@import '~@ionic/angular/css/flex-utils.css';
+@import 'theme/elements';
+.skill-level {
+  --width: 100%;
+  .popover-content {
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+  }
+}
+
+.header-ios ion-toolbar:last-of-type {
+  --border-width: 0 0 0px;
+}
+
+@mixin c-ion-segment {
+  ion-segment {
+    --background: transparent;
+    border: 2px solid #f6f8fb;
+    box-shadow: #f6f8fb 0px 6px;
+    padding: 2px;
+    border-radius: 10px;
+    .segment-button-checked {
+      --background: #5ac5f3;
+      background: #5ac5f3;
+      color: #fff;
+      --indicator-color: transparent;
+      min-height: 40px;
+      font-size: 16px;
+      line-height: 40px;
+      --border-width: 0;
+      --border-radius: 10px;
+      --border-color: transparent;
+    }
+    ion-segment-button {
+      min-height: 40px;
+      font-size: 16px;
+      line-height: 40px;
+    }
+  }
+}
+
+// input customize start
+.outer-border {
+  border: 2px solid #777777;
+  border-radius: 12px;
+  position: relative;
+  height: 56px;
+  margin-bottom: 20px;
+  ion-item {
+    --background: transparent;
+    position: absolute;
+    top: -18px;
+    width: 100%;
+    --min-height: 56px;
+    overflow: visible;
+  }
+  .item-has-focus {
+    .label-floating {
+      font-size: 14px;
+      display: flex;
+      width: auto;
+      position: relative;
+      span {
+        background: #fff;
+        padding: 5px 7px 0;
+        color: #7c7c7c;
+        font-weight: 700;
+      }
+    }
+  }
+  .item-has-value {
+    .label-floating {
+      font-size: 14px;
+      display: flex;
+      width: auto;
+      position: relative;
+      span {
+        background: #fff;
+        padding: 5px 7px 0;
+        color: #7c7c7c;
+        font-weight: 700;
+      }
+    }
+  }
+  .item {
+    .label-floating {
+      font-size: 14px;
+      display: flex;
+      width: auto;
+      position: relative;
+      span {
+        background: #fff;
+        padding: 5px 7px 0;
+        color: #7c7c7c;
+        font-weight: 700;
+      }
+    }
+  }
+  ion-label {
+    margin: 6px 8px 10px 0px;
+  }
+}
+
+.item-label-floating.sc-ion-input-ios-h,
+.item-label-floating .sc-ion-input-ios-h,
+.item-label-stacked.sc-ion-input-ios-h,
+.item-label-stacked .sc-ion-input-ios-h {
+  --padding-start: 3px;
+  --padding-top: 4px;
+  font-size: 18px;
+}
+
+.long-text-area-wrapper {
+  margin-bottom: 20px;
+  ion-textarea {
+    --padding-top: 0px !important;
+    --padding-bottom: 2px !important;
+    --padding-start: 0px !important;
+  }
+}
+
+.text-input-wrapper {
+  min-height: 56px;
+  margin-bottom: 20px;
+  ::placeholder {
+    font-size: 15px;
+  }
+}
+
+// input customize end
+ion-tab-bar {
+  contain: inherit !important;
+  --border: none !important;
+  height: 60px;
+  padding-bottom: 20px;
+  @media screen and(max-height: 667px) {
+    height: 56px;
+    padding-bottom: 10px;
+  }
+  ion-tab-button {
+    ion-icon {
+      margin-top: 8px;
+    }
+    ion-label {
+      color: #000;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+      padding-top: 3px;
+    }
+  }
+}
+
+// common-card
+.theme-card-wrapper {
+  background: #fff;
+  border: 2px solid #f6f8fb;
+  box-shadow: #f6f8fb 0px 10px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.list-heading-wrapper {
+  font-size: 20px;
+  color: #000;
+  font-weight: 700;
+  padding-top: 25px;
+  padding-bottom: 20px;
+}
+
+.header-md:after {
+  background-image: none;
+}
+
+// filter-Modal
+.filterModal,
+.addRemoveHobbiesModal {
+  --height: 68vh;
+  display: flex;
+  align-items: flex-end;
+  .modal-wrapper {
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    box-shadow: rgb(115 115 115 / 20%) 0px 2px 5px 1px, rgb(96 96 96 / 40%) -6px -2px 8px 0px;
+  }
+  ion-header {
+    ion-toolbar {
+      padding-top: 12px;
+      --padding-bottom: 0px;
+      --padding-top: 0px;
+    }
+  }
+}
+
+.filterModal {
+  --height: 90vh;
+}
+
+.homeFilterModal {
+  --height: 72vh;
+  display: flex;
+  align-items: flex-end;
+  .modal-wrapper {
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    box-shadow: rgb(115 115 115 / 20%) 0px 2px 5px 1px, rgb(96 96 96 / 40%) -6px -2px 8px 0px;
+  }
+  ion-header {
+    ion-toolbar {
+      padding-top: 12px;
+      --padding-bottom: 0px;
+      --padding-top: 0px;
+    }
+  }
+}
+
+.verifyAccount {
+  --background: transparent;
+  --backdrop-opacity: var(--ion-backdrop-opacity, 0.6);
+  ion-content {
+    --background: transparent;
+  }
+}
+
+.deleteAccount {
+  .alert-wrapper {
+    background: #fff;
+    .alert-button-group {
+      padding: 10px;
+      .alert-button {
+        background: #fff;
+        border: 2px solid #f6f8fb;
+        box-shadow: #f6f8fb 0px 4px;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+    }
+    .alert-title {
+      font-size: 22px;
+    }
+  }
+}
+
+ion-title {
+  padding-inline: 50px;
+  padding: 0px;
+  font-size: 22px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.unread-count {
+  position: absolute !important;
+  top: 3px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50%;
+  color: white;
+  background: red;
+  margin: 0px !important;
+  font-size: 10px;
+  margin-left: 5px !important;
+  padding: 0 !important;
+  span {
+    width: 100% !important;
+    align-items: center;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+app-edit-hobbies {
+  ui-skill-level {
+    .theme-card-wrapper {
+      background: #fff;
+      border: 2px solid #f6f8fb;
+      box-shadow: #f6f8fb 0px 4px;
+      border-radius: 6px;
+      overflow: hidden;
+      padding: 6px !important;
+      .skill-icon-wrapper {
+        height: 20px;
+        width: 20px;
+        background-size: cover;
+      }
+    }
+    ion-segment-button {
+      min-width: unset !important;
+      max-width: unset !important;
+      --padding-start: 3px !important;
+      --padding-end: 3px !important;
+      --ripple-color: #5ac5f378 !important;
+    }
+    ion-label {
+      margin-top: 5px;
+      margin-bottom: 0px;
+      span {
+        display: none !important;
+      }
+    }
+    .segment-button-checked {
+      --indicator-color: transparent !important;
+      --indicator-height: none !important;
+      min-width: unset !important;
+      max-width: unset !important;
+      .theme-card-wrapper {
+        background: #fff;
+        border: 2px solid #5ac5f378;
+        box-shadow: #5ac5f378 0px 4px;
+        border-radius: 6px;
+        overflow: hidden;
+        padding: 6px !important;
+      }
+    }
+  }
+}
+app-hobby-room {
+  equipment-list {
+    .c-flex-box-column {
+      flex-direction: column;
+    }
+    .skill-level-bg {
+      margin-bottom: 5px !important;
+      background: #fff;
+      height: 18px !important;
+      width: 18px !important;
+      overflow: hidden;
+      .profile-details-icon {
+        height: 14px !important;
+      }
+    }
+  }
+}
+
+// styling for swiper.js
+
+swiper-container {
+  --swiper-pagination-bullet-inactive-color: var(--ion-color-step-200, #cccccc);
+  --swiper-pagination-color: var(--ion-color-primary, #0054e9);
+  --swiper-pagination-progressbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.25);
+  --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
+  --swiper-scrollbar-drag-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
+}
+
+swiper-slide {
+  display: flex;
+  position: relative;
+
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 18px;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+swiper-slide img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+.spinner {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+
+  ion-spinner {
+    color: var(--ion-color-primary);
+  }
+}

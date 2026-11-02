@@ -1,0 +1,38 @@
+<div class="location-overlay" (click)="enableLocation()" *ngIf="(locationActive$ | async) == false">
+  <span>Please turn on location services.</span>
+  <div>
+    <div class="arrow-right"></div>
+  </div>
+</div>
+
+<ion-tabs #myTabs (ionTabsWillChange)="changeTab(myTabs)">
+  <ion-tab-bar slot="bottom">
+    <app-timer-button></app-timer-button>
+
+    <ion-tab-button tab="home-main" class="home-wrapper">
+      <ion-icon name="home"></ion-icon>
+      <ion-label>Home</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile">
+      <ion-icon name="person"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab=""> </ion-tab-button>
+
+    <ion-tab-button tab="messages">
+      <ion-badge class="unread-count" *ngIf="unreadCount > 0 || unreadCountPost >0" color="primary">
+        <span>{{ unreadCount+unreadCountPost }}</span>
+      </ion-badge>
+
+      <ion-icon name="chatbox-ellipses"></ion-icon>
+      <ion-label>Contacts</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="settings" class="settings-wrapper">
+      <ion-icon name="settings-sharp"></ion-icon>
+      <ion-label>Settings</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

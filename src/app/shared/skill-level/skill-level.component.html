@@ -1,0 +1,42 @@
+<ion-segment
+  class="skills-selection"
+  (ionChange)="segmentChanged($event)"
+  mode="md"
+  [value]="skillLevel"
+>
+  <ion-segment-button [value]="SkillLevel.BEGINNER">
+    <ion-label>
+      <div class="theme-card-wrapper c-theme-card-wrapper">
+        <div class="skill-icon-wrapper skill-icon-beginner"></div>
+      </div>
+      <span>Beginner</span>
+    </ion-label>
+  </ion-segment-button>
+  <ion-segment-button [value]="SkillLevel.INTERMEDIATE">
+    <ion-label>
+      <div class="theme-card-wrapper c-theme-card-wrapper">
+        <div class="skill-icon-wrapper skill-icon-intermediate"></div>
+      </div>
+
+      <span>Intermediate</span>
+    </ion-label>
+  </ion-segment-button>
+  <ion-segment-button [value]="SkillLevel.ADVANCED">
+    <ion-label>
+      <div class="theme-card-wrapper c-theme-card-wrapper">
+        <div class="skill-icon-wrapper skill-icon-advanced"></div>
+      </div>
+
+      <span>Advanced</span>
+    </ion-label>
+  </ion-segment-button>
+  <ion-segment-button [value]="SkillLevel.PRO">
+    <ion-label>
+      <div class="theme-card-wrapper c-theme-card-wrapper">
+        <div class="skill-icon-wrapper skill-icon-pro"></div>
+      </div>
+
+      <span>Pro</span>
+    </ion-label>
+  </ion-segment-button>
+</ion-segment>

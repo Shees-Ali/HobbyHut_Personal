@@ -1,0 +1,480 @@
+<ng-container *ngIf="{user: user$ | async} as vm">
+  <div class="background-profile">
+    <img
+      [src]="getPhoto(vm.user)"
+      alt=""
+      onerror="this.src = '../../assets/images/palm-tree.png'"
+    />
+  </div>
+  <div class="profile-img-shadow"></div>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start" *ngIf="!canEdit" class="back-btn-bg">
+        <ion-back-button color="dark" text=""></ion-back-button>
+      </ion-buttons>
+      <div *ngIf="vm?.user" class="user-profile-name">
+        {{vm?.user?.displayName + ", " + getAge(vm?.user)}}<br />
+        <span class="username"> {{ vm?.user?.username ?? ""}} </span>
+        <div class="last-seen">{{lastActive}}</div>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+
+  <ng-container *ngIf="!vm?.user">
+    <div class="spinner">
+      <ion-spinner></ion-spinner>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="vm?.user">
+    <div class="img-wrapper">
+      <div class="upload-icon" *ngIf="canEdit">
+        <ion-icon
+          name="cloud-upload-outline"
+          (click)="fileInp.click()"
+          for="customFileUploadMultiple"
+        ></ion-icon>
+      </div>
+    </div>
+    <div class="profile">
+      <ion-content class="">
+        <div>
+          <input
+            type="file"
+            multiple
+            (change)="onUploadFile($event)"
+            id="customFileUploadMultiple"
+            style="opacity: 0; width: 0px"
+            #fileInp
+          />
+          <!-- <h1 *ngIf="canEdit" class="profile-title">{{vm.user?.displayName}}</h1> -->
+          <section *ngIf="!canEdit" class="add-remove-hobby-and-timer">
+            <!-- <h1 class="profile-title">{{vm.user?.displayName}}</h1> -->
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-text-center ion-padding-end" size="6">
+                  <ion-button
+                    (click)="sendMessage(vm.user)"
+                    *ngIf="!isAlreadyMessaged || isAccepted"
+                  >
+                    <span class="btn-add-remove-hobby"> MESSAGE</span>
+                  </ion-button>
+                  <ion-button disabled="true" *ngIf="isAlreadyMessaged && !isAccepted">
+                    <span class="btn-add-remove-hobby"> REQUESTED</span>
+                  </ion-button>
+                </ion-col>
+                <ion-col class="ion-no-padding ion-padding-start" size="6">
+                  <ion-button
+                    [disabled]="!isAccepted || !isFromHobbyRoom"
+                    [ngClass]="{'c-disable':!isAccepted || !isFromHobbyRoom}"
+                    (click)="presentGameModal(vm.user)"
+                  >
+                    <span class="btn-add-remove-hobby"> CHALLENGE</span>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </section>
+          <section>
+            <div class="theme-card-wrapper">
+              <section class="hobby-header">
+                <equipment-list
+                  class="w-100"
+                  [hobbies]="vm?.user?.hobbies"
+                  (currentActiveHobby)="activatedHobbyIndex($event)"
+                  [activeHobbies]="activatedHobby || vm?.user?.isActive?.[0]"
+                >
+                </equipment-list>
+              </section>
+              <div class="hobby-list ion-padding">
+                <ng-container *ngIf="!isTurningHobbiesOff">
+                  <ng-container>
+                    <span
+                      class="hobby"
+                      *ngFor="let hobby of vm?.user?.hobbies"
+                      (click)="updateActiveHobby(hobby, vm?.user)"
+                      [ngClass]="{'selectedHobby': (activatedHobby ? hobby.name ===
+                                          activatedHobby.name : hobby.name ===
+                                          vm?.user?.activeHobby?.name),'activeHobby': isActiveHobby(hobby.name,
+                                          vm?.user?.isActive)}"
+                    >
+                      <div class="hobbyname">
+                        <div>{{hobby.name | titleCase}}</div>
+                      </div>
+                    </span>
+                  </ng-container>
+
+                  <ng-template #hobbies>
+                    <span
+                      class="hobby"
+                      *ngFor="let hobby of vm?.user?.hobbies"
+                      [ngClass]="{'selectedHobby': hobby.name ===
+                                          vm?.user?.activeHobby?.name, 'activeHobby': isActiveHobby(hobby.name,
+                                          vm?.user?.isActive)}"
+                    >
+                      <div class="hobbyname">
+                        <div>{{hobby.name | titleCase}}</div>
+                      </div>
+                    </span>
+                  </ng-template>
+                </ng-container>
+                <ion-spinner *ngIf="isTurningHobbiesOff"></ion-spinner>
+              </div>
+            </div>
+          </section>
+
+          <section *ngIf="canEdit" class="add-remove-hobby-and-timer ion-padding-top">
+            <ion-grid class="ion-no-padding">
+              <ion-row>
+                <ion-col class="ion-text-center ion-padding-end" size="6">
+                  <ion-button *ngIf="canEdit" (click)="presentModal()">
+                    <span class="btn-add-remove-hobby">Add / Remove Hobbies</span>
+                  </ion-button>
+                </ion-col>
+                <ion-col class="ion-text-center ion-padding-start" size="6">
+                  <ion-button *ngIf="canEdit" (click)="turnOffTimers()">
+                    <span class="btn-turn-off-times">Turn Off Timers</span>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </section>
+          <section
+            class="profile-form"
+            [formGroup]="userProfileForm"
+            *ngIf="(canEdit ==true ||(!canEdit && ((vm?.user?.info?.aboutMe!='' && vm?.user?.info?.aboutMe.length>0) || (vm?.user?.info?.likeToGo!='' &&
+                        vm?.user?.info?.likeToGo?.length>0) ||
+                        (vm?.user?.info?.timeOfWeekToPay!='' &&
+                        vm?.user?.info?.timeOfWeekToPay?.length>0) ||
+                        (vm?.user?.info?.heroAndSportTeam!='' &&
+                        vm?.user?.info?.heroAndSportTeam?.length>0) || (vm?.user?.info?.song!=''
+                        && vm?.user?.info?.song?.length>0) || (vm?.user?.info?.lastMeal!='' &&
+                        vm?.user?.info?.lastMeal?.length>0)) ))"
+          >
+            <div class="item-list-wrapper">
+            
+              <div
+                id="myInputAbout"
+                class="outer-border long-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.aboutMe!='' && vm?.user?.info?.aboutMe.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label color="secondary" position="floating">
+                    <span>About me</span>
+                  </ion-label>
+                  <div
+                    class="custom-textarea-wrapper"
+                    [ngClass]="{ 'hide-placeholder1' : placeholder1Flag , 'about-me-wrapper' :!placeholder1Flag}"
+                  >
+                    <div class="textarea-placeholder">
+                      <ion-textarea
+                        id="textAreaAbout"
+                        auto-grow="true"
+                        [readonly]="!canEdit"
+                        formControlName="aboutMe"
+                        (ionFocus)="onFocusInput()"
+                        (ionFocusOut)="onFocusOut()"
+                        (ionBlur)="onBlurInput(vm?.user)"
+                        (ionChange)="onChangeInput($event.target.value,'aboutMe')"
+                        placeholder=""
+                        [ngClass]="{'hide-placeholder': placeholder1Flag}"
+                        class="about-input"
+                        autocapitalize
+                      ></ion-textarea>
+                      <div *ngIf="showPlaceholder  && canEdit">
+                        Instagram handle? Linked In? <br />
+                        Where are you from? Where do you live? <br />
+                        Tell us more about your favorite activities. What level are you at? <br />
+                        What part of your game are you hoping to work on?
+                      </div>
+                    </div>
+                  </div>
+                </ion-item>
+              </div>
+              <div
+                id="myInputLike"
+                class="outer-border long-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.likeToGo!='' &&
+                            vm?.user?.info?.likeToGo?.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label position="floating">
+                    <span>Where I like to go...</span>
+                  </ion-label>
+                  <div
+                    class="custom-textarea-wrapper"
+                    [ngClass]="{ 'hide-placeholder2' : placeholder2Flag , 'like-to-go-wrapper' : !placeholder2Flag}"
+                  >
+                    <div class="textarea-placeholder">
+                      <ion-textarea
+                        auto-grow="true"
+                        [readonly]="!canEdit"
+                        formControlName="likeToGo"
+                        (ionFocus)="onFocusInput()"
+                        (ionBlur)="onBlurInput(vm?.user)"
+                        (ionChange)="onChangeInput($event.target.value,'likeToGo')"
+                        placeholder=""
+                        [ngClass]="{'hide-placeholder': placeholder2Flag}"
+                        class="like-to-go-input"
+                        autocapitalize
+                      ></ion-textarea>
+                      <div *ngIf="showPlaceholder1 && canEdit">
+                        Tennis – Reed Park <br />
+                        Pickleball – Memorial Park <br />
+                        Beach Tennis – Santa Monica Beach (Bay Street)
+                      </div>
+                    </div>
+                  </div>
+                </ion-item>
+              </div>
+              <div
+                class="outer-border medium-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.timeOfWeekToPay!='' &&
+                            vm?.user?.info?.timeOfWeekToPay?.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label position="floating">
+                    <span>Best times of the week to play</span>
+                  </ion-label>
+                  <ion-textarea
+                    [readonly]="!canEdit"
+                    (ionFocus)="onFocusInput()"
+                    (ionBlur)="onBlurInput(vm?.user)"
+                    auto-grow="true"
+                    formControlName="timeOfWeekToPay"
+                    placeholder="Type Here..."
+                    autocapitalize
+                  >
+                  </ion-textarea>
+                </ion-item>
+              </div>
+              <div
+                class="outer-border medium-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.heroAndSportTeam!='' &&
+                            vm?.user?.info?.heroAndSportTeam?.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label position="floating">
+                    <span>My heroes and favorite sport teams</span>
+                  </ion-label>
+                  <ion-textarea
+                    [readonly]="!canEdit"
+                    (ionFocus)="onFocusInput()"
+                    (ionBlur)="onBlurInput(vm?.user)"
+                    placeholder="Type Here..."
+                    auto-grow="true"
+                    formControlName="heroAndSportTeam"
+                    autocapitalize
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+              <div
+                class="outer-border medium-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.song!='' && vm?.user?.info?.song?.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label position="floating">
+                    <span>Songs that get me in the zone...</span>
+                  </ion-label>
+                  <ion-textarea
+                    [readonly]="!canEdit"
+                    auto-grow="true"
+                    formControlName="song"
+                    (ionFocus)="onFocusInput()"
+                    (ionBlur)="onBlurInput(vm?.user)"
+                    placeholder="Type Here..."
+                    autocapitalize
+                  ></ion-textarea>
+                </ion-item>
+              </div>
+              <div
+                class="outer-border medium-text-area-wrapper profile-detail"
+                *ngIf="canEdit==true || (!canEdit &&
+                            (vm?.user?.info?.lastMeal!='' && vm?.user?.info?.lastMeal?.length>0))"
+              >
+                <ion-item lines="none">
+                  <ion-label position="floating">
+                    <span>My last meal on Earth would be...</span>
+                  </ion-label>
+                  <div
+                    class="custom-textarea-wrapper"
+                    [ngClass]="{ 'hide-placeholder2' : placeholder3Flag , 'last-meal-wrapper' : !placeholder3Flag}"
+                  >
+                    <div class="textarea-placeholder">
+                      <ion-textarea
+                        [readonly]="!canEdit"
+                        auto-grow="true"
+                        formControlName="lastMeal"
+                        (ionFocus)="onFocusInput()"
+                        (ionChange)="onChangeInput($event.target.value,'lastMeal')"
+                        (ionBlur)="onBlurInput(vm?.user)"
+                        [ngClass]="{'hide-placeholder': placeholder3Flag}"
+                        autocapitalize
+                      ></ion-textarea>
+                      <div *ngIf="showPlaceholder2 && canEdit">Main course, dessert, drink.</div>
+                    </div>
+                  </div>
+                </ion-item>
+              </div>
+            </div>
+          </section>
+          <!-- && userNotificationSettings.recordBookPublic -->
+          <section *ngIf="userGameRecords && userGameRecords.length> 0">
+            <div class="theme-card-wrapper bottom-space">
+              <div class="profile-form-label ion-padding-bottom">
+                <h3>Challengers Record Book</h3>
+                <ng-container *ngIf="canEdit">
+                  <ion-toggle
+                    class="toggle-switch"
+                    id="hover-trigger"
+                    checked="{{pushNotificationSettings.recordBookPublic}}"
+                    (ionChange)="updateUserSettingsForMakeBookRecordPublic($event)"
+                  ></ion-toggle>
+                  <ion-popover trigger="hover-trigger" triggerAction="hover">
+                    <ng-template>
+                      <ion-content class="ion-padding"
+                        >{{pushNotificationSettings.recordBookPublic ? 'Make Record Book Private' :
+                        'Make Record Book Public'}}</ion-content
+                      >
+                    </ng-template>
+                  </ion-popover>
+                </ng-container>
+              </div>
+              <div
+                *ngFor="let userGameRecord of userGameRecords"
+                class="ion-padding bottom-line"
+                [ngStyle]="{'opacity': pushNotificationSettings.recordBookPublic ? 1 : 0.5}"
+              >
+                <ion-grid class="ion-no-padding">
+                  <ion-row class="ion-align-items-center">
+                    <ion-col size="2">
+                      <div>
+                        <ion-avatar
+                          (click)="onAvatarClick(userGameRecord.game.player1.uid)"
+                          slot="start"
+                          *ngIf="userGameRecord.game.player1.displayName!=vm?.user?.displayName"
+                        >
+                          <img
+                            alt=""
+                            [src]="userGameRecord.game.player1.photos[userGameRecord.game.player1.photos.length-1]"
+                            onerror="this.src = '../../assets/images/palm-tree.png'"
+                          />
+                        </ion-avatar>
+                        <ion-avatar
+                          (click)="onAvatarClick(userGameRecord.game.player2.uid)"
+                          *ngIf="userGameRecord.game.player1.displayName==vm?.user?.displayName"
+                        >
+                          <img
+                            alt=""
+                            [src]="userGameRecord.game.player2.photos[userGameRecord.game.player2.photos.length-1]"
+                            onerror="this.src = '../../assets/images/palm-tree.png'"
+                          />
+                        </ion-avatar>
+                      </div>
+                    </ion-col>
+                    <ion-col size="10">
+                      <ion-row class="f-13 lh-22 record-book-content-winner">
+                        <ion-col size="5" class="ion-no-padding">
+                          <div class="game-name-wrapper">
+                            <div class="user-profile-game">
+                              {{ userGameRecord.game.hobby.name | titleCase }}
+                            </div>
+                          </div>
+                        </ion-col>
+                        <ion-col size="7" class="ion-no-padding">
+                          <ion-row class="ion-no-padding c-border-row border-bottom-none">
+                            <ion-col size="8" class="ion-no-padding">
+                              <div class="user-name-winner">
+                                <div
+                                  [className]="'skill-icon-wrapper skill-icon-' + (userGameRecord.player1Skill ? userGameRecord.player1Skill.toLowerCase() : 'beginner')"
+                                  style="margin-right: 10px"
+                                ></div>
+                                <span class="skill-label" style="font-size: 10px; margin-right: 5px"
+                                  >{{userGameRecord.player1Skill}}</span
+                                >
+                                <div class="name-wrapper">
+                                  {{currentUser.uid === userGameRecord.game.player1.uid ? 'You' :
+                                  userGameRecord.game.player1.displayName}}
+                                </div>
+                              </div>
+                            </ion-col>
+                            <ion-col size="4" class="ion-no-padding">
+                              <ion-row class="ion-no-padding c-inner-border border-top-bottom-none">
+                                <ion-col size="8" class="ion-no-padding">
+                                  <div class="winner-number">
+                                    {{userGameRecord.game.correctedScore ?
+                                    userGameRecord.game.correctedScore.player1 :
+                                    userGameRecord.game.score.player1}}
+                                  </div>
+                                </ion-col>
+                                <ion-col size="4" class="ion-no-padding">
+                                  <div class="win">
+                                    {{userGameRecord.game.correctedScore ?
+                                    userGameRecord.game.correctedScore.player1Won :
+                                    userGameRecord.game.score.player1Won}}
+                                  </div>
+                                </ion-col>
+                              </ion-row>
+                            </ion-col>
+                          </ion-row>
+                        </ion-col>
+                      </ion-row>
+                      <ion-row class="f-13 lh-22 record-book-content-looser">
+                        <ion-col size="5" class="ion-no-padding">
+                          <div class="date-wrapper">
+                            {{userGameRecord.game.createdAt | date: 'MMM dd, yyyy' }}
+                          </div>
+                        </ion-col>
+                        <ion-col size="7" class="ion-no-padding">
+                          <ion-row class="ion-no-padding c-border-row">
+                            <ion-col size="8" class="ion-no-padding">
+                              <div class="user-name-looser">
+                                <div
+                                  [className]="'skill-icon-wrapper skill-icon-' + (userGameRecord.player2Skill ? userGameRecord.player2Skill.toLowerCase() : 'beginner')"
+                                  style="margin-right: 10px"
+                                ></div>
+                                <span class="skill-label" style="font-size: 10px; margin-right: 5px"
+                                  >{{userGameRecord.player2Skill}}</span
+                                >
+                                <div class="name-wrapper">
+                                  {{currentUser.uid === userGameRecord.game.player2.uid ? 'You' :
+                                  userGameRecord.game.player2.displayName}}
+                                </div>
+                              </div>
+                            </ion-col>
+                            <ion-col size="4" class="ion-no-padding">
+                              <ion-row class="ion-no-padding c-inner-border border-top-bottom-none">
+                                <ion-col size="8" class="ion-no-padding">
+                                  <div class="looser-number">
+                                    {{userGameRecord.game.correctedScore ?
+                                    userGameRecord.game.correctedScore.player2 :
+                                    userGameRecord.game.score.player2}}
+                                  </div>
+                                </ion-col>
+                                <ion-col size="4" class="ion-no-padding">
+                                  <div class="looser">
+                                    {{userGameRecord.game.correctedScore ?
+                                    userGameRecord.game.correctedScore.player2Won :
+                                    userGameRecord.game.score.player2Won}}
+                                  </div>
+                                </ion-col>
+                              </ion-row>
+                            </ion-col>
+                          </ion-row>
+                        </ion-col>
+                      </ion-row>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </div>
+            </div>
+          </section>
+        </div>
+      </ion-content>
+    </div>
+  </ng-container>
+</ng-container>

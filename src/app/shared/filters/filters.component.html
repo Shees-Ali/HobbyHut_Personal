@@ -1,0 +1,171 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="dark" (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-sharp"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <!-- <ion-title>{{this.hobbyName}}</ion-title> -->
+    <ion-title>Skill Settings</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="dark" (click)="save()"> Save </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="top-container">
+    <div class="theme-card-wrapper ion-padding">
+      <section class="skills" *ngIf="!!hobbyName">
+        <h3 class="header-title c-width ion-padding-start ion-padding-top">Skill Level</h3>
+        <ui-skill-level
+          [skillLevel]="skillLevel"
+          (skillLevelChanged)="onSkillLevelChanged($event)"
+        ></ui-skill-level>
+      </section>
+
+      <ion-list [formGroup]="filtersForm" class="form-list ion-padding">
+        <ion-item lines="none" class="c-item-settings">
+          <div class="theme-card-wrapper c-btn-card">
+            <img class="profile-details-icon" src="assets/icon/cap.png" alt="" />
+          </div>
+          <ion-label>I like to coach</ion-label>
+          <ion-toggle formControlName="coach"></ion-toggle>
+        </ion-item>
+
+        <ion-item lines="none" class="c-item-settings">
+          <div class="theme-card-wrapper c-btn-card">
+            <img class="profile-details-icon" src="assets/icon/paddle.png" alt="" />
+          </div>
+          <ion-label>I have equipment for two</ion-label>
+          <ion-toggle formControlName="equipment"></ion-toggle>
+        </ion-item>
+
+        <ion-item lines="none" class="c-item-settings">
+          <div class="theme-card-wrapper c-btn-card">
+            <img class="profile-details-icon" src="assets/icon/keys.png" alt="" />
+          </div>
+          <ion-label>I have facility access</ion-label>
+          <ion-toggle formControlName="facilities"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </div>
+    <!-- FILTERS HOME I.E. SEARCH FILTERS-->
+
+    <ion-header class="ion-no-padding">
+      <ion-toolbar style="padding-top: 0px !important">
+        <ion-title>Search Settings</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <div class="theme-card-wrapper bottom-space ion-padding">
+      <div class="search-filter ion-padding">
+        <h3 class="header-title">
+          Age / {{ filters?.ageRange?.value.lower || this.minAge }} -
+          {{
+            (filters?.ageRange?.value.upper || this.maxAge) > 65
+              ? '65+'
+              : filters?.ageRange?.value.upper || this.maxAge
+          }}
+        </h3>
+
+        <ion-item lines="none" class="age-range">
+          <ion-range
+            dualKnobs="true"
+            min="18"
+            max="66"
+            snaps="true"
+            ticks="false"
+            [value]="filters?.ageRange?.value || { lower: 18, upper: 66 }"
+            (ionChange)="onAgeRangeChanged($event)"
+          >
+          </ion-range>
+        </ion-item>
+      </div>
+
+      <div class="search-filter ion-padding">
+        <h3 class="header-title">
+          Radius /
+          {{
+            (filters?.radius?.value || this.maxRadius) > 50
+              ? '50+'
+              : filters?.radius?.value || this.maxRadius
+          }}
+          Miles
+        </h3>
+
+        <ion-item lines="none" class="age-range">
+          <ion-range
+            min="0.1"
+            max="51"
+            snaps="true"
+            ticks="false"
+            [value]="filters?.radius?.value || maxRadius"
+            (ionChange)="onRadiusRangeChanged($event)"
+          ></ion-range>
+        </ion-item>
+      </div>
+      <div class="ion-padding">
+        <div class="outer-border text-input-wrapper p-relative mb-0">
+          <ion-item lines="none">
+            <ion-label position="floating">
+              <span>Search by Nickname</span>
+            </ion-label>
+            <ion-input
+              type="text"
+              placeholder="Enter a nickname"
+              [value]="filters?.username || ''"
+              (change)="onSearchInputChanged($event)"
+              autocapitalize
+            ></ion-input>
+            <div (click)="save()" class="search-icon">
+              <ion-icon color="light" name="search"></ion-icon>
+            </div>
+          </ion-item>
+        </div>
+      </div>
+      <div class="ion-padding">
+        <div class="outer-border text-input-wrapper p-relative mb-0">
+          <ion-item lines="none">
+            <ion-label position="floating">
+              <span>Update Current Location</span>
+            </ion-label>
+            <div class="update-location" (click)="updateLocation()">
+              <ion-icon color="light" name="locate"></ion-icon>
+            </div>
+          </ion-item>
+        </div>
+      </div>
+      <div class="ion-padding">
+        <div class="search-filter d-flex ion-justify-content-between">
+          <h3 class="header-title c-width">Gender</h3>
+
+          <ion-button
+            class="theme-card-wrapper c-theme-card-wrapper"
+            [ngClass]="filters.gender == Gender.MALE ? 'selected' : ''"
+            fill="clear"
+            (click)="onGenderSegmentChanged(Gender.MALE)"
+          >
+            <ion-label> Male </ion-label>
+          </ion-button>
+          <ion-button
+            class="theme-card-wrapper c-theme-card-wrapper"
+            [ngClass]="filters.gender == Gender.FEMALE ? 'selected' : ''"
+            fill="clear"
+            (click)="onGenderSegmentChanged(Gender.FEMALE)"
+          >
+            <ion-label> Female </ion-label>
+          </ion-button>
+          <ion-button
+            class="theme-card-wrapper c-theme-card-wrapper"
+            [ngClass]="filters.gender == 'both' ? 'selected' : ''"
+            fill="clear"
+            (click)="onGenderSegmentChanged('both')"
+          >
+            <ion-label> Both </ion-label>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

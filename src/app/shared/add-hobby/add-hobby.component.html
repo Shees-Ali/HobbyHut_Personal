@@ -1,0 +1,16 @@
+<div class="add-hobby">
+    <ion-button class="close-btn" (click)="onClose()" color="dark" fill="clear" shape="round">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+    </ion-button>
+    <header class="header">
+        <section class="header-content">
+            <h3 class="header-title">{{ selectedHobby.name }}</h3>
+            <p class="skill-title">Skill Level</p>
+        </section>
+    </header>
+
+    <section>
+        <ui-skill-level (skillLevelChanged)="onSkillLevelChanged($event)"></ui-skill-level>
+        <p class="skill-copy">You can add more hobbies in your profile</p>
+    </section>
+</div>

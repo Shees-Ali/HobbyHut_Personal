@@ -1,0 +1,36 @@
+:host {
+    --skills-margin-top: 20px;
+}
+
+.add-hobby {
+    padding: 15px;
+}
+
+.close-btn {
+    position: absolute;
+    right: -15px;
+    top: 0;
+}
+
+.header {
+    padding-bottom: 10px;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+}
+
+.skill-title {
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+}
+
+.skill-copy {
+    margin-top: 20px;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+    color: #8c8c8c;
+}

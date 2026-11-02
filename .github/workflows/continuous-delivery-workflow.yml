@@ -1,0 +1,69 @@
+# Notes
+# deploy_to_testflight should be the same job
+
+name: Deploy to Testflight
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_ionic_app:
+    env:
+      MATCH_PASSWORD: ${{secrets.MATCH_PASSWORD}}
+      ACCESS_TOKEN: ${{secrets.GIT_CREDENTIALS}}
+      MATCH_CREDENTIALS: ${{secrets.MATCH_CREDENTIALS}}
+      FASTLANE_PASSWORD: ${{secrets.FASTLANE_PASSWORD}}
+    name: Build Ionic App
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+
+      - name: Install & Cache NPM dependencies
+        uses: bahmutov/npm-install@v1
+
+      - name: Build prod app
+        run: npm run build -- --prod
+
+      - name: Fastlane Action
+        uses: maierj/fastlane-action@v1.4.0
+        with:
+          lane: "beta"
+          subdirectory: "ios/App"
+      # - name: Run fastlane setup
+      #   env:
+      #     APPLE_ACCOUNT: ${{ secrets.APPLE_ID }}
+      #     TEAM_ID: ${{ secrets.TEAM_ID }}
+      #   run: |
+      #     fastlane setup_ci_env --verbose
+      #   working-directory: ./platforms/ios
+  # deploy_to_testflight:
+  #   name: Deploy to Testflight via Fastlane
+  #   needs: build_ionic_app
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
+  #     - name: Run Fastlane pipeline
+  #       run: |
+  #         echo 'Ready for fastlane'
+  #       working-directory: ./platforms/ios
+  #     # Build cordova app
+  #     - name: Run fastlane setup
+  #       env:
+  #         APPLE_ACCOUNT: ${{ secrets.APPLE_ID }}
+  #         TEAM_ID: ${{ secrets.TEAM_ID }}
+  #       run: |
+  #         fastlane setup_ci_env --verbose
+  #       working-directory: ./platforms/ios
+  #     - name: Run fastlane beta
+  #       run: |
+  #         fastlane beta --verbose
+  #       working-directory: ./platforms/ios

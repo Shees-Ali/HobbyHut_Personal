@@ -1,0 +1,163 @@
+<ng-container>
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start" class="back-btn-bg">
+        <ion-back-button color="dark" text=""></ion-back-button>
+      </ion-buttons>
+      <ion-title> {{ pageName }} Post </ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="create-post">
+    <ion-content>
+      <div class="post-content" [formGroup]="postForm">
+        <div class="outer-border medium-text-area-wrapper post-detail">
+          <ion-item lines="none">
+            <ion-label position="floating">
+              <span>Subject</span>
+            </ion-label>
+            <ion-textarea
+              #myTextAreaSub
+              placeholder="Type Subject Here..."
+              formControlName="subject"
+              class="description"
+              autocapitalize
+            ></ion-textarea>
+          </ion-item>
+        </div>
+        <div class="outer-border medium-text-area-wrapper post-detail">
+          <ion-item lines="none">
+            <ion-label position="floating">
+              <span>Description</span>
+            </ion-label>
+            <ion-textarea
+              #myTextAreaDesc
+              placeholder="Type Description Here..."
+              formControlName="description"
+              class="description"
+              autocapitalize
+            ></ion-textarea>
+          </ion-item>
+        </div>
+        <div class="outer-border medium-text-area-wrapper">
+          <ion-item lines="none">
+            <ion-label position="stacked">
+              <span>Start Date</span>
+            </ion-label>
+            <ion-datetime-button datetime="startdate">
+              <ion-text *ngIf="postForm.controls['startDate'].value == ''" slot="date-target">
+                <ion-icon name="calendar"> </ion-icon>
+                Select Start Date
+              </ion-text>
+            </ion-datetime-button>
+
+            <ion-modal [keepContentsMounted]="true" [backdropDismiss]="false">
+              <ng-template>
+                <ion-datetime
+                  [showDefaultButtons]="true"
+                  id="startdate"
+                  presentation="date"
+                  [min]="minStartDate"
+                  displayFormat="DD MMM YYYY"
+                  pickerFormat="DD MMM YYYY"
+                  placeholder="Start Date"
+                  formControlName="startDate"
+                  (ionChange)="onChangeStartDate($event)"
+                ></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+        </div>
+        <div class="outer-border medium-text-area-wrapper">
+          <ion-item lines="none">
+            <ion-label position="stacked">
+              <span>Start Time</span>
+            </ion-label>
+            <ion-datetime-button datetime="startTime">
+              <ion-text *ngIf="postForm.controls['startTime'].value == ''" slot="time-target">
+                <ion-icon name="time"> </ion-icon>
+                Select Start Time
+              </ion-text>
+            </ion-datetime-button>
+
+            <ion-modal [keepContentsMounted]="true" [backdropDismiss]="false">
+              <ng-template>
+                <ion-datetime
+                  [showDefaultButtons]="true"
+                  id="startTime"
+                  presentation="time"
+                  displayFormat="h:mm A"
+                  pickerFormat="h:mm A"
+                  placeholder="Start Time"
+                  formControlName="startTime"
+                  locale="en-GB"
+                  hourCycle="h12"
+                ></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+        </div>
+        <div class="outer-border medium-text-area-wrapper">
+          <ion-item lines="none">
+            <ion-label position="stacked">
+              <span>End Date</span>
+            </ion-label>
+            <ion-datetime-button datetime="endDate">
+              <ion-text *ngIf="postForm.controls['endDate'].value == ''" slot="date-target">
+                <ion-icon name="calendar"> </ion-icon>
+                Select End Date
+              </ion-text>
+            </ion-datetime-button>
+
+            <ion-modal [keepContentsMounted]="true" [backdropDismiss]="false">
+              <ng-template>
+                <ion-datetime
+                  [showDefaultButtons]="true"
+                  id="endDate"
+                  presentation="date"
+                  [min]="minEndDate"
+                  displayFormat="DD MMM YYYY"
+                  pickerFormat="DD MMM YYYY"
+                  placeholder="End Date"
+                  formControlName="endDate"
+                ></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+        </div>
+        <div class="outer-border medium-text-area-wrapper">
+          <ion-item lines="none">
+            <ion-label position="stacked">
+              <span>End Time</span>
+            </ion-label>
+            <ion-datetime-button datetime="endTime">
+              <ion-text *ngIf="postForm.controls['endTime'].value == ''" slot="time-target">
+                <ion-icon name="time"> </ion-icon>
+                Select End Time
+              </ion-text>
+            </ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true" [backdropDismiss]="false">
+              <ng-template>
+                <ion-datetime
+                  [showDefaultButtons]="true"
+                  id="endTime"
+                  presentation="time"
+                  locale="en-GB"
+                  hourCycle="h12"
+                  displayFormat="h:mm A"
+                  pickerFormat="h:mm A"
+                  placeholder="End Time"
+                  formControlName="endTime"
+                ></ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+        </div>
+        <!-- [disabled]="postForm.invalid" -->
+
+        <ion-button class="footer-btn" expand="block" type="submit" (click)="onPostSubmit()">
+          {{ pageName }} Post
+        </ion-button>
+      </div>
+    </ion-content>
+  </div>
+</ng-container>

@@ -1,0 +1,118 @@
+<!-- Regular messages -->
+<ion-item-group
+  *ngIf="!isTopFive && !message?.meta?.isInTopFive?.[currentUserId]"
+  class="message-preview"
+  button
+  detail="false"
+>
+  <ion-item-sliding>
+    <div class="contact-list">
+      <ion-item lines="none">
+        <ion-avatar
+          (click)="onAvatarClick(message)"
+          slot="start"
+          [ngClass]="{ 'user-active': message?.participant?.isActive }"
+        >
+          <img
+            alt=""
+            [src]="message?.participant?.photoUrl"
+            onerror="this.src='../../assets/images/palm-tree.png'"
+          />
+        </ion-avatar>
+        <ion-label (click)="onOpenMessage(message)">
+          <h2 class="participant-name" [ngClass]="{ unread: message?.participant?.isLast }">
+            {{ message?.participant?.displayName }}
+          </h2>
+          <p [ngClass]="{ bold: message?.participant?.isLast }">
+            {{ message?.meta?.lastMessage }}
+          </p>
+        </ion-label>
+        <span slot="end" class="unread-dot" *ngIf="message?.participant?.isLast"></span>
+        <ion-note slot="end" class="message-date">
+          {{ message?.meta?.timestamp | date : 'dd MMM' }}
+        </ion-note>
+        <ion-button (click)="presentActionSheet(message, true)" slot="end" fill="clear">
+          <ion-icon name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </div>
+    <ion-item-options side="end">
+      <ion-item-option class="unmatch" (click)="handleUnmatch(message)">
+        <div>Unmatch</div>
+      </ion-item-option>
+      <ion-item-option class="block" (click)="handleBlockUser(message)">
+        <div>Block</div>
+      </ion-item-option>
+      <ion-item-option class="report">
+        <div (click)="handleReportUser(message)">Report</div>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
+</ion-item-group>
+
+<!-- Placeholder for top five -->
+<ion-item-group *ngIf="isTopFive" class="message-preview placeholder-item" button detail="false">
+  <ion-item-sliding *ngIf="!message">
+    <div class="contact-list">
+      <div *ngIf="index + 1 < 11" class="list-number">{{ index + 1 }}</div>
+      <ion-item lines="none">
+        <ion-avatar slot="start" class="placeholder-avatar">
+          <img
+            src="../../assets/images/placeholder-avatar.png"
+            onerror="this.src='../../assets/images/palm-tree.png'"
+          />
+        </ion-avatar>
+        <ion-label>
+          <p class="placeholder-text">Empty Top 5 slot</p>
+        </ion-label>
+      </ion-item>
+    </div>
+  </ion-item-sliding>
+
+  <ion-item-sliding *ngIf="message">
+    <div class="contact-list">
+      <ng-container *ngIf="isTopFive">
+        <div *ngIf="index + 1 < 11" class="list-number">{{ index + 1 }}</div>
+      </ng-container>
+
+      <ion-item lines="none">
+        <ion-avatar
+          (click)="onAvatarClick(message)"
+          slot="start"
+          [ngClass]="{ 'user-active': message?.participant?.isActive }"
+        >
+          <img
+            alt=""
+            [src]="message?.participant?.photoUrl"
+            onerror="this.src='../../assets/images/palm-tree.png'"
+          />
+        </ion-avatar>
+        <ion-label (click)="onOpenMessage(message)">
+          <h2 class="participant-name" [ngClass]="{ unread: message?.participant?.isLast }">
+            {{ message?.participant?.displayName }}
+          </h2>
+          <p [hidden]="isTopFive" [ngClass]="{ bold: message?.participant?.isLast }">
+            {{ message?.meta?.lastMessage }}
+          </p>
+        </ion-label>
+        <ion-note slot="end" class="message-date">
+          {{ message?.meta?.timestamp | date : 'dd MMM' }}
+        </ion-note>
+        <ion-button (click)="presentActionSheet(message)" slot="end" fill="clear">
+          <ion-icon name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </div>
+    <ion-item-options side="end">
+      <ion-item-option class="unmatch" (click)="handleUnmatch(message)">
+        <div>Unmatch</div>
+      </ion-item-option>
+      <ion-item-option class="block" (click)="handleBlockUser(message)">
+        <div>Block</div>
+      </ion-item-option>
+      <ion-item-option class="report">
+        <div (click)="handleReportUser(message)">Report</div>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
+</ion-item-group>
