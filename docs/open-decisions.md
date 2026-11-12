@@ -30,6 +30,7 @@ days). That needs the decline time to be stored and is not built.
 **Where to change it:** `DECLINE_ALLOWS_NEW_REQUEST` in
 `src/app/core/core.facade.ts` (`false` = today's behaviour, `true` = the alternative).
 
-**Related data:** the export of 2026-11-12 has 33 of these marks with no matching chat.
-The data cleanup leaves them in place while this is open. If the answer is "clear the
-mark", they should be removed in the same change.
+**Related data:** after the data cleanup of 2026-11-13 there are no such marks left over
+in the database (every "request sent" mark has a matching chat), so there is nothing to
+tidy up whichever way this is decided. Marks will start to appear again each time a
+request is declined.
