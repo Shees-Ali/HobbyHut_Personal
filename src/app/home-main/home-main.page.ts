@@ -106,7 +106,7 @@ export class HomeMainPage implements OnInit {
           hobby['memberInfo'] = members;
         });
         this.coreFacade.hobbiesList = [];
-        resDetail.user.hobbies.forEach(async (hobby: any) => {
+        (resDetail.user?.hobbies || []).forEach(async (hobby: any) => {
           this.coreFacade.hobbiesList.push({ name: hobby.name, id: hobby.hobbyID });
         });
         this.getFiltersFromLocalStorage();
@@ -122,10 +122,12 @@ export class HomeMainPage implements OnInit {
     this.subscriptions = this.afAuth.user
       .pipe(filter((user) => !!user))
       .subscribe(async (resUser: any) => {
-        const currentUserObj: User = await this.coreFacade.getUserObj(resUser.uid);
+        // A brand-new user's Firestore doc may not exist yet, so fall back to just the uid.
+        const userDoc: User | null = await this.coreFacade.getUserObj(resUser.uid);
+        const currentUserObj = { ...(userDoc || {}), uid: resUser.uid } as User;
 
         // Check if the user profile is incomplete
-        if (!!!currentUserObj.dob || !!!currentUserObj.username || currentUserObj.username === '') {
+        if (!currentUserObj.dob || !currentUserObj.username) {
           this.updateProfileStatus = 'updating';
           this.presentUpdateProfileModal(currentUserObj);
         }
@@ -275,7 +277,7 @@ function markUsersHobbies(hobbies, user: User) {
   return hobbies.map((hobby) => {
     return {
       ...hobby,
-      isChosen: !!user.hobbies.find((userHobby) => userHobby.hobbyID === hobby.hobbyID),
+      isChosen: !!(user?.hobbies || []).find((userHobby) => userHobby.hobbyID === hobby.hobbyID),
     };
   });
 }

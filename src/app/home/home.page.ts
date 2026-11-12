@@ -70,7 +70,7 @@ export class HomePage implements OnInit {
           hobby['memberInfo'] = members;
         });
         this.coreFacade.hobbiesList = [];
-        resDetail.user.hobbies.forEach(async (hobby: any) => {
+        (resDetail.user?.hobbies || []).forEach(async (hobby: any) => {
           this.coreFacade.hobbiesList.push({ name: hobby.name, id: hobby.hobbyID });
         });
         this.getFiltersFromLocalStorage();
@@ -89,7 +89,7 @@ export class HomePage implements OnInit {
       .pipe(filter((user) => !!user))
       .subscribe(async (resUser: any) => {
         const currentUserObj: any = await this.coreFacade.getUserObj(resUser.uid);
-        if (!!!currentUserObj.dob) {
+        if (!currentUserObj?.dob) {
           this.updateProfileStatus = 'updating';
           this.presentUpdateProfileModal(resUser);
         }
@@ -214,7 +214,7 @@ function markUsersHobbies(hobbies, user: User) {
   return hobbies.map((hobby) => {
     return {
       ...hobby,
-      isChosen: !!user.hobbies.find((userHobby) => userHobby.hobbyID === hobby.hobbyID),
+      isChosen: !!(user?.hobbies || []).find((userHobby) => userHobby.hobbyID === hobby.hobbyID),
     };
   });
 }

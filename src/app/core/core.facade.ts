@@ -117,13 +117,24 @@ export class CoreFacade {
     this.user$ = null;
     this.user$ = this.afAuth.user.pipe(
       filter((user) => !!user),
-      switchMap((user: any) => this.afFs.doc(`users/${user.uid}`).valueChanges()),
+      switchMap((authUser: any) =>
+        this.afFs
+          .doc(`users/${authUser.uid}`)
+          .valueChanges()
+          .pipe(
+            // A brand-new user's Firestore doc may not exist yet; wait until it does.
+            filter((userDoc: any) => !!userDoc),
+            map((userDoc: any) => ({
+              uid: authUser.uid,
+              ...userDoc,
+              hobbies: userDoc.hobbies || [],
+            })),
+          ),
+      ),
       tap((user: any) => {
-        if (user) {
-          this.user = { ...user, hobbies: user.hobbies || [] };
-          // Emit the user to the BehaviorSubject
-          this.userSubject.next(this.user);
-        }
+        this.user = user;
+        // Emit the user to the BehaviorSubject
+        this.userSubject.next(this.user);
       }),
       shareReplay(1),
     );
