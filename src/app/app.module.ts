@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ErrorHandler, NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireAuthGuard } from '@angular/fire/compat/auth-guard';
@@ -26,6 +26,7 @@ import { Player2GameComponent } from './shared/player2-game/player2-game.compone
 import { MessageService } from './message.service';
 // import { SignInWithApple } from '@awesome-cordova-plugins/sign-in-with-apple/ngx';
 import { Badge } from '@awesome-cordova-plugins/badge/ngx';
+import { GlobalErrorHandler } from './core/global-error-handler';
 
 @NgModule({
   declarations: [AppComponent,Player2GameComponent],
@@ -57,6 +58,7 @@ import { Badge } from '@awesome-cordova-plugins/badge/ngx';
     HTTP,
     Badge,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

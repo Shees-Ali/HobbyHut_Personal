@@ -8,7 +8,7 @@ import {
   EventEmitter,
   Input
 } from '@angular/core';
-import { SkillLevel } from '../../core/core.model';
+import { HobbyMeta, SkillLevel } from '../../core/core.model';
 
 @Component({
   selector: 'ui-skill-level',
@@ -20,7 +20,7 @@ export class SkillLevelComponent implements OnInit {
   @Input() skillLevel?: string;
   @Input() fromPopover: string;
   @Input() hobbyLevelFilter: string;
-  @Input() meta: string;
+  @Input() meta: HobbyMeta;
   @Input() hobbyID: string;
   @Input() hobbyName: string;
   @Output() skillLevelChanged = new EventEmitter<string>();
@@ -32,16 +32,21 @@ export class SkillLevelComponent implements OnInit {
     // console.log(this.fromPopover, this.meta, this.hobbyID, this.hobbyName, this.hobbyLevelFilter);
   }
 
-  segmentChanged({ detail: { value } }) {
+  async segmentChanged({ detail: { value } }) {
     this.skillLevelChanged.emit(value);
     if (this.fromPopover && this.fromPopover == "1") {
-      localStorage.setItem('skillLevel', value)
-      this.coreFacade.updateUserHobbies(
-        { hobbyID: this.hobbyID, name: this.hobbyName, meta: this.meta },
-        value
+      const saved = await this.coreFacade.feedback.run(
+        () =>
+          this.coreFacade.updateUserHobbies(
+            { hobbyID: this.hobbyID, name: this.hobbyName, meta: this.meta },
+            value
+          ),
+        { failure: 'Could not update your skill level.' }
       );
+      if (saved) {
+        localStorage.setItem('skillLevel', value);
+      }
       this.popoverController.dismiss();
-
     }
   }
 }

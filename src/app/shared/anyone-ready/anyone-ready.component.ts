@@ -4,6 +4,7 @@ import { take } from 'rxjs/operators';
 import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { CoreFacade } from 'src/app/core/core.facade';
+import { isProfileComplete } from 'src/app/core/profile';
 import { CalculateAgePipe } from '../calculate-age/calculate-age.pipe';
 import { Browser } from '@capacitor/browser';
 
@@ -202,6 +203,8 @@ export class AnyoneReadyComponent implements OnInit, OnDestroy, AfterViewInit {
             profile,
           };
         })
+        // Users who have not completed their profile are never listed.
+        .filter((user: any) => isProfileComplete(user.profile))
         .filter((user: any) => !hasActiveFilters || this.passesFilters(user.profile))
         .map(({ profile, ...user }) => user);
 

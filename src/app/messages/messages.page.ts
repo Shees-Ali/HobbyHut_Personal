@@ -292,24 +292,34 @@ export class MessagesPage implements OnInit, OnDestroy {
     });
   }
 
-  handleAcceptRequest({ chatID, messages }) {
+  async handleAcceptRequest({ chatID, messages }) {
     this.messageFlag = true;
-    this.coreFacade.acceptRequest(chatID);
-    setTimeout(() => {
+    const accepted = await this.coreFacade.feedback.run(
+      () => this.coreFacade.acceptRequest(chatID),
+      { failure: 'Could not accept the request.' }
+    );
+    if (accepted) {
       this.getUnreadMessagesCount();
-    }, 1500);
+    }
   }
 
   handleDeclineRequest({ chatID, messages }) {
-    this.coreFacade.declineRequest(chatID);
+    this.coreFacade.feedback.run(() => this.coreFacade.declineRequest(chatID), {
+      failure: 'Could not decline the request.',
+    });
   }
 
   handleBlockUser(message) {
-    this.coreFacade.blockMessage(message);
+    this.coreFacade.feedback.run(() => this.coreFacade.blockMessage(message), {
+      success: 'User blocked.',
+      failure: 'Could not block this user.',
+    });
   }
 
   handleUnmatch(message) {
-    this.coreFacade.removeFromChatsAndFriends(message);
+    this.coreFacade.feedback.run(() => this.coreFacade.removeFromChatsAndFriends(message), {
+      failure: 'Could not remove this friend.',
+    });
   }
 
   handleReportUser(message) {

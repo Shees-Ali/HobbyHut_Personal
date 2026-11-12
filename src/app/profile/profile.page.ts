@@ -329,7 +329,8 @@ export class ProfilePage implements OnInit {
       const filePath = `users/${this.currentUser.uid}/profile-pic/${
         this.currentUser.uid
       }-${Date.now().toString()}`;
-      this.coreFacade.uploadProfilePic(filePath, element, this.currentUser.uid).catch((err) => {});
+      // uploadProfilePic tells the user if the upload fails.
+      this.coreFacade.uploadProfilePic(filePath, element, this.currentUser.uid).catch(() => {});
     }
   }
 
@@ -369,25 +370,18 @@ export class ProfilePage implements OnInit {
 
   async sendMessage(user) {
     this.coreFacade.messageUserId = null;
-    this.coreFacade.fsUsersCollection
-      .doc(user.uid)
-      .get()
-      .subscribe(async (data: any) => {
-        if (
-          data.data().blockedUsers &&
-          data.data().blockedUsers.includes(this.coreFacade.user.uid)
-        ) {
-          +this.presentToast('You are blocked by ' + user.displayName);
-          return;
-        }
-        if (this.isAccepted == true) {
-          this.coreFacade.messageUserId = user.uid;
-          this.router.navigate(['tabs/messages']);
-          return;
-        }
-        await this.coreFacade.initiateChat(user);
-        this.isAlreadyMessaged = true;
-      });
+    if (this.isAccepted == true) {
+      this.coreFacade.messageUserId = user.uid;
+      this.router.navigate(['tabs/messages']);
+      return;
+    }
+    const sent = await this.coreFacade.feedback.run(
+      () => this.coreFacade.sendMessageRequest(user.uid),
+      { failure: 'Could not send your request.' },
+    );
+    if (sent) {
+      this.isAlreadyMessaged = true;
+    }
   }
 
   turnOffTimers() {
@@ -397,14 +391,16 @@ export class ProfilePage implements OnInit {
 
   async stopAllTimers() {
     this.isTurningHobbiesOff = true;
-    const activatedHobbies = this.coreFacade.user.isActive;
+    const activatedHobbies = this.coreFacade.user.isActive || [];
     const timeout = 1000;
     const length = activatedHobbies.length;
 
     this.timerService.turnOffAll();
 
     if (activatedHobbies.length > 0) {
-      await this.coreFacade.clearAllActiveHobbies();
+      await this.coreFacade.feedback.run(() => this.coreFacade.clearAllActiveHobbies(), {
+        failure: 'Could not turn off your timers.',
+      });
     }
 
     setTimeout(() => {
@@ -432,10 +428,15 @@ export class ProfilePage implements OnInit {
     // this.unsubscribeGame();
   }
 
-  updateActiveHobby(hobby, user) {
-    this.coreFacade.updateUserActiveHobby(hobby, user);
-    this.activatedHobby = hobby;
-    this.hobbyName = hobby.name;
+  async updateActiveHobby(hobby, user) {
+    const saved = await this.coreFacade.feedback.run(
+      () => this.coreFacade.updateUserActiveHobby(hobby, user),
+      { failure: 'Could not change your featured hobby.' },
+    );
+    if (saved) {
+      this.activatedHobby = hobby;
+      this.hobbyName = hobby.name;
+    }
   }
 
   onFocusInput() {
@@ -446,7 +447,10 @@ export class ProfilePage implements OnInit {
 
   onBlurInput(user) {
     this.coreFacade.inputStatus$.next('disable');
-    this.coreFacade.updateInfo(this.userProfileForm.value, user);
+    this.coreFacade.feedback.run(
+      () => this.coreFacade.updateInfo(this.userProfileForm.value, user),
+      { failure: 'Could not save your profile details.' },
+    );
   }
   onChangeInput(e, key) {
     // let self = this;

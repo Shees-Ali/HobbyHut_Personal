@@ -1,127 +1,147 @@
-<ion-content class="ion-padding">
-  <section class="profile-wrapper">
-    <ion-card class="profile-wrapper">
-      <form [formGroup]="updateProfileForm" (ngSubmit)="onProfileFormSubmit()" class="ion-padding">
-        <div class="outer-border text-input-wrapper">
-          <ion-item lines="none">
-            <ion-label position="floating">
-              <span>Display Name<ion-text color="danger">*</ion-text></span>
-            </ion-label>
-            <ion-input
-              formControlName="displayName"
-              type="text"
-              placeholder="Chose your display name"
-              autocapitalize
-            ></ion-input>
-          </ion-item>
-        </div>
-        <div class="outer-border text-input-wrapper">
-          <ion-item lines="none">
-            <ion-label position="floating">
-              <span>Gender</span>
-            </ion-label>
-            <ion-select formControlName="gender" multiple="false" placeholder="Select gender">
-              <ion-select-option [value]="Gender.MALE">Male</ion-select-option>
-              <ion-select-option [value]="Gender.FEMALE">Female</ion-select-option>
-              <ion-select-option [value]="Gender.NON_BINARY">Non-Binary</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </div>
-
-        <div class="outer-border input-item medium-text-area-wrapper">
-          <ion-item lines="none">
-            <ion-label class="date-time-label" position="stacked">
-              <span> Date of Birth <ion-text color="danger">*</ion-text></span>
-            </ion-label>
-            <ion-datetime-button datetime="dob">
-              <ion-text *ngIf="updateProfileForm.controls['dob'].value == ''" slot="date-target">
-                <span> Select Date of Birth</span>
-              </ion-text>
-            </ion-datetime-button>
-            <ion-modal [keepContentsMounted]="true">
-              <ng-template>
-                <ion-datetime
-                  [showDefaultButtons]="true"
-                  id="dob"
-                  presentation="date"
-                  displayFormat="DD MMM YYYY"
-                  pickerFormat="DD MMM YYYY"
-                  placeholder="Date Of Birth"
-                  formControlName="dob"
-                ></ion-datetime>
-              </ng-template>
-            </ion-modal>
-          </ion-item>
-        </div>
-        <div class="outer-border text-input-wrapper">
-          <ion-item lines="none">
-            <ion-label position="floating">
-              <span>Username<ion-text color="danger">*</ion-text></span>
-            </ion-label>
-            <ion-input
-              formControlName="username"
-              type="text"
-              placeholder="Chose your username"
-              autocapitalize
-            ></ion-input>
-          </ion-item>
-                  <div
-              *ngIf="
-                updateProfileForm.get('username')?.touched &&
-                updateProfileForm.get('username')?.errors
-              "
-              class="error-message"
-            >
-              <ion-text
-                color="danger"
-                *ngIf="updateProfileForm.get('username')?.errors?.['required']"
-              >
-                <small>Username is required</small>
-              </ion-text>
-              <ion-text
-                color="danger"
-                *ngIf="updateProfileForm.get('username')?.errors?.['invalidUsername']"
-              >
-                <small>Username can only contain letters, numbers, and underscores</small>
-              </ion-text>
-            </div>
-        </div>
-
-        <ion-item button (click)="fileInp.click()">
-          <ion-label position="stacked"
-            >Profile Picture
-            <ion-text color="danger">*</ion-text>
+<section class="profile-wrapper">
+  <ion-card class="profile-wrapper">
+    <form
+      [formGroup]="updateProfileForm"
+      (ngSubmit)="onProfileFormSubmit()"
+      class="ion-padding"
+      novalidate
+    >
+      <div class="outer-border text-input-wrapper">
+        <ion-item lines="none">
+          <ion-label position="floating">
+            <span>Display Name<ion-text color="danger">*</ion-text></span>
           </ion-label>
-          <div class="img-wrapper">
-            <img
-              class="profile-img"
-              [src]="getPhoto(user)"
-              alt=""
-              onerror="this.src='../../assets/images/palm-tree.png'"
-            />
-            <div class="upload-icon">
-              <ion-icon name="cloud-upload-outline" for="customFileUploadMultiple"></ion-icon>
-            </div>
-          </div>
-          <input
-            type="file"
-            formControlName="profilePicture"
-            (change)="onUploadFile($event)"
-            id="customFileUploadMultiple"
-            style="opacity: 0; width: 0px"
-            #fileInp
-          />
+          <ion-input
+            formControlName="displayName"
+            type="text"
+            placeholder="Choose your display name"
+            maxlength="40"
+            autocapitalize="words"
+          ></ion-input>
         </ion-item>
+        <div *ngIf="showError('displayName')" class="error-message">
+          <ion-text color="danger"><small>Display name is required</small></ion-text>
+        </div>
+      </div>
 
-        <ion-button
-          class="footer-btn"
-          expand="block"
-          type="submit"
-          [disabled]="updateProfileForm.invalid"
-        >
-          Update Profile
-        </ion-button>
-      </form>
-    </ion-card>
-  </section>
-</ion-content>
+      <div class="outer-border text-input-wrapper">
+        <ion-item lines="none">
+          <ion-label position="floating">
+            <span>Gender<ion-text color="danger">*</ion-text></span>
+          </ion-label>
+          <ion-select formControlName="gender" multiple="false" placeholder="Select gender">
+            <ion-select-option [value]="Gender.MALE">Male</ion-select-option>
+            <ion-select-option [value]="Gender.FEMALE">Female</ion-select-option>
+            <ion-select-option [value]="Gender.NON_BINARY">Non-Binary</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <div *ngIf="showError('gender')" class="error-message">
+          <ion-text color="danger"><small>Please select your gender</small></ion-text>
+        </div>
+      </div>
+
+      <div class="outer-border input-item medium-text-area-wrapper">
+        <ion-item lines="none">
+          <ion-label class="date-time-label" position="stacked">
+            <span> Date of Birth <ion-text color="danger">*</ion-text></span>
+          </ion-label>
+          <ion-datetime-button datetime="dob">
+            <ion-text *ngIf="!updateProfileForm.controls['dob'].value" slot="date-target">
+              <span> Select Date of Birth</span>
+            </ion-text>
+          </ion-datetime-button>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                [showDefaultButtons]="true"
+                id="dob"
+                presentation="date"
+                [max]="maxDob"
+                formControlName="dob"
+              ></ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </ion-item>
+        <div *ngIf="showError('dob')" class="error-message">
+          <ion-text color="danger" *ngIf="hasError('dob', 'required')">
+            <small>Date of birth is required</small>
+          </ion-text>
+          <ion-text color="danger" *ngIf="hasError('dob', 'dob')">
+            <small>You must be at least {{ minAge }} to use the app</small>
+          </ion-text>
+        </div>
+      </div>
+
+      <div class="outer-border text-input-wrapper">
+        <ion-item lines="none">
+          <ion-label position="floating">
+            <span>Username<ion-text color="danger">*</ion-text></span>
+          </ion-label>
+          <ion-input
+            formControlName="username"
+            type="text"
+            placeholder="Choose your username"
+            [maxlength]="usernameMaxLength"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+          ></ion-input>
+        </ion-item>
+        <div *ngIf="showError('username')" class="error-message">
+          <ion-text color="danger" *ngIf="hasError('username', 'required')">
+            <small>Username is required</small>
+          </ion-text>
+          <ion-text
+            color="danger"
+            *ngIf="hasError('username', 'minlength') || hasError('username', 'maxlength')"
+          >
+            <small
+              >Username must be {{ usernameMinLength }} to {{ usernameMaxLength }} characters</small
+            >
+          </ion-text>
+          <ion-text color="danger" *ngIf="hasError('username', 'pattern')">
+            <small>Username can only contain letters, numbers, and underscores</small>
+          </ion-text>
+          <ion-text color="danger" *ngIf="hasError('username', 'taken')">
+            <small>That username is already taken</small>
+          </ion-text>
+        </div>
+      </div>
+
+      <ion-item button [disabled]="isUploading" (click)="fileInp.click()">
+        <ion-label position="stacked"
+          >Profile Picture
+          <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <div class="img-wrapper">
+          <img
+            class="profile-img"
+            [src]="photoUrl || '../../assets/images/palm-tree.png'"
+            alt=""
+            onerror="this.src='../../assets/images/palm-tree.png'"
+          />
+          <div class="upload-icon">
+            <ion-icon name="cloud-upload-outline"></ion-icon>
+          </div>
+        </div>
+        <!-- Not a form control on purpose: binding a file input stores the browser's
+             fake path (C:\fakepath\...) in the form value. -->
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onUploadFile($event)"
+          style="opacity: 0; width: 0px"
+          #fileInp
+        />
+      </ion-item>
+      <div *ngIf="submitted && !photoUrl" class="error-message">
+        <ion-text color="danger"><small>A profile picture is required</small></ion-text>
+      </div>
+
+      <ion-button class="footer-btn" expand="block" type="submit" [disabled]="!canSubmit">
+        <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
+        <span *ngIf="!isSaving">Save Profile</span>
+      </ion-button>
+    </form>
+  </ion-card>
+</section>

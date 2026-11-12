@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { combineLatest } from 'rxjs';
-import { filter, concatMap, map, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { FiltersHomeComponent } from '../shared/filters-home/filters-home.component';
 import { AnyoneReadyComponent } from '../shared/anyone-ready/anyone-ready.component';
 import { FiltersComponent } from '../shared/filters/filters.component';
@@ -10,9 +10,7 @@ import { FiltersComponent } from '../shared/filters/filters.component';
 import { CoreFacade } from '../core/core.facade';
 import { User } from '../core/core.model';
 import { AddHobbyComponent } from '../shared/add-hobby/add-hobby.component';
-import { UpdateProfileComponent } from '../shared/update-profile/update-profile.component';
 import * as _ from 'lodash';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-home-main',
@@ -27,13 +25,11 @@ export class HomeMainPage implements OnInit {
   filters: any = {};
   hobbies$;
   params: Params;
-  private updateProfileStatus = 'evaluating';
   private user;
   user$;
   vm$;
   radius: any;
   mydate: any;
-  subscriptions: any;
 
   // new variables _ July 2024
   right_row: any = [
@@ -81,7 +77,6 @@ export class HomeMainPage implements OnInit {
     private coreFacade: CoreFacade,
     private modalController: ModalController,
     private cd: ChangeDetectorRef,
-    private afAuth: AngularFireAuth,
   ) {}
 
   async ngOnInit() {
@@ -91,7 +86,9 @@ export class HomeMainPage implements OnInit {
       tap((user) => {
         this.user = user;
 
-        this.coreFacade.setDeviceForUser();
+        Promise.resolve(this.coreFacade.setDeviceForUser()).catch((err) =>
+          console.error('Could not save the push notification token', err),
+        );
       }),
     );
 
@@ -119,20 +116,6 @@ export class HomeMainPage implements OnInit {
   }
 
   async ionViewWillEnter() {
-    this.subscriptions = this.afAuth.user
-      .pipe(filter((user) => !!user))
-      .subscribe(async (resUser: any) => {
-        // A brand-new user's Firestore doc may not exist yet, so fall back to just the uid.
-        const userDoc: User | null = await this.coreFacade.getUserObj(resUser.uid);
-        const currentUserObj = { ...(userDoc || {}), uid: resUser.uid } as User;
-
-        // Check if the user profile is incomplete
-        if (!currentUserObj.dob || !currentUserObj.username) {
-          this.updateProfileStatus = 'updating';
-          this.presentUpdateProfileModal(currentUserObj);
-        }
-      });
-
     try {
       let location = await this.coreFacade.checkGPSPermission();
       this.coreFacade.updateUserLocation(location);
@@ -239,27 +222,6 @@ export class HomeMainPage implements OnInit {
       },
     });
     return await popover.present();
-  }
-
-  private async presentUpdateProfileModal(user: User) {
-    const userProfileModal = await this.modalController.create({
-      component: UpdateProfileComponent,
-      componentProps: { user },
-    });
-
-    await userProfileModal.present();
-  }
-
-  ionViewWillLeave() {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
   }
 
   // new functions _ July 2024

@@ -92,11 +92,15 @@ export class RequestsComponent implements OnInit {
   }
 
   handleDeclineRequest({ chatID, messages }) {
-    this.coreFacade.declineRequest(chatID);
+    this.coreFacade.feedback.run(() => this.coreFacade.declineRequest(chatID), {
+      failure: 'Could not decline the request.',
+    });
   }
 
   handleAcceptRequest({ chatID, messages }) {
-    this.coreFacade.acceptRequest(chatID);
+    this.coreFacade.feedback.run(() => this.coreFacade.acceptRequest(chatID), {
+      failure: 'Could not accept the request.',
+    });
     // setTimeout(() => {
     //   this.getUnreadMessagesCount();
     // }, 1500);

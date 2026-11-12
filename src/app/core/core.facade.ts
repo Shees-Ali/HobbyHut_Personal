@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { GeoPoint, arrayUnion } from '@angular/fire/firestore';
+import { GeoPoint, arrayRemove, arrayUnion } from '@angular/fire/firestore';
 import { PhoneAuthProvider } from '@angular/fire/auth';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import * as moment from 'moment';
@@ -18,12 +18,49 @@ import {
   Platform,
   AnimationController,
 } from '@ionic/angular';
-import { Gender, SkillLevel } from './core.model';
 import { LinkedinService } from '../linkedin.service';
 import { AuthService } from '../auth.service';
 import { BehaviorSubject, Observable, Subject, Subscription, combineLatest, of } from 'rxjs';
-import { filter, shareReplay, switchMap, take, tap, map, first, catchError } from 'rxjs/operators';
-import { Hobby, User, UserHobbies } from './core.model';
+import {
+  filter,
+  shareReplay,
+  switchMap,
+  take,
+  tap,
+  map,
+  first,
+  catchError,
+  timeout,
+} from 'rxjs/operators';
+import {
+  ActiveDoc,
+  ActiveEntry,
+  Chat,
+  ChatDoc,
+  Hobby,
+  HobbyMember,
+  Message,
+  PushNotificationSettings,
+  SkillLevel,
+  User,
+  UserHobby,
+  UserInfo,
+} from './core.model';
+import {
+  DEFAULT_PUSH_NOTIFICATION_SETTINGS,
+  normalizeHobbyMember,
+  normalizeUser,
+} from './normalize';
+import { FeedbackService, describeError } from './feedback.service';
+import {
+  PROFILE_VERSION,
+  isListableMember,
+  isProfileComplete,
+  isValidDob,
+  isValidGender,
+  isValidUsername,
+  toDateOnly,
+} from './profile';
 import { HTTP } from '@ionic-native/http/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as geofirestore from 'geofirestore';
@@ -32,15 +69,31 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeSettings, IOSSettings } from 'capacitor-native-settings';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import * as _ from 'lodash';
-import { Chat } from '../messages/interfaces/Chat';
 type Hobbies = Observable<Hobby[]>;
+
+/**
+ * PRODUCT DECISION PENDING (see docs/open-decisions.md).
+ *
+ * false: after a request is declined the sender stays marked as "request sent" and
+ *        cannot ask the same person again. This is how the app has always behaved.
+ * true:  declining also clears that mark, so the sender can ask again.
+ */
+const DECLINE_ALLOWS_NEW_REQUEST = false;
+
+type OwnChat = ChatDoc & { chatID: string };
+
+/** An error with a reason that is safe and useful to show to the user. */
+function userError(code: string, userMessage: string): Error {
+  return Object.assign(new Error(userMessage), { code, userMessage });
+}
 
 declare var window;
 @Injectable({
   providedIn: 'root',
 })
 export class CoreFacade {
-  chats$;
+  /** The signed-in user's chats (never anyone else's). Shared: one listener for all subscribers. */
+  chats$: Observable<OwnChat[]>;
   confirmationResult: any;
   currentHobbyRoom = new BehaviorSubject('');
   currentHobbyId = new BehaviorSubject('');
@@ -56,7 +109,6 @@ export class CoreFacade {
   unreadRequest: any = [];
   messageLength: number;
   toptenString: string;
-  messagesSubscription: Subscription;
   messageReceived = new Subject();
   private locationActiveSource = new BehaviorSubject(undefined);
   locationActive$ = this.locationActiveSource.asObservable();
@@ -67,8 +119,6 @@ export class CoreFacade {
   inputStatus$ = new BehaviorSubject('disabled');
   timerStatusWaitingScore$ = new BehaviorSubject('disabled');
   UpdatedUser$: any;
-  messages$;
-  messages = [];
   token = '';
   GeoFirestore;
   geoLocationSubscription;
@@ -85,7 +135,9 @@ export class CoreFacade {
   filters: any;
   hobbiesList = [];
   messageUserId: any = null;
-  private loading: any;
+  private expiredActivesSubscription: Subscription;
+  private latestActives: ActiveDoc[] = [];
+  private expiringActives = new Set<string>();
   advertismentImages: any[] = [];
   postChat$;
   constructor(
@@ -108,6 +160,8 @@ export class CoreFacade {
     // private diagnostic: Diagnostic,
     private geolocation: Geolocation,
     public animationCtrl: AnimationController,
+    /** For telling the user what happened to something they did. */
+    public feedback: FeedbackService,
   ) {
     this.GeoFirestore = geofirestore.initializeApp(this.afFs.firestore);
 
@@ -124,14 +178,10 @@ export class CoreFacade {
           .pipe(
             // A brand-new user's Firestore doc may not exist yet; wait until it does.
             filter((userDoc: any) => !!userDoc),
-            map((userDoc: any) => ({
-              uid: authUser.uid,
-              ...userDoc,
-              hobbies: userDoc.hobbies || [],
-            })),
+            map((userDoc: any) => normalizeUser(userDoc, authUser.uid)),
           ),
       ),
-      tap((user: any) => {
+      tap((user: User) => {
         this.user = user;
         // Emit the user to the BehaviorSubject
         this.userSubject.next(this.user);
@@ -139,24 +189,45 @@ export class CoreFacade {
       shareReplay(1),
     );
 
-    this.chats$ = this.afFs.collection('chats').valueChanges({ idField: 'chatID' });
+    this.chats$ = this.afAuth.user.pipe(
+      switchMap((authUser: any): Observable<OwnChat[]> => {
+        if (!authUser) {
+          return of([]);
+        }
+        const uid: string = authUser.uid;
+        // Only this user's chats are requested from Firestore. Every chat must carry
+        // `participantIds` (added to old chats by the 2026-11 data migration).
+        const chats = this.afFs.collection<ChatDoc>('chats', (ref) =>
+          ref.where('participantIds', 'array-contains', uid),
+        );
+        return (chats.valueChanges({ idField: 'chatID' }) as Observable<OwnChat[]>).pipe(
+          map((own) =>
+            own.filter(
+              (chat) =>
+                Array.isArray(chat.participants) &&
+                chat.participants.some((participant) => participant?.uid === uid),
+            ),
+          ),
+        );
+      }),
+      shareReplay({ bufferSize: 1, refCount: true }),
+    );
     this.postChat$ = this.afFs.collection('posts-chat').valueChanges({ idField: 'postChatID' });
   }
 
-  addUserHobby(hobby, skillLevel) {
-    this.userSubject
-      .pipe(
-        filter((user) => !!user && !!user.uid),
-        first(),
-      )
-      .subscribe((user) => {
-        this.fsUsersCollection.doc(user.uid).update({
-          hobbies: [...user.hobbies, { name: hobby.name, hobbyID: hobby.hobbyID, skillLevel }],
-        });
-      });
+  /** Adds a hobby to the signed-in user (or updates the skill level if they have it). */
+  async addUserHobby(
+    hobby: Pick<Hobby, 'hobbyID' | 'name'>,
+    skillLevel: SkillLevel,
+  ): Promise<void> {
+    const user = await this.getCurrentUser();
+    const entry: UserHobby = { name: hobby.name, hobbyID: hobby.hobbyID, skillLevel };
+    await this.fsUsersCollection.doc(user.uid).update({
+      hobbies: [...user.hobbies.filter((item) => item.hobbyID !== hobby.hobbyID), entry],
+    });
   }
 
-  createGame(hobbyID, user) {
+  createGame(hobbyID: string, user: User) {
     if (user.pushNotificationSettings && user.pushNotificationSettings.proGameRequest) {
       user.device.forEach((token) => {
         const notificationData = {
@@ -201,103 +272,112 @@ export class CoreFacade {
     });
   }
 
-deleteAccount() {
-  return new Promise((resolve, reject) => {
-    this.afAuth.authState.pipe(take(1)).subscribe(async (user) => {
-      if (user) {
-        try {
-          // Remove the user from hobby members and active lists before deleting the Auth user
-          const uid = user.uid;
-          await Promise.all(
-            (this.user?.hobbies || []).map((hobby) =>
-              this.afFs.doc(`hobbies/${hobby.hobbyID}/members/${uid}`).delete(),
-            ),
-          );
-          await this.afFs.collection('active').doc(uid).delete();
-
-          // Delete the user account
-          await user.delete();
-          console.log('Account deleted successfully');
-          
-          // Clear local storage
-          localStorage.clear();
-          
-          // Sign out the user (this will clear the auth state)
-          await this.afAuth.signOut();
-          
-          // Navigate to login/welcome screen
-          await this.router.navigateByUrl('sign-in', { replaceUrl: true });
-          
-          // Show success message
-          this.presentToast('Account deleted successfully');
-          
-          resolve(true);
-        } catch (error) {
-          console.error('Error deleting account:', error);
-          this.presentToast('Error deleting account: ' + error.message);
-          reject(error);
-        }
-      } else {
-        console.error('No user signed in to delete');
-        reject(new Error('No user signed in'));
-      }
-    });
-  });
-}
-
-  fetchExpiredActiveHobbies() {
-    this.afFs
-      .collection('active')
-      .valueChanges()
-      .pipe()
-      .subscribe((v) => {
-        v.forEach((actives) => {
-          actives['hobby'].forEach((hobby) => {
-            let createdAt = 0;
-            let now = 0;
-            let expiredAt = 0;
-            createdAt = hobby.start;
-            now = new Date().getTime();
-            expiredAt = createdAt + 30 * 60 * 1000;
-            if (now > expiredAt) {
-              this.removeExpiredActives(hobby.name, actives['uid']);
-            } else {
-            }
-          });
-        });
-      });
+  /**
+   * Deletes the signed-in account and signs out. The cleanupUser Cloud Function then
+   * removes the user's data (profile, hobby memberships, chats, photos).
+   *
+   * Rejects without changing anything if the deletion is refused, most often with
+   * `auth/requires-recent-login` when the user signed in too long ago.
+   */
+  async deleteAccount(): Promise<void> {
+    const authUser = await this.afAuth.currentUser;
+    if (!authUser) {
+      throw Object.assign(new Error('No user signed in'), { code: 'unauthenticated' });
+    }
+    await authUser.delete();
+    localStorage.clear();
+    await this.afAuth.signOut().catch((err) => console.error('Sign out after delete failed', err));
   }
 
-  removeExpiredActives(hobbyName, uid) {
-    this.fsUsersCollection
-      .doc(uid)
-      .valueChanges()
-      .subscribe((user) => {
-        const isActive = user['isActive'].filter((userIsActive) => {
-          return userIsActive['name'] !== hobbyName;
-        });
-        this.fsUsersCollection.doc(user['uid']).update({
-          isActive,
-        });
-        if (isActive.length > 0) {
-          this.afFs.collection('active').doc(user['uid']).set({
-            uid: user['uid'],
-            hobby: isActive,
-          });
-        } else {
-          this.afFs.collection('active').doc(user['uid']).delete();
+  /**
+   * Watches the "ready now" list and removes entries whose 30 minutes are up.
+   * Safe to call often: there is only ever one listener, and every call re-checks.
+   */
+  fetchExpiredActiveHobbies() {
+    if (!this.expiredActivesSubscription || this.expiredActivesSubscription.closed) {
+      this.expiredActivesSubscription = this.afFs
+        .collection<ActiveDoc>('active')
+        .valueChanges()
+        .subscribe(
+          (actives) => {
+            this.latestActives = actives;
+            this.removeExpiredFrom(actives);
+          },
+          (err) => console.error('Could not watch the ready-now list', err),
+        );
+    }
+    this.removeExpiredFrom(this.latestActives);
+  }
+
+  private removeExpiredFrom(actives: ActiveDoc[]) {
+    const now = Date.now();
+    (actives || []).forEach((active) => {
+      (active?.hobby || []).forEach((entry) => {
+        if (now > entry.start + 30 * 60 * 1000) {
+          this.removeExpiredActives(entry.name, active.uid);
         }
       });
+    });
+  }
+
+  /** Background clean-up; failures are logged, not shown. */
+  private async removeExpiredActives(hobbyName: string, uid: string): Promise<void> {
+    const key = `${uid}/${hobbyName}`;
+    if (this.expiringActives.has(key)) {
+      return;
+    }
+    this.expiringActives.add(key);
+    try {
+      await this.updateActiveEntries(uid, (entries) =>
+        entries.filter((entry) => entry.name !== hobbyName),
+      );
+    } catch (err) {
+      console.error('Could not remove an expired ready-now entry', err);
+    } finally {
+      this.expiringActives.delete(key);
+    }
+  }
+
+  /**
+   * Changes a user's running timers. users/{uid}.isActive and active/{uid} are written
+   * together, from the latest stored value, so concurrent changes cannot lose each other.
+   */
+  private async updateActiveEntries(
+    uid: string,
+    change: (entries: ActiveEntry[]) => ActiveEntry[],
+  ): Promise<void> {
+    const db = this.afFs.firestore;
+    const userRef = db.doc(`users/${uid}`);
+    const activeRef = db.doc(`active/${uid}`);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(userRef);
+      if (!snap.exists) {
+        // Left over from a deleted user.
+        tx.delete(activeRef);
+        return;
+      }
+      const stored = snap.data()?.isActive;
+      const next = change(Array.isArray(stored) ? stored : []);
+      tx.update(userRef, { isActive: next });
+      if (next.length > 0) {
+        tx.set(activeRef, { uid, hobby: next });
+      } else {
+        tx.delete(activeRef);
+      }
+    });
   }
 
   /**
    * @description Use this for chats
    */
-  fetchActiveUsers() {
+  fetchActiveUsers(): Observable<ActiveDoc[]> {
     return this.userSubject.pipe(
       filter((user) => !!user && !!user.uid),
-      switchMap((user) =>
-        this.afFs.collection('active', (ref) => ref.where('uid', '!=', user.uid)).valueChanges(),
+      switchMap(
+        (user): Observable<ActiveDoc[]> =>
+          this.afFs
+            .collection<ActiveDoc>('active', (ref) => ref.where('uid', '!=', user.uid))
+            .valueChanges(),
       ),
     );
   }
@@ -305,28 +385,22 @@ deleteAccount() {
   /**
    * @description Use this for hobby lobby
    */
-  fetchActiveUsersByHobby(hobby: string) {
-    // return this.afFs.collection('active', ref => ref.where('hobby', '==', hobby)).valueChanges();
-    return this.userSubject.pipe(
-      filter((user) => !!user && !!user.uid),
-      switchMap((user) =>
-        this.afFs.collection('active', (ref) => ref.where('uid', '!=', user.uid)).valueChanges(),
-      ),
-    );
+  fetchActiveUsersByHobby(hobby: string): Observable<ActiveDoc[]> {
+    return this.fetchActiveUsers();
   }
 
-  fetchChatDetails(chatID: string) {
-    return this.fsChatsCollection.doc(chatID).valueChanges();
+  fetchChatDetails(chatID: string): Observable<ChatDoc | undefined> {
+    return this.fsChatsCollection.doc<ChatDoc>(chatID).valueChanges();
   }
 
-  fetchChatDetailsOnce(chatID: string): Promise<any> {
+  fetchChatDetailsOnce(chatID: string): Promise<ChatDoc | null> {
     return new Promise((resolve, reject) => {
       this.fsChatsCollection
         .doc(chatID)
         .ref.get()
         .then((doc) => {
           if (doc.exists) {
-            return resolve(doc.data());
+            return resolve(doc.data() as ChatDoc);
           } else {
             return resolve(null);
           }
@@ -343,7 +417,12 @@ deleteAccount() {
         this.geoLocationSubscription();
         this.geoLocationSubscription = false;
       }
-      return this.afFs.collection(`hobbies/${hobbyID}/members`).valueChanges();
+      return this.afFs
+        .collection(`hobbies/${hobbyID}/members`)
+        .valueChanges()
+        .pipe(
+          map((members: any[]) => members.map(normalizeHobbyMember).filter(isListableMember)),
+        );
     } else {
       return this.getUserList(hobbyID).then((members) => {
         return members;
@@ -351,9 +430,9 @@ deleteAccount() {
     }
   }
 
-  getUserList(hobbyID) {
+  getUserList(hobbyID: string): Promise<HobbyMember[]> {
     return new Promise(async (resolve, reject) => {
-      const members = [];
+      const members: HobbyMember[] = [];
       const geocollection = this.GeoFirestore.collection(`hobbies/${hobbyID}/members`);
       const location: any = await this.getCurrentLocation();
       console.log('In Get Users List', this.radius);
@@ -363,24 +442,34 @@ deleteAccount() {
       });
       this.geoLocationSubscription = query.onSnapshot((snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          members.push(change.doc.data());
+          const member = normalizeHobbyMember(change.doc.data());
+          if (isListableMember(member)) {
+            members.push(member);
+          }
         });
         resolve(members);
       });
     });
   }
 
-  fetchHobbyMembersByHobbyId(hobbyId) {
+  /** Members of a hobby, excluding the current user. Resolves once with the current list. */
+  fetchHobbyMembersByHobbyId(hobbyId: string): Promise<HobbyMember[]> {
     return new Promise((resolve, reject) => {
-      let membersCollection = this.afFs.collection(`hobbies/${hobbyId}/members`);
-      membersCollection.valueChanges().subscribe((members) => {
-        let currentUser = this.user;
-        let filterMembers = _.map(members, function (member) {
-          if (member.uid != currentUser.uid) return member;
-        });
-        filterMembers = _.without(filterMembers, undefined);
-        resolve(filterMembers);
-      });
+      this.afFs
+        .collection(`hobbies/${hobbyId}/members`)
+        .valueChanges()
+        .pipe(first())
+        .subscribe(
+          (members: any[]) => {
+            const currentUid = this.user?.uid;
+            resolve(
+              members
+                .map(normalizeHobbyMember)
+                .filter((member) => member.uid !== currentUid && isListableMember(member)),
+            );
+          },
+          (err) => reject(err),
+        );
     });
   }
 
@@ -453,14 +542,15 @@ deleteAccount() {
     });
   }
 
-  getUserObj(userId: string) {
-    return new Promise<User>((resolve, reject) => {
+  /** Reads a user once. Resolves with null if the user document does not exist. */
+  getUserObj(userId: string): Promise<User | null> {
+    return new Promise<User | null>((resolve, reject) => {
       this.afFs
         .doc(`users/${userId}`)
         .ref.get()
         .then((doc: any) => {
           if (doc.exists) {
-            return resolve(doc.data());
+            return resolve(normalizeUser(doc.data(), doc.id));
           } else {
             return resolve(null);
           }
@@ -471,43 +561,50 @@ deleteAccount() {
     });
   }
 
-  getPhoto(user: any) {
+  /** The user's profile picture: the most recently added photo. */
+  getPhoto(user: Pick<User, 'photos'> | null | undefined): string | undefined {
     if (user && user.photos && user.photos.length > 0) {
       return user.photos[user.photos.length - 1];
     }
   }
 
-  searchUsersByUsername(query: string): Promise<any[]> {
-    console.log('Query', query);
-    return new Promise((resolve, reject) => {
-      return (
-        this.afFs.firestore
-          .collection('users')
-          // Does exact matches if there is issue think of an alternative
-          .where('username', '==', query.trim())
-          .limit(20)
-          .get()
-          .then(
-            async (querySnapshot) => {
-              const userPromises = querySnapshot.docs.map(async (doc) => {
-                const userData = doc.data();
-                const isInChats = await this.isContactInUserChats(doc.id).pipe(take(1)).toPromise();
-                return {
-                  uid: doc.id,
-                  displayName: userData['displayName'] || '',
-                  username: userData['username'] || '',
-                  photos: userData['photos'] || [],
-                  isInChats: isInChats || false,
-                };
-              });
-              return resolve(await Promise.all(userPromises));
-            },
-            (err) => {
-              return reject(err);
-            },
-          )
-      );
+  /**
+   * Finds users by exact username (any letter case). Users who have not completed
+   * their profile are never returned.
+   */
+  async searchUsersByUsername(query: string): Promise<any[]> {
+    const username = (query || '').trim();
+    if (!username) {
+      return [];
+    }
+    const users = this.afFs.firestore.collection('users');
+    // `usernameLower` is only present on profiles saved through the new profile form,
+    // so also match the stored username exactly.
+    const [byLower, byExact] = await Promise.all([
+      users.where('usernameLower', '==', username.toLowerCase()).limit(20).get(),
+      users.where('username', '==', username).limit(20).get(),
+    ]);
+
+    const found = new Map<string, User>();
+    [...byLower.docs, ...byExact.docs].forEach((doc) => {
+      const user = normalizeUser(doc.data(), doc.id);
+      if (isProfileComplete(user)) {
+        found.set(doc.id, user);
+      }
     });
+
+    return Promise.all(
+      Array.from(found.values()).map(async (user) => {
+        const isInChats = await this.isContactInUserChats(user.uid).pipe(take(1)).toPromise();
+        return {
+          uid: user.uid,
+          displayName: user.displayName || '',
+          username: user.username || '',
+          photos: user.photos,
+          isInChats: isInChats || false,
+        };
+      }),
+    );
   }
 
   getGameObj(hobby, player1, player2) {
@@ -609,6 +706,7 @@ deleteAccount() {
     });
   }
 
+  /** Push notifications are best effort: a failure is logged and never fails the caller. */
   sendNotification(token, notificationData, bodyData) {
     // Prepare the notification
     const notifcationObj: any = {
@@ -620,93 +718,224 @@ deleteAccount() {
     // URL for the cloud function
     const url = 'https://us-central1-hobby-hut-dev.cloudfunctions.net/sendNotification';
 
-    // Send the notification
-    this.http.setDataSerializer('json');
-    this.http
-      .post(url, notifcationObj, {})
-      .then((data) => {
-        console.log('Notification sent successfully', data);
-      })
-      .catch((error) => {
-        console.error('Error sending notification', error);
-      });
+    try {
+      this.http.setDataSerializer('json');
+      this.http
+        .post(url, notifcationObj, {})
+        .then((data) => {
+          console.log('Notification sent successfully', data);
+        })
+        .catch((error) => {
+          console.error('Error sending notification', error);
+        });
+    } catch (error) {
+      // The HTTP plugin does not exist when the app runs in a browser.
+      console.warn('Notification not sent', error);
+    }
   }
 
-  async updateChatTimestamp(chatID, msgThreadOpen) {
-    let count = 0;
-    const chat = await this.fetchChatDetails(chatID).subscribe((item) => {
-      count++;
-      item['participants'].forEach((participant, index) => {
-        if (participant.uid === this.user.uid) {
-          item['participants'][index].timestamp = Date.now();
-          if (msgThreadOpen) {
-            item['participants'][index].isThreadOpen = msgThreadOpen;
-            item['participants'][index].unreadCount = 0;
-          } else {
-            item['participants'][index].isThreadOpen = msgThreadOpen;
-          }
-        }
-      });
-      if (count === 1) {
-        this.fsChatsCollection.doc(chatID).update({ participants: item['participants'] });
+  /** Sends a push notification to every device of a user, if they have that setting on. */
+  private notifyUser(
+    user: User | null,
+    setting: keyof PushNotificationSettings,
+    notification: { title: string; body: string },
+    data: { [key: string]: string },
+  ) {
+    if (!user || !user.pushNotificationSettings?.[setting]) {
+      return;
+    }
+    user.device.forEach((token) => this.sendNotification(token, notification, data));
+  }
+
+  /**
+   * Changes the participant list of a chat (unread counts, read state, members) from
+   * the latest stored value, in a transaction. Two changes at the same moment are both
+   * applied instead of one overwriting the other.
+   *
+   * @param change returns the new list, or null to leave the chat as it is
+   */
+  private async changeParticipants(
+    docPath: string,
+    change: (participants: any[]) => any[] | null,
+  ): Promise<void> {
+    const db = this.afFs.firestore;
+    const ref = db.doc(docPath);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const stored = snap.data()?.participants;
+      if (!snap.exists || !Array.isArray(stored)) {
+        throw userError('not-found', 'This chat no longer exists.');
+      }
+      const next = change(stored.map((participant) => ({ ...participant })));
+      if (next) {
+        tx.update(ref, { participants: next });
       }
     });
   }
 
-  initiateChat(otherUser: User, isMessageRequest = true) {
-    if (
-      otherUser.pushNotificationSettings &&
-      otherUser.pushNotificationSettings.messagesRequested
-    ) {
-      otherUser.device.forEach((token) => {
-        const notificationData = {
-          title: isMessageRequest ? 'Friend Request Received' : 'New Message Received',
-          body: isMessageRequest
-            ? 'You have received a Friend Request from ' + this.user.displayName
-            : 'You have received a new message from ' + this.user.displayName,
-        };
-        const bodyData = {
-          chatID: '',
-          request: 'request',
-        };
-        this.sendNotification(token, notificationData, bodyData);
-      });
+  /** Records that the signed-in user opened or left a chat. Background; failures are logged. */
+  async updateChatTimestamp(chatID: string, msgThreadOpen: boolean): Promise<void> {
+    try {
+      const uid = this.user?.uid;
+      if (!uid) {
+        return;
+      }
+      await this.changeParticipants(`chats/${chatID}`, (participants) =>
+        participants.map((participant) =>
+          participant.uid !== uid
+            ? participant
+            : {
+                ...participant,
+                timestamp: Date.now(),
+                isThreadOpen: msgThreadOpen,
+                unreadCount: msgThreadOpen ? 0 : participant.unreadCount,
+              },
+        ),
+      );
+    } catch (err) {
+      console.error('Could not update the chat read state', err);
+    }
+  }
+
+  /** The signed-in user's chat with another user, if there is one. */
+  private async findChatWith(otherUid: string): Promise<OwnChat | undefined> {
+    const chats = await this.chats$.pipe(first()).toPromise();
+    return chats.find((chat) => chat.participants.some((p) => p.uid === otherUid));
+  }
+
+  /**
+   * Loads another user for a friend or message action. Rejects with a reason the user
+   * can be shown when the other user is gone or has blocked the signed-in user.
+   */
+  private async requireOtherUser(otherUid: string): Promise<{ me: User; other: User }> {
+    const me = await this.getCurrentUser();
+    if (!otherUid || otherUid === me.uid) {
+      throw userError('invalid-argument', 'You cannot do that with your own profile.');
+    }
+    const other = await this.getUserObj(otherUid);
+    if (!other) {
+      throw userError('not-found', 'This user no longer exists.');
+    }
+    if (other.blockedUsers.includes(me.uid)) {
+      throw userError('blocked', `You are blocked by ${other.displayName || 'this user'}.`);
+    }
+    return { me, other };
+  }
+
+  /**
+   * Makes sure there is exactly one chat between the signed-in user and another user.
+   *
+   * New chats get an id built from the two user ids, and are created in a transaction,
+   * so two people starting a chat with each other at the same moment still end up with
+   * one chat. Resolves with the chat id and whether it was created now.
+   */
+  private async ensureChat(
+    me: User,
+    other: User,
+    isMessageRequest: boolean,
+  ): Promise<{ chatID: string; created: boolean }> {
+    const existing = await this.findChatWith(other.uid);
+    if (existing) {
+      // Adding someone as a friend settles a request that was still pending.
+      if (!isMessageRequest && existing.meta?.isMessageRequest) {
+        await this.fsChatsCollection
+          .doc(existing.chatID)
+          .update({ 'meta.isMessageRequest': false });
+      }
+      return { chatID: existing.chatID, created: false };
     }
 
-    // unreadCount
-    this.fsChatsCollection.add({
-      messages: [],
-      participants: [
-        {
-          uid: otherUser.uid,
-          photoUrl: this.getPhoto(otherUser) || '',
-          displayName: otherUser.displayName,
-          timestamp: 0,
-          isThreadOpen: false,
-          unreadCount: 1,
+    const db = this.afFs.firestore;
+    const chatID = [me.uid, other.uid].sort().join('_');
+    const chatRef = db.doc(`chats/${chatID}`);
+    const meRef = db.doc(`users/${me.uid}`);
+    const now = Date.now();
+
+    const created = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(chatRef);
+      if (snap.exists) {
+        return false;
+      }
+      const chat: ChatDoc = {
+        messages: [],
+        participantIds: [other.uid, me.uid],
+        participants: [
+          {
+            uid: other.uid,
+            photoUrl: this.getPhoto(other) || '',
+            displayName: other.displayName || '',
+            timestamp: 0,
+            isThreadOpen: false,
+            unreadCount: 1,
+          },
+          {
+            uid: me.uid,
+            photoUrl: this.getPhoto(me) || '',
+            displayName: me.displayName || '',
+            timestamp: now,
+            isThreadOpen: false,
+            unreadCount: 0,
+          },
+        ],
+        meta: {
+          lastMessage: 'Send a message',
+          timestamp: now,
+          isMessageRequest,
+          block: '',
+          lastSenderID: me.uid,
         },
-        {
-          uid: this.user.uid,
-          photoUrl: this.getPhoto(this.user) || '',
-          displayName: this.user.displayName,
-          timestamp: Date.now(),
-          isThreadOpen: false,
-          unreadCount: 0,
-        },
-      ],
-      meta: {
-        lastMessage: 'Send a message',
-        timestamp: Date.now(),
-        isMessageRequest: isMessageRequest,
-        block: '',
-        lastSenderID: this.user.uid,
-      },
+      };
+      tx.set(chatRef, chat);
+      // Legacy: the profile page reads this to show "request sent".
+      tx.update(meRef, { chats: arrayUnion(other.uid) });
+      return true;
     });
 
-    const chats = this.user.chats || [];
-    return this.fsUsersCollection.doc(this.user.uid).update({
-      chats: [...chats, otherUser.uid],
-    });
+    return { chatID, created };
+  }
+
+  /**
+   * Starts a chat with another user (a message request by default) and notifies them.
+   * Does nothing if the two already have a chat. Resolves with the chat id.
+   */
+  async initiateChat(otherUser: User, isMessageRequest = true): Promise<string> {
+    const me = await this.getCurrentUser();
+    const { chatID, created } = await this.ensureChat(me, otherUser, isMessageRequest);
+    if (created) {
+      this.notifyUser(
+        otherUser,
+        'messagesRequested',
+        {
+          title: isMessageRequest ? 'Friend Request Received' : 'New Message Received',
+          body: isMessageRequest
+            ? 'You have received a Friend Request from ' + me.displayName
+            : 'You have received a new message from ' + me.displayName,
+        },
+        { chatID: '', request: 'request' },
+      );
+    }
+    return chatID;
+  }
+
+  /** Sends a message request to another user. Rejects if they are gone or have blocked you. */
+  async sendMessageRequest(otherUid: string): Promise<void> {
+    const { me, other } = await this.requireOtherUser(otherUid);
+    // A request that was sent before and declined (the mark is still there, the chat is not).
+    if (me.chats.includes(other.uid) && !(await this.findChatWith(other.uid))) {
+      throw userError('already-requested', 'You have already sent this person a request.');
+    }
+    await this.initiateChat(other, true);
+  }
+
+  /** Makes two users friends straight away (no request) and opens a chat between them. */
+  async addFriend(otherUid: string): Promise<void> {
+    const { me, other } = await this.requireOtherUser(otherUid);
+    const db = this.afFs.firestore;
+    const batch = db.batch();
+    batch.update(db.doc(`users/${me.uid}`), { friend: arrayUnion(other.uid) });
+    batch.update(db.doc(`users/${other.uid}`), { friend: arrayUnion(me.uid) });
+    await batch.commit();
+    await this.initiateChat(other, false);
   }
 
   async loginWithPhone(confirmationCode, verificationId): Promise<void> {
@@ -717,44 +946,15 @@ deleteAccount() {
       const auth = await this.afAuth.signInWithCredential(credential);
       const uid = auth.user.uid;
 
-      const loginUserData: User | null = await this.getUserObj(uid);
-
-      // If the user is new, update with default values
-      if (!loginUserData || loginUserData === null) {
-        // using set instead of update to ensure the document is created
-        await this.fsUsersCollection.doc(uid).set({
-          gender: 'male',
-        }, { merge: true });
-      }
-
-      // Check if the user data has phoneNumber set
-      if (!loginUserData?.phoneNumber) {
-        this.presentToast('Phone number not set, updating...');
-        // If phoneNumber is not set, update it
-        // Normalize the phone number before storing
-        const normalizedPhoneNumber = auth.user.phoneNumber
-          ? auth.user.phoneNumber.replace(/\D/g, '') // Remove non-digit characters
-          : '';
-
-        // Update the user's phone number in Firestore
-        await this.fsUsersCollection.doc(uid).update({
-          phoneNumber: normalizedPhoneNumber,
-        });
-      }
+      // Creates the user document if this is a new user, and records the phone number.
+      await this.ensureUserDoc(auth.user);
 
       // Method completes successfully - Promise<void> resolves
     } catch (error) {
-      console.log(error);
-      this.showAlert('Error', 'Something went wrong: ' + error.message);
+      console.error('Phone sign-in failed', error);
+      this.showAlert('Could not sign you in', describeError(error));
       throw error; // Re-throw so caller knows operation failed
     }
-  }
-
-  async presentLoading() {
-    this.loading = await this.loadingController.create({
-      message: 'Loading',
-    });
-    await this.loading.present();
   }
 
   async showAlert(title: string, msg: string) {
@@ -767,69 +967,6 @@ deleteAccount() {
     await alert.present();
   }
 
-  createUser(name, email, profilePicture) {
-    return new Promise((resolve, reject) => {
-      this.getCustomToken(email).then((token) => {
-        this.signInWithToken(token.data)
-          .then((userCredentials) => {
-            if (userCredentials.additionalUserInfo.isNewUser) {
-              const user = {
-                name,
-                email,
-                profile: profilePicture,
-                uid: userCredentials.user.uid,
-                phoneNumber: userCredentials.user.phoneNumber || '',
-              };
-              this.updateUserInfo(user)
-                .then(() => {
-                  this.fsUsersCollection.doc(user.uid).set({
-                    hobbies: [],
-                    chats: [],
-                    photos: user.profile ? [user.profile] : [],
-                    activeHobby: {},
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.name,
-                    phoneNumber: user.phoneNumber || '',
-                  });
-                  this.loading.dismiss();
-                  this.handleSuccessfulLogin();
-                  resolve('Done');
-                })
-                .catch((error) => [
-                  //console.log('updateUser', error)
-                ]);
-            } else {
-              this.loading.dismiss();
-              this.handleSuccessfulLogin();
-            }
-          })
-          .catch((error) => {
-            //console.log('customTokenError', error);
-          });
-      });
-    });
-  }
-
-  getCustomToken(email) {
-    return this.http.post(
-      'https://us-central1-hobby-hut-dev.cloudfunctions.net/getCredential',
-      // "https://www.linkedin.com/oauth/v2/accessToken?grant_type=client_credentials&client_id="+ environment.linkedinClientId +"&client_secret=" + environment.linkedinClientSecret,
-      {
-        email,
-      },
-      {},
-    );
-  }
-
-  signInWithToken(token) {
-    return this.afAuth.signInWithCustomToken(token);
-  }
-
-  updateUserInfo(user) {
-    return this.afAuth.updateCurrentUser(user);
-  }
-
   loginWithEmail(email: string, password: string): Promise<any> {
     return this.afAuth.signInWithEmailAndPassword(email, password);
   }
@@ -838,434 +975,227 @@ deleteAccount() {
     this.messageReceived.next(show);
   }
 
-  removeUserHobby(hobby: UserHobbies) {
-    return new Promise((resolve, reject) => {
-      this.userSubject
-        .pipe(
-          filter((user) => !!user && !!user.uid),
-          first(),
-        )
-        .subscribe((user) => {
-          const userHobbies = user.hobbies.filter((userHobby) => {
-            return userHobby.hobbyID !== hobby.hobbyID;
-          });
-
-          this.fsUsersCollection
-            .doc(user.uid)
-            .update({
-              hobbies: userHobbies,
-            })
-            .then(resolve)
-            .catch(reject);
-        });
+  async removeUserHobby(hobby: Pick<UserHobby, 'hobbyID'>): Promise<void> {
+    const user = await this.getCurrentUser();
+    await this.fsUsersCollection.doc(user.uid).update({
+      hobbies: user.hobbies.filter((userHobby) => userHobby.hobbyID !== hobby.hobbyID),
     });
   }
 
-  async sendMessage(chatID: string, messages: any[]) {
-    let count = 0;
-    this.fetchChatDetails(chatID).subscribe(async (item: Chat) => {
-      let otherUser = item['participants'].filter((user) => user.uid !== this.user.uid);
-      let otherUserData: any = await this.getUserObj(otherUser[0].uid);
-      this.fsUsersCollection
-        .doc(otherUser[0].uid)
-        .valueChanges()
-        .subscribe((user) => {
-          if (user['device']) {
-            count++;
-            if (count === 1) {
-              if (
-                otherUserData.pushNotificationSettings &&
-                otherUserData.pushNotificationSettings.messagesReceived
-              ) {
-                user['device'].forEach((token) => {
-                  const notificationData = {
-                    title: 'New message',
-                    body: 'Received new message from ' + this.user.displayName,
-                  };
-                  const bodyData = {
-                    chatID: chatID,
-                    request: 'message',
-                  };
-                  this.sendNotification(token, notificationData, bodyData);
-                });
-              }
-            }
-          }
-        });
-    });
-
-    // Get existing chat details it order to persist the meta data
-    // and update the messages
-    const chat: Chat = await this.fetchChatDetailsOnce(chatID);
-    const existingMeta = chat?.meta;
-
-    const metaUpdate = {
-      ...existingMeta,
-      lastMessage: [...messages].pop().text,
-      timestamp: Date.now(),
-      isMessageRequest: false,
-      block: '',
-      lastSenderID: this.user.uid,
-    };
-
-    // Make sure we preserve the existing isInTopFive and topFivePosition objects
-    if (!metaUpdate.isInTopFive) {
-      metaUpdate.isInTopFive = {};
+  /**
+   * Adds messages to a chat and notifies the other person. Rejects if the save fails.
+   *
+   * The messages, the chat summary and the other person's unread count are written in
+   * one transaction, so messages sent at the same moment are all counted.
+   */
+  async sendMessage(chatID: string, messages: Message[]): Promise<void> {
+    if (!messages || messages.length === 0) {
+      return;
     }
+    const me = await this.getCurrentUser();
+    const last = messages[messages.length - 1];
+    const db = this.afFs.firestore;
+    const chatRef = db.doc(`chats/${chatID}`);
 
-    if (!metaUpdate.topFivePosition) {
-      metaUpdate.topFivePosition = {};
-    }
-
-    return this.fsChatsCollection.doc(chatID).update({
-      messages: arrayUnion(...messages),
-      meta: metaUpdate,
-    });
-  }
-
-  updateUnreadCount(chatID: string) {
-    return new Promise((resolve, reject) => {
-      this.fetchChatDetails(chatID)
-        .pipe(first())
-        .subscribe((item) => {
-          if (!item || !item['participants']) {
-            return reject(new Error('Chat not found: ' + chatID));
-          }
-          item['participants'].forEach((participant, index) => {
-            if (participant.uid !== this.user.uid) {
-              if (!item['participants'][index].isThreadOpen) {
-                item['participants'][index].unreadCount =
-                  item['participants'][index].unreadCount + 1;
-                resolve(
-                  this.fsChatsCollection
-                    .doc(chatID)
-                    .update({ participants: item['participants'] }),
-                );
-              } else {
-                resolve(null);
-              }
-            }
-          });
-          resolve(null);
-        });
-    });
-  }
-
-  updateCountonRequestAccept(chatID: string) {
-    return new Promise((resolve, reject) => {
-      this.fetchChatDetails(chatID)
-        .pipe(first())
-        .subscribe((item) => {
-          item['participants'].forEach((participant, index) => {
-            if (participant.uid == this.user.uid) {
-              item['participants'][index].unreadCount = 0;
-              resolve(this.fsChatsCollection.doc(chatID).update({ participants: item['participants'] }));
-            }
-          });
-        });
-    });
-  }
-
-  acceptRequest(chatID: string) {
-    // Add new for notification
-    let count = 0;
-    this.fetchChatDetails(chatID).subscribe(async (item) => {
-      let otherUser = item['participants'];
-      let CurrentUserData: any = await this.getUserObj(otherUser[0].uid);
-      let otherUserData: any = await this.getUserObj(otherUser[1].uid);
-      if (typeof otherUserData.friend == 'undefined' || !otherUserData.friend) {
-        otherUserData.friend = [];
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(chatRef);
+      const stored = snap.data()?.participants;
+      if (!snap.exists || !Array.isArray(stored)) {
+        throw userError('not-found', 'This chat no longer exists.');
       }
-
-      let CurrentFriend = otherUserData.friend ? otherUserData.friend : [];
-      if (CurrentFriend.indexOf(CurrentUserData.uid) == -1) {
-        CurrentFriend.push(CurrentUserData.uid);
-        otherUserData.friend = CurrentFriend;
-      }
-
-      if (typeof CurrentUserData.friend == 'undefined' || !CurrentUserData.friend) {
-        CurrentUserData.friend = [];
-      }
-      var NewCurrentFriend = CurrentUserData.friend ? CurrentUserData.friend : [];
-      if (NewCurrentFriend.indexOf(otherUserData.uid) == -1) {
-        NewCurrentFriend.push(otherUserData.uid);
-        CurrentUserData.friend = NewCurrentFriend;
-      }
-
-      this.fsUsersCollection
-        .doc(otherUser[1].uid)
-        .valueChanges()
-        .subscribe(async (user) => {
-          if (user['device']) {
-            count++;
-            if (count === 1) {
-              this.fsUsersCollection.doc(otherUserData.uid).update({
-                friend: otherUserData.friend,
-              });
-
-              this.fsUsersCollection.doc(CurrentUserData.uid).update({
-                friend: CurrentUserData.friend,
-              });
-
-              await this.updateCountonRequestAccept(chatID);
-
-              if (
-                otherUserData.pushNotificationSettings &&
-                otherUserData.pushNotificationSettings.messagesReceived
-              ) {
-                user['device'].forEach((token) => {
-                  const notificationData = {
-                    title: 'Message Request Accepted',
-                    body: 'Message request accepted from ' + otherUserData.displayName,
-                  };
-                  const bodyData = {
-                    chatID: '',
-                    request: 'Accept',
-                  };
-                  this.sendNotification(token, notificationData, bodyData);
-                });
-              }
-            }
-          }
-        });
-    });
-
-    return this.fsChatsCollection.doc(chatID).update({
-      meta: {
-        lastMessage: 'Send a message',
-        timestamp: Date.now(),
-        isMessageRequest: false,
-        block: '',
-        lastSenderID: this.user.uid,
-      },
-    });
-  }
-
-  checkRequestAcceptedForMessage(objSelectedUser, CurrentUser) {
-    var lstuserChat = [];
-    return new Promise((resolve, reject) => {
-      this.chats$.subscribe((AllChates) => {
-        lstuserChat = AllChates.filter((uchat) => {
-          if (
-            CurrentUser.uid == uchat.meta.lastSenderID &&
-            uchat.meta.lastMessage == 'Send a message'
-          ) {
-            let cnt = 0;
-            uchat.participants.forEach((element) => {
-              if (element.uid == objSelectedUser.uid) {
-                cnt += 1;
-              }
-            });
-            if (cnt > 0) {
-              return uchat;
-            }
-          }
-        });
-        return resolve(lstuserChat.length > 0 ? true : false);
+      // Field paths, so the rest of `meta` (top five positions) is left alone.
+      tx.update(chatRef, {
+        messages: arrayUnion(...messages),
+        'meta.lastMessage': last.text,
+        'meta.timestamp': Date.now(),
+        'meta.isMessageRequest': false,
+        'meta.block': '',
+        'meta.lastSenderID': me.uid,
+        // Unread only goes up for someone who does not have the chat open.
+        participants: stored.map((participant) =>
+          participant.uid === me.uid || participant.isThreadOpen
+            ? participant
+            : { ...participant, unreadCount: (participant.unreadCount || 0) + messages.length },
+        ),
       });
     });
+
+    this.notifyChatPartner(chatID, me.uid, 'messagesReceived', {
+      title: 'New message',
+      body: 'Received new message from ' + me.displayName,
+    }, { chatID, request: 'message' });
   }
 
-  acceptRequest1(email: string) {
-    this.afFs.firestore
-      .collection('users')
-      .where('email', '==', email)
-      .onSnapshot(async (querySnapshot) => {
-        // let player1List = [];
-        let game = null;
-        // let game = null;
-        //console.log(querySnapshot)
-        querySnapshot.forEach(async (doc) => {
-          game = doc.data();
-          // game.id = doc.id;
-        });
-
-        if (game && game.uid) {
-          //console.log(game);
-
-          this.handleSuccessfulLogin();
-        }
-      });
-  }
-
-  declineRequest(chatID: string) {
-    this.fsChatsCollection.doc(chatID).delete();
-  }
-
-  blockMessage(messages: any) {
-    messages.participants.forEach((participant) => {
-      this.fsUsersCollection
-        .doc(participant.uid)
-        .get()
-        .subscribe((data: any) => {
-          // remove from chats
-          const chat = data.data().chats;
-          const index = chat.indexOf(participant.uid);
-          if (index > -1) {
-            chat.splice(index, 1);
-          }
-
-          // remove from friend
-          const friend = data.data().friend;
-          const friendindex = chat.indexOf(participant.uid);
-          if (friendindex > -1) {
-            friend.splice(friendindex, 1);
-          }
-
-          if (participant.uid == this.user.uid) {
-            const blockedUsers = data.data().blockedUsers ? data.data().blockedUsers : [];
-            blockedUsers.push(
-              messages.participants[0].uid == this.user.uid
-                ? messages.participants[1].uid
-                : messages.participants[0].uid,
-            );
-
-            this.fsUsersCollection.doc(this.user.uid).update({
-              friend: friend,
-              chats: chat,
-              blockedUsers: blockedUsers,
-            });
-          } else {
-            this.fsUsersCollection.doc(participant.uid).update({
-              friend: friend,
-              chats: chat,
-            });
-          }
-        });
-    });
-    this.fsChatsCollection.doc(messages.chatID).delete();
-
-    // return this.fsChatsCollection.doc(chatID).update({
-    //   meta: {
-    //     lastMessage: messages.length > 0 ? [...messages].pop().text : 'Send a message',
-    //     timestamp: Date.now(),
-    //     isMessageRequest: false,
-    //     block: this.user.uid,
-    //     lastSenderID: this.user.uid,
-    //   },
-    // });
-  }
-
-  removeFromChatsAndFriends(messages: any) {
-    messages.participants.forEach((participant) => {
-      this.userSubject
-        .pipe(
-          filter((user) => !!user && !!user.uid),
-          first(),
-        )
-        .subscribe((user) => {
-          this.fsUsersCollection
-            .doc(participant.uid)
-            .get()
-            .subscribe((data: any) => {
-              const userData = data.data();
-
-              // Get the other participant's UID (not the current participant)
-              const otherParticipantUid = messages.participants.find(
-                (p) => p.uid !== participant.uid,
-              )?.uid;
-
-              // Remove from chats
-              const chat = userData.chats || [];
-              const chatIndex = chat.indexOf(otherParticipantUid);
-              if (chatIndex > -1) {
-                chat.splice(chatIndex, 1);
-              }
-
-              // Remove from friend list
-              const friend = userData.friend || [];
-              const friendIndex = friend.indexOf(otherParticipantUid);
-              if (friendIndex > -1) {
-                friend.splice(friendIndex, 1);
-              }
-
-              // Update the participant's document (no blocking involved)
-              this.fsUsersCollection.doc(participant.uid).update({
-                friend: friend,
-                chats: chat,
-              });
-            });
-        });
-    });
-
-    // Delete the chat document
-    this.fsChatsCollection.doc(messages.chatID).delete();
-  }
-
-  unblockMessage(chatID: string, messages: any[]) {
-    return this.fsChatsCollection.doc(chatID).update({
-      meta: {
-        lastMessage: messages.length > 0 ? [...messages].pop().text : 'Send a message',
-        timestamp: Date.now(),
-        isMessageRequest: false,
-        block: '',
-        lastSenderID: this.user.uid,
-      },
-    });
-  }
-
-  setUserActive(hobbyID: string) {
-    this.userSubject
-      .pipe(
-        filter((user) => !!user && !!user.uid),
-        first(),
-      )
-      .subscribe((user) => {
-        const isActive = user.isActive || [];
-        const now = new Date().getTime();
-        const hobby = this.hobbiesList.find((hobby) => hobby.name === hobbyID);
-        const newActive = { name: this.currentHobbyRoom.getValue(), start: now, id: hobby.id };
-        this.fsUsersCollection.doc(user.uid).update({
-          isActive: [...isActive, newActive],
-        });
-
-        this.afFs
-          .collection('active')
-          .doc(user.uid)
-          .set({
-            uid: user.uid,
-            hobby: [...isActive, newActive],
-          });
-      });
-  }
-
-  setUserActiveFalse(hobbyName) {
-    this.userSubject
-      .pipe(
-        filter((user) => !!user && !!user.uid),
-        first(),
-      )
-      .subscribe((user) => {
-        const isActive = user.isActive.filter((userIsActive) => {
-          return userIsActive['name'] !== hobbyName;
-        });
-        this.fsUsersCollection.doc(user.uid).update({
-          isActive,
-        });
-        if (isActive.length > 0) {
-          this.afFs.collection('active').doc(user.uid).set({
-            uid: user.uid,
-            hobby: isActive,
-          });
-        } else {
-          this.afFs.collection('active').doc(user.uid).delete();
-        }
-      });
-  }
-
-  clearAllActiveHobbies(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const user = this.userSubject.value;
-      if (!user || !user.uid) {
-        resolve();
+  /** Best effort: looks up the other person in a chat and sends them a notification. */
+  private async notifyChatPartner(
+    chatID: string,
+    myUid: string,
+    setting: keyof PushNotificationSettings,
+    notification: { title: string; body: string },
+    data: { [key: string]: string },
+  ): Promise<void> {
+    try {
+      const chat = await this.fetchChatDetailsOnce(chatID);
+      const partner = chat?.participants?.find((participant) => participant.uid !== myUid);
+      if (!partner) {
         return;
       }
-      this.fsUsersCollection.doc(user.uid).update({
-        isActive: [],
-      }).then(() => {
-        this.afFs.collection('active').doc(user.uid).delete().then(resolve).catch(reject);
-      }).catch(reject);
+      this.notifyUser(await this.getUserObj(partner.uid), setting, notification, data);
+    } catch (err) {
+      console.error('Could not send a notification', err);
+    }
+  }
+
+  /**
+   * Accepts a message request: the two users become friends and the chat opens up.
+   * Everything is written together, so it cannot be left half done.
+   */
+  async acceptRequest(chatID: string): Promise<void> {
+    const me = await this.getCurrentUser();
+    const chat = await this.fetchChatDetailsOnce(chatID);
+    const partner = chat?.participants?.find((participant) => participant.uid !== me.uid);
+    if (!chat || !partner) {
+      throw userError('not-found', 'This request no longer exists.');
+    }
+
+    const db = this.afFs.firestore;
+    const chatRef = db.doc(`chats/${chatID}`);
+    const other = await this.getUserObj(partner.uid);
+    if (!other) {
+      // The person who sent it has deleted their account.
+      await chatRef.delete();
+      throw userError('not-found', 'This user no longer exists.');
+    }
+
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(chatRef);
+      const stored = snap.data()?.participants;
+      if (!snap.exists || !Array.isArray(stored)) {
+        throw userError('not-found', 'This request no longer exists.');
+      }
+      tx.update(chatRef, {
+        'meta.isMessageRequest': false,
+        'meta.lastMessage': 'Send a message',
+        'meta.timestamp': Date.now(),
+        'meta.block': '',
+        'meta.lastSenderID': me.uid,
+        participantIds: stored.map((participant) => participant.uid),
+        participants: stored.map((participant) =>
+          participant.uid === me.uid ? { ...participant, unreadCount: 0 } : participant,
+        ),
+      });
+      tx.update(db.doc(`users/${me.uid}`), { friend: arrayUnion(other.uid) });
+      tx.update(db.doc(`users/${other.uid}`), { friend: arrayUnion(me.uid) });
     });
+
+    this.notifyUser(
+      other,
+      'messagesReceived',
+      {
+        title: 'Message Request Accepted',
+        body: (me.displayName || 'Someone') + ' accepted your message request',
+      },
+      { chatID: '', request: 'Accept' },
+    );
+  }
+
+  /**
+   * Declines a message request: the chat is removed and nobody becomes a friend.
+   * Whether the sender may ask again is controlled by DECLINE_ALLOWS_NEW_REQUEST.
+   */
+  declineRequest(chatID: string): Promise<void> {
+    return this.endChat(chatID, {
+      block: false,
+      unfriend: false,
+      clearRequestMark: DECLINE_ALLOWS_NEW_REQUEST,
+    });
+  }
+
+  /** Blocks the other person in a chat: no longer friends, chat removed, future requests refused. */
+  blockMessage(chat: Pick<Chat, 'chatID'>): Promise<void> {
+    return this.endChat(chat.chatID, { block: true, unfriend: true, clearRequestMark: true });
+  }
+
+  /** Removes the other person in a chat as a friend and removes the chat. */
+  removeFromChatsAndFriends(chat: Pick<Chat, 'chatID'>): Promise<void> {
+    return this.endChat(chat.chatID, { block: false, unfriend: true, clearRequestMark: true });
+  }
+
+  /**
+   * Removes a chat and, depending on the options, what links the two users.
+   * `clearRequestMark` removes each user from the other's "request sent" list (`chats`).
+   */
+  private async endChat(
+    chatID: string,
+    options: { block: boolean; unfriend: boolean; clearRequestMark: boolean },
+  ): Promise<void> {
+    const me = await this.getCurrentUser();
+    const db = this.afFs.firestore;
+    const chatRef = db.doc(`chats/${chatID}`);
+    const chat = await this.fetchChatDetailsOnce(chatID);
+    const partner = chat?.participants?.find((participant) => participant.uid !== me.uid);
+
+    const batch = db.batch();
+    batch.delete(chatRef);
+    if (partner) {
+      const mine: { [field: string]: unknown } = {};
+      const theirs: { [field: string]: unknown } = {};
+      if (options.clearRequestMark) {
+        mine.chats = arrayRemove(partner.uid);
+        theirs.chats = arrayRemove(me.uid);
+      }
+      if (options.unfriend) {
+        mine.friend = arrayRemove(partner.uid);
+        theirs.friend = arrayRemove(me.uid);
+      }
+      if (options.block) {
+        mine.blockedUsers = arrayUnion(partner.uid);
+      }
+      if (Object.keys(mine).length > 0) {
+        batch.update(db.doc(`users/${me.uid}`), mine);
+      }
+      // Their account may have been deleted; updating a missing document would fail.
+      if (Object.keys(theirs).length > 0 && (await this.getUserObj(partner.uid))) {
+        batch.update(db.doc(`users/${partner.uid}`), theirs);
+      }
+    }
+    await batch.commit();
+  }
+
+  /**
+   * Shows the signed-in user as "ready now" for a hobby.
+   * @param start when the timer started; pass the original time when restoring a timer
+   */
+  async setUserActive(hobbyName: string, start: number = Date.now()): Promise<void> {
+    const user = await this.getCurrentUser();
+    const hobbyId =
+      user.hobbies.find((hobby) => hobby.name === hobbyName)?.hobbyID ||
+      this.hobbiesList.find((hobby) => hobby.name === hobbyName)?.id;
+    if (!hobbyId) {
+      throw Object.assign(new Error(`Not one of your hobbies: ${hobbyName}`), {
+        code: 'not-found',
+      });
+    }
+    const entry: ActiveEntry = { name: hobbyName, start, id: hobbyId };
+    await this.updateActiveEntries(user.uid, (entries) => [
+      ...entries.filter((item) => item.name !== hobbyName),
+      entry,
+    ]);
+  }
+
+  async setUserActiveFalse(hobbyName: string): Promise<void> {
+    const user = await this.getCurrentUser();
+    await this.updateActiveEntries(user.uid, (entries) =>
+      entries.filter((entry) => entry.name !== hobbyName),
+    );
+  }
+
+  async clearAllActiveHobbies(): Promise<void> {
+    const user = this.userSubject.value;
+    if (!user || !user.uid) {
+      return;
+    }
+    await this.updateActiveEntries(user.uid, () => []);
   }
 
   signOut() {
@@ -1316,7 +1246,7 @@ deleteAccount() {
   //     });
   // }
 
-  updateUserActiveHobby(hobby, user) {
+  updateUserActiveHobby(hobby: Partial<UserHobby>, user: Pick<User, 'uid'>) {
     return this.fsUsersCollection.doc(user.uid).update({
       activeHobby: hobby,
     });
@@ -1327,36 +1257,203 @@ deleteAccount() {
    *
    * Update members array with users id
    */
-  updateUserHobbies(hobby: Partial<Hobby>, skillLevel: SkillLevel) {
-    const hobbyIndex = this.user.hobbies.findIndex(
-      (userHobby) => userHobby.hobbyID === hobby.hobbyID,
-    );
-    this.user.hobbies[hobbyIndex] = {
+  updateUserHobbies(hobby: Partial<Hobby>, skillLevel: SkillLevel): Promise<void> {
+    const entry: UserHobby = {
       hobbyID: hobby.hobbyID,
       name: hobby.name,
       skillLevel,
       meta: hobby.meta || {},
     };
+    const current = this.user.hobbies;
+    const hobbies = current.some((userHobby) => userHobby.hobbyID === hobby.hobbyID)
+      ? current.map((userHobby) => (userHobby.hobbyID === hobby.hobbyID ? entry : userHobby))
+      : [...current, entry];
 
-    return this.fsUsersCollection.doc(this.user.uid).update({
-      hobbies: this.user.hobbies,
-    });
+    return this.fsUsersCollection.doc(this.user.uid).update({ hobbies });
   }
 
-  updateUserProfile(profile: Partial<User>) {
-    return new Promise((resolve, reject) => {
-      this.userSubject
-        .pipe(
-          filter((user) => !!user && !!user.uid),
-          first(),
-        )
-        .subscribe((user) => {
-          this.fsUsersCollection.doc(user.uid).update(profile).then(resolve).catch(reject);
+  /**
+   * Makes sure the signed-in user has a user document and returns it.
+   *
+   * New users get a starter document. It is written with merge so it never overwrites
+   * anything that is already there, and it leaves the profile fields empty: the user
+   * fills those in on the complete-profile page.
+   */
+  async ensureUserDoc(authUser: {
+    uid: string;
+    email?: string | null;
+    phoneNumber?: string | null;
+  }): Promise<User> {
+    const uid = authUser.uid;
+    const existing = await this.getUserObj(uid);
+    // Digits only, to match how contacts are looked up.
+    const phoneNumber = (authUser.phoneNumber || '').replace(/\D/g, '');
+
+    if (existing) {
+      const patch: Partial<User> = {};
+      if (!existing.phoneNumber && phoneNumber) {
+        patch.phoneNumber = phoneNumber;
+      }
+      if (!existing.email && authUser.email) {
+        patch.email = authUser.email;
+      }
+      if (Object.keys(patch).length > 0) {
+        await this.fsUsersCollection.doc(uid).set(patch, { merge: true });
+      }
+      return { ...existing, ...patch };
+    }
+
+    const starter: Partial<User> = {
+      uid,
+      hobbies: [],
+      chats: [],
+      photos: [],
+      activeHobby: {},
+      pushNotificationSettings: { ...DEFAULT_PUSH_NOTIFICATION_SETTINGS },
+    };
+    if (phoneNumber) {
+      starter.phoneNumber = phoneNumber;
+    }
+    if (authUser.email) {
+      starter.email = authUser.email;
+    }
+    await this.fsUsersCollection.doc(uid).set(starter, { merge: true });
+    return normalizeUser(starter, uid);
+  }
+
+  /**
+   * Is this username free for the given user? Usernames are unique regardless of
+   * letter case.
+   */
+  async isUsernameAvailable(username: string, uid: string): Promise<boolean> {
+    const lower = username.toLowerCase();
+    const db = this.afFs.firestore;
+
+    // A claim document is the authority once it exists.
+    const claim = await db.doc(`usernames/${lower}`).get();
+    if (claim.exists) {
+      return claim.data()?.uid === uid;
+    }
+
+    // Profiles saved before claims existed: look for anyone else using the name.
+    const users = db.collection('users');
+    const [byLower, byExact] = await Promise.all([
+      users.where('usernameLower', '==', lower).limit(2).get(),
+      users.where('username', '==', username).limit(2).get(),
+    ]);
+    return ![...byLower.docs, ...byExact.docs].some((doc) => doc.id !== uid);
+  }
+
+  /**
+   * Saves the required profile fields and marks the profile as complete.
+   *
+   * The username is claimed in the same transaction, so two users can never end up
+   * with the same one. Rejects with `code: 'username-taken'` if it is already in use
+   * and `code: 'photo-required'` if the user has no photo yet.
+   */
+  async saveProfile(profile: {
+    displayName: string;
+    username: string;
+    dob: string;
+    gender: User['gender'];
+  }): Promise<void> {
+    const uid = (await this.afAuth.currentUser)?.uid;
+    if (!uid) {
+      throw Object.assign(new Error('You are signed out. Please sign in again.'), {
+        code: 'signed-out',
+      });
+    }
+
+    const displayName = (profile.displayName || '').trim();
+    const username = (profile.username || '').trim();
+    const dob = toDateOnly(profile.dob);
+    if (
+      !displayName ||
+      !isValidUsername(username) ||
+      !isValidDob(dob) ||
+      !isValidGender(profile.gender)
+    ) {
+      throw Object.assign(new Error('Please check the highlighted fields.'), {
+        code: 'invalid-profile',
+      });
+    }
+
+    if (!(await this.isUsernameAvailable(username, uid))) {
+      throw Object.assign(new Error('That username is already taken.'), {
+        code: 'username-taken',
+      });
+    }
+
+    const db = this.afFs.firestore;
+    const lower = username.toLowerCase();
+    const userRef = db.doc(`users/${uid}`);
+    const claimRef = db.doc(`usernames/${lower}`);
+
+    await db.runTransaction(async (tx) => {
+      // All reads first, then writes.
+      const [userSnap, claimSnap] = await Promise.all([tx.get(userRef), tx.get(claimRef)]);
+      const current: any = userSnap.data() || {};
+      const previousLower: string | undefined = current.usernameLower;
+      const previousClaimRef =
+        previousLower && previousLower !== lower ? db.doc(`usernames/${previousLower}`) : null;
+      const previousClaimSnap = previousClaimRef ? await tx.get(previousClaimRef) : null;
+
+      if (claimSnap.exists && claimSnap.data()?.uid !== uid) {
+        throw Object.assign(new Error('That username is already taken.'), {
+          code: 'username-taken',
         });
+      }
+      if (!Array.isArray(current.photos) || current.photos.filter((photo) => !!photo).length === 0) {
+        throw Object.assign(new Error('Please add a profile photo.'), { code: 'photo-required' });
+      }
+
+      if (previousClaimRef && previousClaimSnap.exists && previousClaimSnap.data()?.uid === uid) {
+        tx.delete(previousClaimRef);
+      }
+      tx.set(claimRef, { uid, username });
+      tx.set(
+        userRef,
+        {
+          uid,
+          displayName,
+          username,
+          usernameLower: lower,
+          dob,
+          gender: profile.gender,
+          profileVersion: PROFILE_VERSION,
+        },
+        { merge: true },
+      );
     });
+
+    // The save is on the server, but the live user stream (and any read that shares its
+    // listener) only catches up a moment later. Wait for it, so whatever runs next, such
+    // as the route guard, sees the completed profile instead of the previous state.
+    try {
+      await this.user$
+        .pipe(
+          filter((user) => !!user && user.uid === uid && isProfileComplete(user)),
+          first(),
+          timeout(8000),
+        )
+        .toPromise();
+    } catch (err) {
+      // Slow connection. The save itself succeeded, so carry on.
+      console.warn('Saved the profile, but the live profile has not updated yet', err);
+    }
   }
 
-  updateUserpushNotificationSettings(pushNotificationSettings) {
+  /**
+   * True when the live copy of this user's profile is complete. A one-off read straight
+   * after a save can still return the previous state; the live copy does not.
+   */
+  isLiveProfileComplete(uid: string): boolean {
+    return !!this.user && this.user.uid === uid && isProfileComplete(this.user);
+  }
+
+  updateUserpushNotificationSettings(
+    pushNotificationSettings: Partial<PushNotificationSettings>,
+  ) {
     const sanitized = { ...(pushNotificationSettings || {}) };
     Object.keys(sanitized).forEach((key) => {
       sanitized[key] = sanitized[key] === undefined ? true : !!sanitized[key];
@@ -1370,49 +1467,58 @@ deleteAccount() {
       });
   }
 
-  updateUserLocation(location) {
-    const geocollection = this.GeoFirestore.collection('users').doc(this.user.uid);
-    const locationObj = {
-      coordinates: new GeoPoint(location.lat, location.lng),
-    };
-    return geocollection.update(locationObj);
+  /** Background update; failures are logged, not shown. */
+  async updateUserLocation(location): Promise<void> {
+    if (!location || !this.user?.uid) {
+      return;
+    }
+    try {
+      await this.GeoFirestore.collection('users')
+        .doc(this.user.uid)
+        .update({ coordinates: new GeoPoint(location.lat, location.lng) });
+    } catch (err) {
+      console.error('Could not save your location', err);
+    }
   }
 
-  updateUserLocationInHobby(location, hobbyID) {
-    const geocollection = this.GeoFirestore.collection(`hobbies/${hobbyID}/members`).doc(
-      this.user.uid,
-    );
-    const locationObj = {
-      coordinates: new GeoPoint(location.lat, location.lng),
-    };
-    return geocollection.update(locationObj);
+  /** Background update; failures are logged, not shown. */
+  async updateUserLocationInHobby(location, hobbyID): Promise<void> {
+    if (!location || !hobbyID || !this.user?.uid) {
+      return;
+    }
+    try {
+      await this.GeoFirestore.collection(`hobbies/${hobbyID}/members`)
+        .doc(this.user.uid)
+        .update({ coordinates: new GeoPoint(location.lat, location.lng) });
+    } catch (err) {
+      // Expected when the user is not (yet) listed in this hobby.
+      console.warn('Could not save your location in this hobby', err);
+    }
   }
 
-  async uploadProfilePic(filePath: string, file: unknown, uid: string) {
-    this.presentLoading();
-    return this.afStorage
-      .upload(filePath, file, {
+  /**
+   * Uploads a photo and adds it to the user's photos. Resolves with the photo URL.
+   * Shows a toast and rejects if the upload or the save fails.
+   */
+  async uploadProfilePic(filePath: string, file: unknown, uid: string): Promise<string> {
+    const loading = await this.loadingController.create({ message: 'Uploading photo' });
+    await loading.present();
+    try {
+      const res: any = await this.afStorage.upload(filePath, file, {
         customMetadata: {
           userID: uid,
         },
-      })
-      .then(async (res: any) => {
-        const url = await res.ref.getDownloadURL();
-        await this.fsUsersCollection.doc(uid).update({
-          photos: [...(this.user?.photos || []), url],
-        });
-        setTimeout(() => {
-          if (res.state == 'success') {
-            this.loading.dismiss();
-          } else {
-            this.loading.dismiss();
-          }
-        }, 5000);
-      })
-      .catch((err: any) => {
-        this.loading.dismiss();
-        this.presentToast('Could not save profile photo. Please try again.');
       });
+      const url: string = await res.ref.getDownloadURL();
+      await this.fsUsersCollection.doc(uid).set({ photos: arrayUnion(url) }, { merge: true });
+      return url;
+    } catch (err) {
+      console.error('Error uploading profile photo', err);
+      this.presentToast('Could not save profile photo. Please try again.');
+      throw err;
+    } finally {
+      await loading.dismiss();
+    }
   }
 
   verifyConfirmationCode(confirmationCode: string) {
@@ -1600,44 +1706,35 @@ deleteAccount() {
     }
   }
 
-  updateInfo(info, user) {
-    console.log(user.uid);
+  updateInfo(info: UserInfo, user: Pick<User, 'uid'>) {
     return this.fsUsersCollection.doc(user.uid).update({
       info: info,
     });
   }
 
+  /** Background update; failures are logged, not shown. */
   updateLastLoginTime() {
     if (this.user) {
-      this.fsUsersCollection.doc(this.user.uid).update({
-        lastlogintime: moment().format(),
-      });
+      this.fsUsersCollection
+        .doc(this.user.uid)
+        .update({
+          lastlogintime: moment().format(),
+        })
+        .catch((err) => console.error('Could not save the last login time', err));
     }
   }
 
-  createPost(post) {
-    this.presentLoading();
-    return new Promise<any>((resolve, reject) => {
-      this.createPostChat(post.subject)
-        .then((res) => {
-          this.fsPostCollection.add({ ...post, chatId: res.id }).then(
-            async (res) => {
-              setTimeout(() => {
-                this.loading.dismiss();
-              }, 2000);
-              resolve(await res.get());
-            },
-            (err) => {
-              reject(err);
-              this.loading.dismiss();
-            },
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-          this.loading.dismiss();
-        });
-    });
+  /** Creates a post and its group chat. Rejects if either write fails. */
+  async createPost(post): Promise<any> {
+    const loading = await this.loadingController.create({ message: 'Loading' });
+    await loading.present();
+    try {
+      const chat = await this.createPostChat(post.subject);
+      const created = await this.fsPostCollection.add({ ...post, chatId: chat.id });
+      return await created.get();
+    } finally {
+      await loading.dismiss();
+    }
   }
 
   getPost() {
@@ -1778,102 +1875,81 @@ deleteAccount() {
       });
   }
 
-  addParticipantInPostChat(chatID: string, participants: any[]) {
-    return this.fsPostChatCollection.doc(chatID).update({
-      participants,
+  /**
+   * Adds people to a group chat. Anyone in `participants` who is not in the chat yet is
+   * added; people already there keep their stored state (unread count).
+   */
+  addParticipantInPostChat(chatID: string, participants: any[]): Promise<void> {
+    return this.changeParticipants(`posts-chat/${chatID}`, (stored) => {
+      const present = new Set(stored.map((participant) => participant.uid));
+      const added = (participants || []).filter(
+        (participant) => participant?.uid && !present.has(participant.uid),
+      );
+      return added.length > 0 ? [...stored, ...added] : null;
     });
   }
   getPostMessage(chatID: string) {
     return this.fsPostChatCollection.doc(chatID).snapshotChanges();
   }
-  getContacts() {
-    return new Promise((resolve, reject) => {
-      this.messages$ = combineLatest([this.chats$, this.fetchActiveUsers()]).pipe(
-        map(([chats, activeUsers]: [any[], any[]]) => {
-          chats.sort(function (chat1, chat2) {
-            if (chat2.meta && chat1.meta) {
-              return chat2.meta.timestamp - chat1.meta.timestamp;
-            }
-          });
-          return chats
+  /**
+   * The signed-in user's chats, newest first, each with "the other person" attached.
+   * Resolves once with the current list.
+   */
+  getContacts(): Promise<Chat[]> {
+    return combineLatest([this.chats$, this.fetchActiveUsers()])
+      .pipe(
+        first(),
+        map(([chats, activeUsers]) => {
+          const uid = this.user.uid;
+          return [...chats]
+            .sort((chat1, chat2) => (chat2.meta?.timestamp || 0) - (chat1.meta?.timestamp || 0))
             .map((chat) => {
-              if (chat.participants) {
-                const chatParticipant = chat.participants.filter(
-                  (participant) => participant.uid !== this.user.uid,
-                )[0];
-                const chatUser = chat.participants.filter(
-                  (participant) => participant.uid === this.user.uid,
-                )[0];
-
-                return {
-                  ...chat,
-                  participant: {
-                    ...chatParticipant,
-                    isActive: activeUsers.find((activeUser) => {
-                      return activeUser.uid === chatParticipant.uid;
-                    }),
-                    isLast:
-                      this.user.uid !== chat.meta.lastSenderID &&
-                      chatUser &&
-                      chat.meta['timestamp'] > chatUser['timestamp'],
-                  },
-                };
-              }
+              const partner = chat.participants.find((participant) => participant.uid !== uid);
+              const self = chat.participants.find((participant) => participant.uid === uid);
+              return {
+                ...chat,
+                participant: {
+                  ...partner,
+                  isActive: activeUsers.find((activeUser) => activeUser.uid === partner?.uid),
+                  isLast:
+                    uid !== chat.meta?.lastSenderID &&
+                    !!self &&
+                    chat.meta?.timestamp > self.timestamp,
+                },
+              } as Chat;
             })
-            .filter((chat) => {
-              if (chat) {
-                return chat.participants.find(
-                  (participantUser) => participantUser.uid === this.user.uid,
-                );
-              }
-            });
+            .filter((chat) => !!chat.participant?.uid);
         }),
-      );
-      this.messages = [];
-      this.messagesSubscription = this.messages$.subscribe((resChats: any) => {
-        if (!!resChats) {
-          resolve(resChats);
-        } else {
-          resolve(resChats);
-        }
-      });
-    });
+      )
+      .toPromise();
   }
 
   fetchPostChatDetails(chatID: string) {
     return this.fsPostChatCollection.doc(chatID).valueChanges();
   }
 
-  updateUnreadCountInPostChat(chatID: string) {
-    return new Promise((resolve, reject) => {
-      this.fetchPostChatDetails(chatID)
-        .pipe(first())
-        .subscribe((item) => {
-          item['participants'].forEach((participant, index) => {
-            if (participant.uid !== this.user.uid) {
-              item['participants'][index].unreadCount = item['participants'][index].unreadCount
-                ? item['participants'][index].unreadCount + 1
-                : 1;
-              resolve(this.fsPostChatCollection.doc(chatID).update({ participants: item['participants'] }));
-            }
-          });
-        });
-    });
+  /** Adds one unread message for everyone in a group chat except the signed-in user. */
+  updateUnreadCountInPostChat(chatID: string): Promise<void> {
+    const uid = this.user.uid;
+    return this.changeParticipants(`posts-chat/${chatID}`, (participants) =>
+      participants.map((participant) =>
+        participant.uid === uid
+          ? participant
+          : { ...participant, unreadCount: (participant.unreadCount || 0) + 1 },
+      ),
+    );
   }
 
-  updateCountonOpenChat(chatID: string) {
-    return new Promise((resolve, reject) => {
-      this.fetchPostChatDetails(chatID)
-        .pipe(first())
-        .subscribe((item) => {
-          item['participants'].forEach((participant, index) => {
-            if (participant.uid == this.user.uid) {
-              item['participants'][index].unreadCount = 0;
-              resolve(this.fsPostChatCollection.doc(chatID).update({ participants: item['participants'] }));
-            }
-          });
-        });
-    });
+  /** Marks a group chat as read for the signed-in user. Background; failures are logged. */
+  updateCountonOpenChat(chatID: string): Promise<void> {
+    const uid = this.user.uid;
+    return this.changeParticipants(`posts-chat/${chatID}`, (participants) =>
+      participants.some((participant) => participant.uid === uid && participant.unreadCount)
+        ? participants.map((participant) =>
+            participant.uid === uid ? { ...participant, unreadCount: 0 } : participant,
+          )
+        : null,
+    ).catch((err) => console.error('Could not mark the group chat as read', err));
   }
 
   updatePost(postID: string, data: any) {
@@ -1979,10 +2055,9 @@ deleteAccount() {
       .valueChanges()
       .pipe(
         map((users: User[]) => {
-          // If any user is found, return their user id
-          return users.length > 0
-            ? users[0].uid // Return the first user's UID
-            : null; // Return false if no user is found
+          // Only users who have completed their profile count as registered.
+          const registered = users.find((user) => isProfileComplete(user));
+          return registered ? registered.uid : null;
         }),
         catchError(() => of(null)), // Return false in case of an error
       );
@@ -1994,7 +2069,7 @@ deleteAccount() {
    */
   isContactInUserChats(contactuid: string): Observable<boolean> {
     return this.chats$.pipe(
-      map((chats: Chat[]) => {
+      map((chats) => {
         // First filter chats to only include those where current user is a participant
         const userChats = chats.filter((chat) =>
           chat.participants.some((participant) => participant.uid === this.user.uid),
@@ -2007,7 +2082,4 @@ deleteAccount() {
       }),
     );
   }
-}
-function firstValueFrom(arg0: Observable<boolean>) {
-  throw new Error('Function not implemented.');
 }

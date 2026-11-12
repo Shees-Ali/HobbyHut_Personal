@@ -31,10 +31,15 @@ export class SettingsPage implements OnInit {
     return this.user.hobbies.find((hobby) => hobby.name === this.hobbyName).meta;
   }
 
-  deleteAccount() {
-    this.coreFacade.deleteAccount().then((_: any) =>
-      this.router.navigate(['sign-in'], { replaceUrl: true })
-    );
+  async deleteAccount() {
+    const deleted = await this.coreFacade.feedback.run(() => this.coreFacade.deleteAccount(), {
+      loading: 'Deleting your account',
+      success: 'Your account has been deleted.',
+      failure: 'Could not delete your account.',
+    });
+    if (deleted) {
+      this.router.navigate(['sign-in'], { replaceUrl: true });
+    }
   }
 
   ngOnInit() {
@@ -128,13 +133,16 @@ export class SettingsPage implements OnInit {
     this.updateUserpushNotificationSettings();
   }
 
-  signOut() {
-    this.coreFacade.currentSelectedhobby = null;
-    this.coreFacade.signOut().then((_) =>
+  async signOut() {
+    const signedOut = await this.coreFacade.feedback.run(() => this.coreFacade.signOut(), {
+      failure: 'Could not sign out.',
+    });
+    if (signedOut) {
+      this.coreFacade.currentSelectedhobby = null;
       this.router.navigate(['sign-in'], {
         replaceUrl: true,
         state: { goToPage: 'sign-in' },
-      })
-    );
+      });
+    }
   }
 }

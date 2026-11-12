@@ -39,20 +39,26 @@ export class EditHobbiesComponent implements OnInit {
   }
 
   onSkillLevelChanged(skillLevel, hobby) {
+    const feedback = this.coreFacade.feedback;
     if (hobby.skillLevel) {
       if (hobby.skillLevel.skillLevel == skillLevel) {
-        this.coreFacade.removeUserHobby(hobby);
+        this.removeHobby(hobby);
         return;
       }
-      this.coreFacade.updateUserHobbies(hobby, skillLevel);
-
+      feedback.run(() => this.coreFacade.updateUserHobbies(hobby, skillLevel), {
+        failure: `Could not update ${hobby.name}.`,
+      });
       return;
     }
-    this.coreFacade.addUserHobby(hobby, skillLevel);
+    feedback.run(() => this.coreFacade.addUserHobby(hobby, skillLevel), {
+      failure: `Could not add ${hobby.name}.`,
+    });
   }
 
   removeHobby(hobby) {
-    this.coreFacade.removeUserHobby(hobby);
+    this.coreFacade.feedback.run(() => this.coreFacade.removeUserHobby(hobby), {
+      failure: `Could not remove ${hobby.name}.`,
+    });
   }
 
   save() {

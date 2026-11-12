@@ -118,7 +118,7 @@ export class CreatePostComponent implements OnInit {
             .catch((err) => console.error('Failed to save post location', err));
           this.location.back();
         })
-        .catch((error) => {});
+        .catch((error) => this.coreFacade.feedback.error(error, 'Could not create your post.'));
     } else {
       const obj = {
         ...formValue,
@@ -143,7 +143,7 @@ export class CreatePostComponent implements OnInit {
             `/tabs/home-main/home/hobby-room/${this.editPost['data'].hobbyId}`,
           ]);
         })
-        .catch((error) => {});
+        .catch((error) => this.coreFacade.feedback.error(error, 'Could not save your post.'));
     }
   }
   private toDateTime(date: string, time: string) {

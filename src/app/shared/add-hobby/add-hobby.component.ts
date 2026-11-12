@@ -29,7 +29,14 @@ export class AddHobbyComponent implements OnInit {
   }
 
   async onSkillLevelChanged(skillLevel) {
-    this.coreFacade.addUserHobby(this.selectedHobby, skillLevel);
+    const added = await this.coreFacade.feedback.run(
+      () => this.coreFacade.addUserHobby(this.selectedHobby, skillLevel),
+      { failure: 'Could not add this hobby.' },
+    );
+    if (!added) {
+      // Stay on the popover so the user can try again.
+      return;
+    }
     this.popoverController.dismiss();
     this.coreFacade.hobbiesList.push({ name: this.selectedHobby.name, id: this.selectedHobby.hobbyID })
     this.coreFacade.currentSelectedhobby = this.selectedHobby;

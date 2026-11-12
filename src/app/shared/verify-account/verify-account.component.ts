@@ -19,8 +19,6 @@ export class VerifyAccountComponent implements OnInit, AfterViewInit {
   recaptchaStatus = 'not-started';
   public verificationId = '';
   country_code: any = [];
-  // private phoneNum = '+919712309690';
-  phoneNum = '+917043020666';
 
   constructor(
     private coreFacade: CoreFacade,
@@ -71,19 +69,26 @@ export class VerifyAccountComponent implements OnInit, AfterViewInit {
         message: 'Sending Phone Code...',
       });
 
-      loading.present();
-      // Attach `phoneCodeSent` listener to be notified as soon as the SMS is sent
-      await FirebaseAuthentication.addListener('phoneCodeSent', async (event) => {
-        // Ask the user for the SMS code
-        this.verificationId = event.verificationId;
-        this.isCode = true;
-        await loading.dismiss();
-      });
+      await loading.present();
+      try {
+        // Attach `phoneCodeSent` listener to be notified as soon as the SMS is sent
+        await FirebaseAuthentication.addListener('phoneCodeSent', async (event) => {
+          // Ask the user for the SMS code
+          this.verificationId = event.verificationId;
+          this.isCode = true;
+          await loading.dismiss();
+        });
 
-      // Start sign in with phone number and send the SMS
-      await FirebaseAuthentication.signInWithPhoneNumber({
-        phoneNumber: this.phoneNumber,
-      });
+        // Start sign in with phone number and send the SMS
+        await FirebaseAuthentication.signInWithPhoneNumber({
+          phoneNumber: this.phoneNumber,
+        });
+      } catch (error) {
+        // Without this the spinner stayed up forever when the SMS could not be sent.
+        await loading.dismiss();
+        this.coreFacade.feedback.error(error, 'Could not send the code.');
+      }
+      resolve(null);
     });
   }
 
@@ -91,14 +96,14 @@ export class VerifyAccountComponent implements OnInit, AfterViewInit {
     const loading = await this.loadingCtrl.create({
       message: 'Verifying Phone...',
     });
+    await loading.present();
     try {
-      loading.present();
       await this.signinFirebase(confirmationCode);
-      await loading.dismiss();
     } catch (error) {
-      await loading.dismiss();
+      // loginWithPhone has already told the user what went wrong.
       console.error('Error verifying code:', error);
-      throw error;
+    } finally {
+      await loading.dismiss();
     }
   }
 

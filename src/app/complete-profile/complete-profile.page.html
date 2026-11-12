@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Complete your profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="signOut()">Sign out</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="state === 'loading'" class="status">
+    <ion-spinner name="bubbles"></ion-spinner>
+    <p>Loading your profile</p>
+  </div>
+
+  <div *ngIf="state === 'error'" class="status">
+    <p>We could not load your profile. Check your connection and try again.</p>
+    <ion-button (click)="load()">Try again</ion-button>
+  </div>
+
+  <ng-container *ngIf="state === 'ready'">
+    <p class="intro">
+      Add these details to start using the app. Other people cannot see your profile until
+      it is complete.
+    </p>
+    <app-update-profile [user]="user" (saved)="onSaved()"></app-update-profile>
+  </ng-container>
+</ion-content>

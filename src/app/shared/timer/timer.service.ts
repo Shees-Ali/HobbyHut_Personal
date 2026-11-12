@@ -124,7 +124,26 @@ export class TimerService {
 
     // Update Firebase with hobby-specific activity
     if (hobbyName) {
-      this.coreFacade.setUserActive(hobbyName);
+      const shown = await this.coreFacade.feedback.run(
+        () => this.coreFacade.setUserActive(hobbyName, now),
+        { failure: 'Could not show you as ready.' },
+      );
+      if (!shown) {
+        // Nobody can see this timer, so do not leave it running on this device.
+        this.removeLocalTimer(hobbyId);
+      }
+    }
+  }
+
+  /** Stops a timer on this device only. */
+  private removeLocalTimer(hobbyId: string): void {
+    const updatedTimers: HobbyTimerMap = { ...this.activeTimers$.value };
+    delete updatedTimers[hobbyId];
+    this.activeTimers$.next(updatedTimers);
+    this.persistTimers();
+    if (Object.keys(updatedTimers).length === 0) {
+      this.stopTicking();
+      this.coreFacade.timerStatus$.next('stopped');
     }
   }
 
@@ -142,7 +161,9 @@ export class TimerService {
 
     // Clear hobby-specific activity in Firebase
     if (timer.hobbyName) {
-      this.coreFacade.setUserActiveFalse(timer.hobbyName);
+      this.coreFacade.feedback.run(() => this.coreFacade.setUserActiveFalse(timer.hobbyName), {
+        failure: 'Could not turn off your timer. Others may still see you as ready.',
+      });
     }
 
     if (Object.keys(updatedTimers).length === 0) {
@@ -155,7 +176,9 @@ export class TimerService {
     const timers = { ...this.activeTimers$.value };
     Object.values(timers).forEach((timer) => {
       if (timer.hobbyName) {
-        this.coreFacade.setUserActiveFalse(timer.hobbyName);
+        this.coreFacade
+          .setUserActiveFalse(timer.hobbyName)
+          .catch((err) => console.error('Could not turn off a timer', err));
       }
     });
 
@@ -189,7 +212,10 @@ export class TimerService {
           validTimers[timer.hobbyId] = timer;
           // Restore Firebase active state for this hobby
           if (timer.hobbyName) {
-            this.coreFacade.setUserActive(timer.hobbyName);
+            // Keep the original start time so restoring does not extend the timer.
+            this.coreFacade
+              .setUserActive(timer.hobbyName, timer.startTime)
+              .catch((err) => console.error('Could not restore a timer', err));
           }
         }
       });
@@ -250,7 +276,9 @@ export class TimerService {
         changed = true;
         delete currentTimers[timer.hobbyId];
         if (timer.hobbyName) {
-          this.coreFacade.setUserActiveFalse(timer.hobbyName);
+          this.coreFacade
+            .setUserActiveFalse(timer.hobbyName)
+            .catch((err) => console.error('Could not clear an expired timer', err));
         }
       }
     });

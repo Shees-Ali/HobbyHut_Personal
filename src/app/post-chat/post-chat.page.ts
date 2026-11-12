@@ -94,7 +94,9 @@ export class PostChatPage implements OnInit {
           timestamp: Date.now(),
           isAdmin: false
         }]
-        this.coreFacade.addParticipantInPostChat(this.post['data'].chatId, this.participants);
+        this.coreFacade
+          .addParticipantInPostChat(this.post['data'].chatId, this.participants)
+          .catch((err) => console.error('Could not join the group chat', err));
       }
       this.coreFacade.sendPostMessage(this.post['data'].chatId, message).then((res) => {
         // console.log('send Message res: ', res);
@@ -102,9 +104,9 @@ export class PostChatPage implements OnInit {
         this.coreFacade.updatePostMessageCount(this.post['id'], this.messages.length + message.length).then((res) => {
           // console.log('updatePostMessageCount res: ', res);
         });
-        this.coreFacade.updateUnreadCountInPostChat(this.post['data'].chatId).then((res) => {
-          // console.log('updateUnreadCountInPostChat res: ', res);
-        });
+        this.coreFacade
+          .updateUnreadCountInPostChat(this.post['data'].chatId)
+          .catch((err) => console.error('Could not update unread counts', err));
       }).catch((err) => {
         console.error('send Message err: ', err);
       });

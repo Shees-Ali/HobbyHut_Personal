@@ -134,8 +134,7 @@ export class ChatPage implements OnInit {
     this.badge.clear();
 
     this.coreFacade
-      .updateUnreadCount(this.params.chatID)
-      .then(() => this.coreFacade.sendMessage(this.params.chatID, message))
+      .sendMessage(this.params.chatID, message)
       .then(() => this.chatInput.reset())
       .catch((err) => {
         console.error('Failed to send message to chat', this.params.chatID, err);

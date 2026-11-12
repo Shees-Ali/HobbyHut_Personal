@@ -1,0 +1,196 @@
+// REFERENCE ONLY. Not loaded or deployed (the .txt extension is deliberate).
+//
+// Source of the Cloud Functions that were deployed to hobby-hut-dev on the
+// Node 14 runtime before the 2026-11 overhaul: createUserProfile,
+// updateHobbyMembers, onFileUpload, getCredential.
+//
+// Known problems (see the overhaul plan):
+//   - getCredential mints a sign-in token for any uid with no authentication.
+//   - createUserProfile uses set() without merge and overwrites client writes.
+//   - updateHobbyMembers compares hobby counts, never removes members, and
+//     writes incomplete member docs.
+//   - onFileUpload races with the app's own photos[] write and needs a key file.
+//
+// Do not copy code from here into functions/index.js without review.
+
+"use strict";
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const serviceAccount = require("./service-account.json");
+const request = require("request");
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: `https://hobby-hut-dev.firebaseio.com`
+});
+exports.createUserProfile = functions.auth.user().onCreate(user => {
+	let userObj = {
+		hobbies: [],
+		chats: [],
+		photos: [],
+		activeHobby: {},
+		pushNotificationSettings: {
+			messagesReceived: true,
+			messagesRequested: true,
+			groupMessage:true,
+			timerFromTop20Contacts: true,
+			proGameRequest: true,
+			recordBookPublic:true,
+		}
+	};
+
+	if (user.email) {
+		userObj = {
+			...userObj,
+			email: user.email,
+			uid: user.uid,
+		};
+	} else {
+		userObj = {
+			...userObj,
+			uid: user.uid
+		};
+	}
+
+	return setDoc('users', user.uid, userObj);
+});
+
+// FIXME: deal with removing hobbies
+exports.updateHobbyMembers = functions.firestore
+	.document('users/{userID}')
+	.onUpdate((change, context) => {
+		const {
+			hobbies: newHobbies,
+			uid,
+			displayName,
+			dob,
+			photos,
+			gender
+		} = change.after.data();
+		const {
+			hobbies: oldHobbies
+		} = change.before.data();
+
+		if (oldHobbies.length === newHobbies.length) {
+			for (const hobby of newHobbies) {
+				console.log(`👍🏾 updating hobby: ${hobby.name}`);
+				updateDoc(`hobbies/${hobby.hobbyID}/members`, uid, {
+					photos: photos || [],
+					displayName,
+					dob,
+					uid,
+					gender,
+					skillLevel: hobby.skillLevel,
+					meta: hobby.meta || {}
+				});
+			}
+			return 'Update hobby members';
+		}
+
+		if (oldHobbies.length > newHobbies.length) {
+			// User removed hobby
+			console.log('👎🏾 Removing a hobby');
+			return 'Removed Hobby';
+		}
+
+		console.log('👍🏾 Adding new hobby');
+		const newHobby = (newHobbies).pop();
+
+		const updateHobbyMembersArray = updateDoc(`hobbies`, newHobby.hobbyID, {
+			members: admin.firestore.FieldValue.arrayUnion(uid)
+		});
+
+		const updateHobbyMembersCollection = setDoc(`hobbies/${newHobby.hobbyID}/members`, uid, {
+			displayName,
+			dob,
+			uid,
+			skillLevel: newHobby.skillLevel
+		});
+
+		return Promise.all([updateHobbyMembersArray, updateHobbyMembersCollection]);
+	});
+
+exports.onFileUpload = functions.storage.object().onFinalize(async (object, context) => {
+	// const { userID } = context.params;
+
+	const {
+		metadata,
+		mediaLink = ''
+	} = (object);
+	const downloadUrl = mediaLinkToDownloadableUrl(mediaLink, metadata.firebaseStorageDownloadTokens);
+
+	const doc = await getDoc('users', metadata.userID);
+	const {
+		photos = []
+	} = doc.data();
+	console.log(`:: doc.data()`, doc.data());
+
+	if (photos.length < 6) {
+		photos.push(downloadUrl);
+	} else {
+		const {
+			position = 0
+		} = metadata;
+		photos[position] = downloadUrl;
+	}
+
+	return updateDoc('users', metadata.userID, {
+		photos
+	});
+});
+
+function updateDoc(collection, docID, payload) {
+	const firestore = admin.firestore();
+	return firestore
+		.collection(collection)
+		.doc(docID)
+		.update(payload);
+}
+
+function getDoc(collection, docID) {
+	const firestore = admin.firestore();
+	return firestore
+		.collection(collection)
+		.doc(docID)
+		.get();
+}
+
+function setDoc(collection, docID, payload) {
+	const firestore = admin.firestore();
+	return firestore
+		.collection(collection)
+		.doc(docID)
+		.set(payload);
+}
+
+function mediaLinkToDownloadableUrl(mediaLink, firebaseStorageDownloadTokens) {
+	let [firstPartUrl, secondPartUrl] = mediaLink.split('?');
+
+	firstPartUrl = firstPartUrl.replace(
+		'https://storage.googleapis.com/download/storage/v1',
+		'https://firebasestorage.googleapis.com/v0'
+	);
+
+	firstPartUrl += '?' + secondPartUrl.split('&')[1];
+	firstPartUrl += '&token=' + firebaseStorageDownloadTokens;
+
+	return firstPartUrl;
+}
+
+exports.getCredential = functions.https.onRequest((req, res) => {
+	const uid = req.body.email;
+	if (uid) {
+		admin
+			.auth()
+			.createCustomToken(uid)
+			.then(function (customToken) {
+				res.send(customToken);
+			})
+			.catch(function (error) {
+				console.error("Error creating custom token:", error);
+				res.status(500).send("Error creating custom token");
+			});
+	} else {
+		console.error("No email provided");
+		res.status(400).send('No email provided');
+	}
+});

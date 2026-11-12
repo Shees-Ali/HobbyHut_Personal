@@ -1,10 +1,26 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { CoreFacade } from './../../core/core.facade';
-import { map, tap } from 'rxjs/operators';
 import { User, Gender } from 'src/app/core/core.model';
+import {
+  MIN_AGE,
+  PLACEHOLDER_DOBS,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_PATTERN,
+  isValidDob,
+  isValidGender,
+  latestAllowedDob,
+  toDateOnly,
+} from 'src/app/core/profile';
 
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+
+/**
+ * The required-profile form: display name, username, date of birth, gender and a photo.
+ * Emits `saved` once everything is stored. Nothing is saved until the user submits,
+ * except the photo, which is uploaded as soon as it is picked.
+ */
 @Component({
   selector: 'app-update-profile',
   templateUrl: './update-profile.component.html',
@@ -12,72 +28,135 @@ import { User, Gender } from 'src/app/core/core.model';
 })
 export class UpdateProfileComponent implements OnInit {
   @Input() user: User;
+  @Output() saved = new EventEmitter<void>();
+
   updateProfileForm: FormGroup;
   readonly Gender = Gender;
+  readonly minAge = MIN_AGE;
+  readonly maxDob = latestAllowedDob();
+  readonly usernameMinLength = USERNAME_MIN_LENGTH;
+  readonly usernameMaxLength = USERNAME_MAX_LENGTH;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private modalController: ModalController,
-    private coreFacade: CoreFacade
-  ) {}
+  photoUrl: string | null = null;
+  isUploading = false;
+  isSaving = false;
+  /** Set after the user tried to submit, so missing fields are pointed out. */
+  submitted = false;
 
-  dismissModal() {
-    this.modalController.dismiss();
-  }
+  constructor(private formBuilder: FormBuilder, private coreFacade: CoreFacade) {}
 
   ngOnInit() {
-    // Get the date for 2000-01-01
-    const date = new Date(2000, 0, 1);
-    // Set the default value for the date input
-    const defaultDate = date.toISOString().split('T')[0];
+    const user: Partial<User> = this.user || {};
+    this.photoUrl = this.coreFacade.getPhoto(user as User) || null;
 
-    // Custom validator function for username
-    const usernameValidator = (control: { value: string }) => {
-      const valid = /^[a-zA-Z0-9_]+$/.test(control.value);
-      return valid ? null : { invalidUsername: true };
-    };
+    // The old form filled in a date by itself; make the user choose a real one.
+    const existingDob = toDateOnly(user.dob);
+    const dob = existingDob && !PLACEHOLDER_DOBS.includes(existingDob) ? existingDob : '';
 
     this.updateProfileForm = this.formBuilder.group({
-      displayName: [this.user.displayName ? this.user.displayName : '', Validators.required],
-      gender: [this.user.gender || Gender.MALE, Validators.required],
-      dob: [this.user.dob || defaultDate, Validators.required],
+      displayName: [user.displayName || '', [Validators.required, notBlank, Validators.maxLength(40)]],
+      gender: [isValidGender(user.gender) ? user.gender : null, Validators.required],
+      dob: [dob, [Validators.required, dobValidator]],
       username: [
-        this.user.username ? this.user.username : '',
-        [Validators.required, usernameValidator],
+        user.username || '',
+        [
+          Validators.required,
+          Validators.minLength(USERNAME_MIN_LENGTH),
+          Validators.maxLength(USERNAME_MAX_LENGTH),
+          Validators.pattern(USERNAME_PATTERN),
+        ],
       ],
-      profilePicture: [this.getPhoto(this.user), Validators.required],
     });
   }
 
-  onProfileFormSubmit() {
-    this.coreFacade.updateUserProfile(this.updateProfileForm.value);
-    this.dismissModal();
+  get canSubmit(): boolean {
+    return !this.isSaving && !this.isUploading;
+  }
+
+  showError(controlName: string): boolean {
+    const control = this.updateProfileForm.get(controlName);
+    return !!control && control.invalid && (control.touched || this.submitted);
+  }
+
+  hasError(controlName: string, error: string): boolean {
+    return !!this.updateProfileForm.get(controlName)?.errors?.[error];
+  }
+
+  async onProfileFormSubmit() {
+    this.submitted = true;
+    this.updateProfileForm.markAllAsTouched();
+    if (this.updateProfileForm.invalid || !this.photoUrl || !this.canSubmit) {
+      this.coreFacade.presentToast(
+        this.photoUrl ? 'Please check the highlighted fields.' : 'Please add a profile photo.',
+      );
+      return;
+    }
+
+    this.isSaving = true;
+    try {
+      const { displayName, username, dob, gender } = this.updateProfileForm.value;
+      await this.coreFacade.saveProfile({ displayName, username, dob, gender });
+      this.coreFacade.presentToast('Profile saved.');
+      this.saved.emit();
+    } catch (err) {
+      console.error('Error saving profile', err);
+      if (err?.code === 'username-taken') {
+        this.updateProfileForm.get('username').setErrors({ taken: true });
+        this.coreFacade.presentToast('That username is already taken. Please choose another.');
+      } else if (err?.code === 'photo-required') {
+        this.photoUrl = null;
+        this.coreFacade.presentToast('Please add a profile photo.');
+      } else if (err?.code === 'invalid-profile' || err?.code === 'signed-out') {
+        this.coreFacade.presentToast(err.message);
+      } else {
+        this.coreFacade.presentToast(
+          'Could not save your profile. Check your connection and try again.',
+        );
+      }
+    } finally {
+      this.isSaving = false;
+    }
   }
 
   async onUploadFile(event) {
-    for (let index = 0; index < event.target.files.length; index++) {
-      const element = event.target.files[index];
-      const filePath = `users/${this.user.uid}/profile-pic/${
-        this.user.uid
-      }-${Date.now().toString()}`;
-      this.coreFacade
-        .uploadProfilePic(filePath, element, this.user.uid)
-        .then((res) => {
-          this.coreFacade.user$.subscribe((user) => {
-            this.user = user;
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    // Allow picking the same file again after a failed upload.
+    input.value = '';
+    if (!file) {
+      return;
     }
-  }
+    if (!file.type.startsWith('image/')) {
+      this.coreFacade.presentToast('Please choose an image file.');
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      this.coreFacade.presentToast('That photo is too large. Please choose one under 10 MB.');
+      return;
+    }
 
-  getPhoto(user: any) {
-    if (user && user.photos && user.photos.length > 0) {
-      return user.photos[user.photos.length - 1];
-    } else {
-      return null;
+    const uid = this.user.uid;
+    const filePath = `users/${uid}/profile-pic/${uid}-${Date.now().toString()}`;
+    this.isUploading = true;
+    try {
+      this.photoUrl = await this.coreFacade.uploadProfilePic(filePath, file, uid);
+    } catch (err) {
+      // uploadProfilePic has already told the user.
+    } finally {
+      this.isUploading = false;
     }
   }
+}
+
+function notBlank(control: AbstractControl): ValidationErrors | null {
+  return typeof control.value === 'string' && control.value.trim().length === 0
+    ? { required: true }
+    : null;
+}
+
+function dobValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) {
+    return null; // `required` reports this
+  }
+  return isValidDob(control.value) ? null : { dob: true };
 }

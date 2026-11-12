@@ -2,16 +2,14 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ModalController, PopoverController } from '@ionic/angular';
 import { combineLatest } from 'rxjs';
-import { filter, concatMap, map, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { FiltersHomeComponent } from '../shared/filters-home/filters-home.component';
 import { FiltersComponent } from '../shared/filters/filters.component';
 
 import { CoreFacade } from './../core/core.facade';
 import { User } from './../core/core.model';
 import { AddHobbyComponent } from './../shared/add-hobby/add-hobby.component';
-import { UpdateProfileComponent } from './../shared/update-profile/update-profile.component';
 import * as _ from 'lodash';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-home',
@@ -26,13 +24,11 @@ export class HomePage implements OnInit {
   filters: any = {};
   hobbies$;
   params: Params;
-  private updateProfileStatus = 'evaluating';
   private user;
   user$;
   vm$;
   radius: any;
   mydate: any;
-  subscriptions: any;
   showRooms = false;
   selectedRoom = null;
   constructor(
@@ -42,7 +38,6 @@ export class HomePage implements OnInit {
     private coreFacade: CoreFacade,
     private modalController: ModalController,
     private cd: ChangeDetectorRef,
-    private afAuth: AngularFireAuth
   ) {}
 
   async ngOnInit() {
@@ -54,7 +49,9 @@ export class HomePage implements OnInit {
       tap((user) => {
         this.user = user;
 
-        this.coreFacade.setDeviceForUser();
+        Promise.resolve(this.coreFacade.setDeviceForUser()).catch((err) =>
+          console.error('Could not save the push notification token', err),
+        );
       })
     );
 
@@ -84,16 +81,6 @@ export class HomePage implements OnInit {
     if (this.params.room != this.selectedRoom) {
       this.ngOnInit();
     }
-
-    this.subscriptions = this.afAuth.user
-      .pipe(filter((user) => !!user))
-      .subscribe(async (resUser: any) => {
-        const currentUserObj: any = await this.coreFacade.getUserObj(resUser.uid);
-        if (!currentUserObj?.dob) {
-          this.updateProfileStatus = 'updating';
-          this.presentUpdateProfileModal(resUser);
-        }
-      });
 
     try {
       let location = await this.coreFacade.checkGPSPermission();
@@ -181,27 +168,6 @@ export class HomePage implements OnInit {
       },
     });
     return await popover.present();
-  }
-
-  private async presentUpdateProfileModal(user: User) {
-    const userProfileModal = await this.modalController.create({
-      component: UpdateProfileComponent,
-      componentProps: { user },
-    });
-
-    await userProfileModal.present();
-  }
-
-  ionViewWillLeave() {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.subscriptions) {
-      this.subscriptions.unsubscribe();
-    }
   }
 
   // new functions _ July 2024

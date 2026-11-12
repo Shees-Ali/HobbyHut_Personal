@@ -74,3 +74,11 @@ ion-datetime-button::part(native) {
     padding-right: 4px;
   }
 }
+
+.error-message {
+  padding: 0 16px 8px;
+}
+
+.footer-btn ion-spinner {
+  color: #01c8f8;
+}

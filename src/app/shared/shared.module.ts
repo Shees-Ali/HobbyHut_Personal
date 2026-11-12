@@ -63,6 +63,7 @@ import { AnyoneReadyComponent } from './anyone-ready/anyone-ready.component';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [
     SkillLevelComponent,
+    UpdateProfileComponent,
     EquipmentListComponent,
     CalculateAgePipe,
     FilterMembersPipe,

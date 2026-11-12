@@ -28,9 +28,7 @@ export class SignInPage implements OnInit {
     private modalController: ModalController,
     private router: Router,
     private platform: Platform
-  ) {
-    this.coreFacade.acceptRequest1('dhavalbhanderi880@gmail.com');
-  }
+  ) {}
 
   manageIntroSlides() {
     this.next();
@@ -49,7 +47,7 @@ export class SignInPage implements OnInit {
       .then(async (user) => {
         this.manageIntroSlides();
       })
-      .catch((err) => this.coreFacade.presentToast(err.message));
+      .catch((err) => this.coreFacade.feedback.error(err, 'Could not sign you in.'));
   }
 
   ngOnInit() {
@@ -116,7 +114,7 @@ export class SignInPage implements OnInit {
       .then(async (user) => {
         this.manageIntroSlides();
       })
-      .catch((err: any) => this.coreFacade.presentToast(err.message));
+      .catch((err: any) => this.coreFacade.feedback.error(err, 'Could not create your account.'));
   }
 
   next() {

@@ -6,10 +6,12 @@
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "node --test test/unit.test.js",
+    "test:emulator": "firebase emulators:exec --project demo-hobbyhut --only auth,firestore,functions \"node --test test/emulator.test.js\""
   },
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {

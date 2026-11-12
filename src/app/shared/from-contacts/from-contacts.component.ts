@@ -140,58 +140,19 @@ export class FromContactsComponent implements OnInit {
    * @param contact - The contact to be added.
    * This function is a placeholder and should be implemented to handle the logic of adding a contact
    */
-  addContact(contact: AddContacts) {
+  async addContact(contact: AddContacts) {
     this.coreFacade.messageUserId = null;
-    this.coreFacade.fsUsersCollection
-      .doc(contact.userId)
-      .get()
-      .subscribe(async (data: any) => {
-        if (
-          data.data().blockedUsers &&
-          data.data().blockedUsers.includes(this.coreFacade.user.uid)
-        ) {
-          this.presentToast('You are blocked by ' + data.data().displayName);
-          return;
-        }
-
-        // Get both users' data
-        let otherUserData = data.data();
-        let currentUserData = this.coreFacade.user as any;
-
-        // Add current user to other user's friend list
-        if (typeof otherUserData.friend == 'undefined' || !otherUserData.friend) {
-          otherUserData.friend = [];
-        }
-        let otherUserFriends = otherUserData.friend ? otherUserData.friend : [];
-        if (otherUserFriends.indexOf(currentUserData.uid) == -1) {
-          otherUserFriends.push(currentUserData.uid);
-        }
-
-        // Add other user to current user's friend list
-        if (typeof currentUserData.friend == 'undefined' || !currentUserData.friend) {
-          currentUserData.friend = [];
-        }
-        let currentUserFriends = currentUserData.friend ? currentUserData.friend : [];
-        if (currentUserFriends.indexOf(otherUserData.uid) == -1) {
-          currentUserFriends.push(otherUserData.uid);
-        }
-
-        // Update both users' friend lists
-        await this.coreFacade.fsUsersCollection.doc(otherUserData.uid).update({
-          friend: otherUserFriends,
-        });
-
-        await this.coreFacade.fsUsersCollection.doc(currentUserData.uid).update({
-          friend: currentUserFriends,
-        });
-
-        // Initiate the chat (this will handle adding to chats array)
-        await this.coreFacade.initiateChat(otherUserData, false);
-
-        contact.isInChats = true; // Update the contact's status to indicate they are now in chats
-        this.filterContacts(); // Re-filter contacts to update the view
-        this.presentToast('Contact added as friend successfully 🙂');
-      });
+    const added = await this.coreFacade.feedback.run(
+      () => this.coreFacade.addFriend(contact.userId),
+      {
+        success: 'Contact added as friend successfully 🙂',
+        failure: 'Could not add this contact.',
+      },
+    );
+    if (added) {
+      contact.isInChats = true; // Update the contact's status to indicate they are now in chats
+      this.filterContacts(); // Re-filter contacts to update the view
+    }
   }
 
   /**

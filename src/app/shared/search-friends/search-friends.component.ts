@@ -59,50 +59,13 @@ export class SearchFriendsComponent implements OnInit {
     }
 
     this.coreFacade.messageUserId = null;
-    this.coreFacade.fsUsersCollection
-      .doc(user.uid)
-      .get()
-      .subscribe(async (data: any) => {
-        if (
-          data.data().blockedUsers &&
-          data.data().blockedUsers.includes(this.coreFacade.user.uid)
-        ) {
-          this.presentToast('You are blocked by ' + data.data().displayName);
-          return;
-        }
-
-        let otherUserData = data.data();
-        let currentUserData = this.coreFacade.user as any;
-
-        if (typeof otherUserData.friend == 'undefined' || !otherUserData.friend) {
-          otherUserData.friend = [];
-        }
-        let otherUserFriends = otherUserData.friend ? otherUserData.friend : [];
-        if (otherUserFriends.indexOf(currentUserData.uid) == -1) {
-          otherUserFriends.push(currentUserData.uid);
-        }
-
-        if (typeof currentUserData.friend == 'undefined' || !currentUserData.friend) {
-          currentUserData.friend = [];
-        }
-        let currentUserFriends = currentUserData.friend ? currentUserData.friend : [];
-        if (currentUserFriends.indexOf(otherUserData.uid) == -1) {
-          currentUserFriends.push(otherUserData.uid);
-        }
-
-        await this.coreFacade.fsUsersCollection.doc(otherUserData.uid).update({
-          friend: otherUserFriends,
-        });
-
-        await this.coreFacade.fsUsersCollection.doc(currentUserData.uid).update({
-          friend: currentUserFriends,
-        });
-
-        await this.coreFacade.initiateChat(otherUserData, false);
-
-        user.isInChats = true;
-        this.presentToast('Added as friend successfully 🙂');
-      });
+    const added = await this.coreFacade.feedback.run(() => this.coreFacade.addFriend(user.uid), {
+      success: 'Added as friend successfully 🙂',
+      failure: 'Could not add this friend.',
+    });
+    if (added) {
+      user.isInChats = true;
+    }
   }
 
   private async presentToast(msg: string): Promise<void> {
