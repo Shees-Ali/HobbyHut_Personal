@@ -11,13 +11,14 @@ import {
 import { iif } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 import { CoreFacade } from './../core/core.facade';
-import { User, Game, Hobby, GameRecord } from './../core/core.model';
+import { User, Game, Hobby, GameRecord, PhotoPosition } from './../core/core.model';
 import { EditHobbiesComponent } from './../shared/edit-hobbies/edit-hobbies.component';
 import { Player1GameComponent } from './../shared/player1-game/player1-game.component';
 import { MessageService } from '../message.service';
 import { TimerService } from '../shared/timer/timer.service';
 import * as moment from 'moment';
 import { EventManager } from '@angular/platform-browser';
+import { cropProfilePhoto } from '../shared/photo-cropper/photo-cropper.component';
 import * as _ from 'lodash';
 // import $ from "jquery";
 
@@ -96,6 +97,12 @@ export class ProfilePage implements OnInit {
   Why did you download HangTime? </div>`;
 
   pushNotificationSettings;
+  /** True while the owner is dragging their profile picture to a new position in the frame. */
+  isRepositioning = false;
+  isSavingPosition = false;
+  /** Unsaved position while repositioning. */
+  private draftPosition: PhotoPosition | null = null;
+  private photoDrag: { pointerId: number; x: number; y: number } | null = null;
   // variable to check if user is turning off hobbies
   isTurningHobbiesOff: boolean = false;
   constructor(
@@ -260,6 +267,96 @@ export class ProfilePage implements OnInit {
     return this.coreFacade.getPhoto(user);
   }
 
+  getPhotoObjectPosition(user: User): string {
+    if (this.isRepositioning && this.draftPosition) {
+      return `${this.draftPosition.x}% ${this.draftPosition.y}%`;
+    }
+    return this.coreFacade.getPhotoObjectPosition(user);
+  }
+
+  startReposition(user: User) {
+    const url = this.getPhoto(user);
+    if (!this.canEdit || !url) {
+      return;
+    }
+    const pos = user.photoPosition;
+    const saved = pos && pos.url === url && isFinite(pos.x) && isFinite(pos.y);
+    this.draftPosition = { url, x: saved ? pos.x : 50, y: saved ? pos.y : 50 };
+    this.isRepositioning = true;
+  }
+
+  cancelReposition() {
+    this.isRepositioning = false;
+    this.draftPosition = null;
+    this.photoDrag = null;
+  }
+
+  async saveReposition() {
+    if (!this.draftPosition || this.isSavingPosition) {
+      return;
+    }
+    const uid = this.currentUser?.uid || this.coreFacade.user?.uid;
+    if (!uid) {
+      return;
+    }
+    this.isSavingPosition = true;
+    try {
+      // updatePhotoPosition tells the user if the save fails; stay in edit mode so they can retry.
+      await this.coreFacade.updatePhotoPosition(uid, this.draftPosition);
+      this.cancelReposition();
+    } catch {
+      // Already reported by updatePhotoPosition.
+    } finally {
+      this.isSavingPosition = false;
+    }
+  }
+
+  onPhotoPointerDown(event: PointerEvent) {
+    if (!this.isRepositioning) {
+      return;
+    }
+    event.preventDefault();
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    this.photoDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+  }
+
+  onPhotoPointerMove(event: PointerEvent) {
+    const drag = this.photoDrag;
+    if (!this.isRepositioning || !this.draftPosition || drag?.pointerId !== event.pointerId) {
+      return;
+    }
+    event.preventDefault();
+    const img = event.target as HTMLImageElement;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    this.photoDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+
+    // With object-fit: cover the image overflows the frame on at most one axis.
+    // Moving object-position by 1% shifts the image by 1% of that overflow.
+    const frameW = img.clientWidth;
+    const frameH = img.clientHeight;
+    const naturalW = img.naturalWidth || frameW;
+    const naturalH = img.naturalHeight || frameH;
+    const scale = Math.max(frameW / naturalW, frameH / naturalH);
+    const overflowX = naturalW * scale - frameW;
+    const overflowY = naturalH * scale - frameH;
+
+    const clamp = (value: number) => Math.min(100, Math.max(0, value));
+    // Dragging right reveals more of the left side, so the percentage goes down.
+    const { x, y } = this.draftPosition;
+    this.draftPosition = {
+      ...this.draftPosition,
+      x: overflowX > 1 ? clamp(x - (dx / overflowX) * 100) : x,
+      y: overflowY > 1 ? clamp(y - (dy / overflowY) * 100) : y,
+    };
+  }
+
+  onPhotoPointerUp(event: PointerEvent) {
+    if (this.photoDrag?.pointerId === event.pointerId) {
+      this.photoDrag = null;
+    }
+  }
+
   async ionViewDidEnter() {
     if (!this.canEdit) {
       await this.checkIfProGameRequestSent();
@@ -324,14 +421,34 @@ export class ProfilePage implements OnInit {
   }
 
   async onUploadFile(event) {
-    for (let index = 0; index < event.target.files.length; index++) {
-      const element = event.target.files[index];
-      const filePath = `users/${this.currentUser.uid}/profile-pic/${
-        this.currentUser.uid
-      }-${Date.now().toString()}`;
-      // uploadProfilePic tells the user if the upload fails.
-      this.coreFacade.uploadProfilePic(filePath, element, this.currentUser.uid).catch(() => {});
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    // Allow picking the same file again.
+    input.value = '';
+    if (!file) {
+      return;
     }
+    if (!file.type.startsWith('image/')) {
+      this.coreFacade.presentToast('Please choose an image file.');
+      return;
+    }
+
+    // Let the user drag and zoom the photo into the frame before uploading it.
+    let cropped: Blob | null;
+    try {
+      cropped = await cropProfilePhoto(this.modalController, file);
+    } catch (err) {
+      this.coreFacade.presentToast('Could not open that photo. Please choose another one.');
+      return;
+    }
+    if (!cropped) {
+      return;
+    }
+
+    const uid = this.currentUser.uid;
+    const filePath = `users/${uid}/profile-pic/${uid}-${Date.now().toString()}`;
+    // uploadProfilePic tells the user if the upload fails.
+    this.coreFacade.uploadProfilePic(filePath, cropped, uid).catch(() => {});
   }
 
   async presentLoading() {
@@ -497,6 +614,7 @@ export class ProfilePage implements OnInit {
   }
 
   ionViewWillLeave() {
+    this.cancelReposition();
     if (this.objSubscriber) {
       this.objSubscriber();
     }

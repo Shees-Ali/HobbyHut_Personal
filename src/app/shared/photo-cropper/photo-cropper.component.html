@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>Adjust photo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong="true" [disabled]="!ready || isSaving" (click)="save()">
+        <ion-spinner *ngIf="isSaving" name="crescent"></ion-spinner>
+        <span *ngIf="!isSaving">Save</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [scrollY]="false">
+  <div class="cropper">
+    <div
+      class="stage"
+      #stage
+      [style.width.px]="frameSize"
+      [style.height.px]="frameSize"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (wheel)="onWheel($event)"
+    >
+      <img
+        #image
+        alt=""
+        draggable="false"
+        [class.hidden]="!ready"
+        [style.width.px]="imageWidth"
+        [style.height.px]="imageHeight"
+        [style.transform]="imageTransform"
+        (load)="onImageLoad()"
+        (error)="onImageError()"
+      />
+      <div class="circle-guide" *ngIf="ready"></div>
+      <ion-spinner *ngIf="!ready" name="crescent"></ion-spinner>
+    </div>
+
+    <p class="hint">Drag to reposition. Pinch or use the slider to zoom.</p>
+
+    <div class="zoom-row">
+      <ion-button fill="clear" color="medium" [disabled]="!ready" (click)="zoomBy(-0.25)">
+        <ion-icon slot="icon-only" name="remove-outline"></ion-icon>
+      </ion-button>
+      <ion-range
+        min="1"
+        [max]="maxZoom"
+        step="0.01"
+        [value]="zoom"
+        [disabled]="!ready"
+        (ionChange)="onZoomInput($event)"
+      ></ion-range>
+      <ion-button fill="clear" color="medium" [disabled]="!ready" (click)="zoomBy(0.25)">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

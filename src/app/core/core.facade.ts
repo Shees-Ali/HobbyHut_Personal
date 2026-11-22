@@ -40,6 +40,7 @@ import {
   Hobby,
   HobbyMember,
   Message,
+  PhotoPosition,
   PushNotificationSettings,
   SkillLevel,
   User,
@@ -1519,6 +1520,35 @@ export class CoreFacade {
     } finally {
       await loading.dismiss();
     }
+  }
+
+  /**
+   * Saves where the user's profile picture sits in its frame.
+   * Shows a toast and rejects if the save fails.
+   */
+  async updatePhotoPosition(uid: string, position: PhotoPosition): Promise<void> {
+    const clamp = (value: number) => Math.round(Math.min(100, Math.max(0, value)) * 10) / 10;
+    const photoPosition: PhotoPosition = {
+      url: position.url,
+      x: clamp(position.x),
+      y: clamp(position.y),
+    };
+    try {
+      await this.fsUsersCollection.doc(uid).set({ photoPosition }, { merge: true });
+    } catch (err) {
+      console.error('Error saving profile photo position', err);
+      this.presentToast('Could not save photo position. Please try again.');
+      throw err;
+    }
+  }
+
+  /** CSS `object-position` for the user's profile picture; centred unless the user moved it. */
+  getPhotoObjectPosition(user: Pick<User, 'photos' | 'photoPosition'> | null | undefined): string {
+    const pos = user?.photoPosition;
+    if (pos && pos.url === this.getPhoto(user) && isFinite(pos.x) && isFinite(pos.y)) {
+      return `${pos.x}% ${pos.y}%`;
+    }
+    return '50% 50%';
   }
 
   verifyConfirmationCode(confirmationCode: string) {

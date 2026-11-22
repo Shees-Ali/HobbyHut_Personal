@@ -152,6 +152,17 @@ export interface ActiveDoc {
   hobby: ActiveEntry[];
 }
 
+/**
+ * Focal point of a profile picture inside its frame, as CSS `object-position` percentages
+ * (0 = left/top, 50 = centre, 100 = right/bottom). Only applies to the photo at `url`, so a
+ * newly uploaded picture starts centred.
+ */
+export interface PhotoPosition {
+  url: string;
+  x: number;
+  y: number;
+}
+
 /** users/{uid} */
 export interface User {
   uid: string;
@@ -164,6 +175,8 @@ export interface User {
   gender: Gender;
   /** Download URLs; the last entry is the profile picture. */
   photos: string[];
+  /** Where the profile picture sits in its frame, chosen by the user by dragging. */
+  photoPosition?: PhotoPosition;
 
   /** Lower-cased `username`, for uniqueness and search. */
   usernameLower?: string;

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { ModalController } from '@ionic/angular';
 import { CoreFacade } from './../../core/core.facade';
 import { User, Gender } from 'src/app/core/core.model';
 import {
@@ -13,13 +14,15 @@ import {
   latestAllowedDob,
   toDateOnly,
 } from 'src/app/core/profile';
+import { cropProfilePhoto } from '../photo-cropper/photo-cropper.component';
 
-const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+/** Limit on the picked file. Only the cropped result (much smaller) is uploaded. */
+const MAX_PHOTO_BYTES = 30 * 1024 * 1024;
 
 /**
  * The required-profile form: display name, username, date of birth, gender and a photo.
  * Emits `saved` once everything is stored. Nothing is saved until the user submits,
- * except the photo, which is uploaded as soon as it is picked.
+ * except the photo, which is uploaded as soon as it is picked and adjusted.
  */
 @Component({
   selector: 'app-update-profile',
@@ -43,7 +46,11 @@ export class UpdateProfileComponent implements OnInit {
   /** Set after the user tried to submit, so missing fields are pointed out. */
   submitted = false;
 
-  constructor(private formBuilder: FormBuilder, private coreFacade: CoreFacade) {}
+  constructor(
+    private formBuilder: FormBuilder,
+    private coreFacade: CoreFacade,
+    private modalController: ModalController,
+  ) {}
 
   ngOnInit() {
     const user: Partial<User> = this.user || {};
@@ -131,7 +138,18 @@ export class UpdateProfileComponent implements OnInit {
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      this.coreFacade.presentToast('That photo is too large. Please choose one under 10 MB.');
+      this.coreFacade.presentToast('That photo is too large. Please choose one under 30 MB.');
+      return;
+    }
+
+    let cropped: Blob | null;
+    try {
+      cropped = await cropProfilePhoto(this.modalController, file);
+    } catch (err) {
+      this.coreFacade.presentToast('Could not open that photo. Please choose another one.');
+      return;
+    }
+    if (!cropped) {
       return;
     }
 
@@ -139,7 +157,7 @@ export class UpdateProfileComponent implements OnInit {
     const filePath = `users/${uid}/profile-pic/${uid}-${Date.now().toString()}`;
     this.isUploading = true;
     try {
-      this.photoUrl = await this.coreFacade.uploadProfilePic(filePath, file, uid);
+      this.photoUrl = await this.coreFacade.uploadProfilePic(filePath, cropped, uid);
     } catch (err) {
       // uploadProfilePic has already told the user.
     } finally {

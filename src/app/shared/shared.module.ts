@@ -22,6 +22,7 @@ import { TitleCaseWordsPipe } from '../directives/capitalize-first/title-case.pi
 import { FromContactsComponent } from './from-contacts/from-contacts.component';
 import { SearchFriendsComponent } from './search-friends/search-friends.component';
 import { AnyoneReadyComponent } from './anyone-ready/anyone-ready.component';
+import { PhotoCropperComponent } from './photo-cropper/photo-cropper.component';
 
 @NgModule({
   entryComponents: [
@@ -37,6 +38,7 @@ import { AnyoneReadyComponent } from './anyone-ready/anyone-ready.component';
     RequestsComponent,
     SearchFriendsComponent,
     AnyoneReadyComponent,
+    PhotoCropperComponent,
   ],
   declarations: [
     AddHobbyComponent,
@@ -57,6 +59,7 @@ import { AnyoneReadyComponent } from './anyone-ready/anyone-ready.component';
     FromContactsComponent,
     SearchFriendsComponent,
     AnyoneReadyComponent,
+    PhotoCropperComponent,
     TitleCaseWordsPipe,
   ],
   imports: [CommonModule, IonicModule, FormsModule, ReactiveFormsModule, CapitalizeFirstModule],

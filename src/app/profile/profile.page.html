@@ -1,10 +1,36 @@
 <ng-container *ngIf="{user: user$ | async} as vm">
-  <div class="background-profile">
+  <div class="background-profile" [class.repositioning]="isRepositioning">
     <img
       [src]="getPhoto(vm.user)"
+      [style.object-position]="getPhotoObjectPosition(vm.user)"
       alt=""
+      draggable="false"
       onerror="this.src = '../../assets/images/palm-tree.png'"
+      (pointerdown)="onPhotoPointerDown($event)"
+      (pointermove)="onPhotoPointerMove($event)"
+      (pointerup)="onPhotoPointerUp($event)"
+      (pointercancel)="onPhotoPointerUp($event)"
     />
+    <ng-container *ngIf="isRepositioning">
+      <div class="reposition-hint">
+        <ion-icon name="move-outline"></ion-icon>
+        Drag to reposition
+      </div>
+      <div class="reposition-actions">
+        <ion-button fill="solid" color="light" size="small" (click)="cancelReposition()">
+          Cancel
+        </ion-button>
+        <ion-button
+          fill="solid"
+          size="small"
+          [disabled]="isSavingPosition"
+          (click)="saveReposition()"
+        >
+          <ion-spinner *ngIf="isSavingPosition" name="crescent"></ion-spinner>
+          <span *ngIf="!isSavingPosition">Save</span>
+        </ion-button>
+      </div>
+    </ng-container>
   </div>
   <div class="profile-img-shadow"></div>
   <ion-header>
@@ -27,6 +53,13 @@
   </ng-container>
   <ng-container *ngIf="vm?.user">
     <div class="img-wrapper">
+      <div class="reposition-icon" *ngIf="canEdit && getPhoto(vm.user)">
+        <ion-icon
+          name="move-outline"
+          aria-label="Reposition profile picture"
+          (click)="startReposition(vm.user)"
+        ></ion-icon>
+      </div>
       <div class="upload-icon" *ngIf="canEdit">
         <ion-icon
           name="cloud-upload-outline"
@@ -40,7 +73,7 @@
         <div>
           <input
             type="file"
-            multiple
+            accept="image/*"
             (change)="onUploadFile($event)"
             id="customFileUploadMultiple"
             style="opacity: 0; width: 0px"

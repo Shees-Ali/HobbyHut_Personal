@@ -18,6 +18,14 @@
   z-index: 12;
 }
 
+.reposition-icon {
+  position: absolute;
+  right: 64px;
+  bottom: 16px;
+  font-size: 36px;
+  z-index: 12;
+}
+
 .profile-title {
   font-weight: 600;
   display: flex;
@@ -219,6 +227,51 @@ ion-avatar {
       min-height: 320px;
       max-height: 320px;
     }
+  }
+
+  // While the owner drags the picture, lift it above the header and card so it gets the touches.
+  &.repositioning {
+    z-index: 30;
+    width: 100vw;
+
+    img {
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      outline: 2px dashed rgb(255 255 255 / 80%);
+      outline-offset: -6px;
+    }
+
+    img:active {
+      cursor: grabbing;
+    }
+  }
+
+  .reposition-hint {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 16px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgb(0 0 0 / 55%);
+    color: #fff;
+    font-size: 14px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .reposition-actions {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    gap: 8px;
   }
 }
 

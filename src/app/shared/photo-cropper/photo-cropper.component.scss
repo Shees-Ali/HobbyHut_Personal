@@ -1,0 +1,75 @@
+.cropper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #111;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    max-height: none;
+    transform-origin: 0 0;
+    pointer-events: none;
+    -webkit-user-drag: none;
+
+    &.hidden {
+      visibility: hidden;
+    }
+  }
+
+  ion-spinner {
+    color: #fff;
+  }
+}
+
+// Shows what the small round avatars will show.
+.circle-guide {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 85%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 25%);
+  pointer-events: none;
+}
+
+.hint {
+  margin: 16px 0 8px;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+  text-align: center;
+}
+
+.zoom-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+
+  ion-range {
+    flex: 1;
+    padding: 0 4px;
+  }
+}
