@@ -95,6 +95,7 @@
             {{ message?.meta?.lastMessage }}
           </p>
         </ion-label>
+        <span slot="end" class="unread-dot" *ngIf="message?.participant?.isLast"></span>
         <ion-note slot="end" class="message-date">
           {{ message?.meta?.timestamp | date : 'dd MMM' }}
         </ion-note>
